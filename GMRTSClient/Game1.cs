@@ -1,6 +1,8 @@
-﻿using Microsoft.Xna.Framework;
+﻿using GMRTSClient.Unit;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System;
 
 namespace GMRTSClient
 {
@@ -13,7 +15,7 @@ namespace GMRTSClient
         private Camera mainCamera;
 
         private Texture2D map;
-        private Texture2D tank;
+        private Tank tank;
 
         public Game1()
         {
@@ -22,7 +24,7 @@ namespace GMRTSClient
             IsMouseVisible = true; 
             Window.AllowUserResizing = true;
         }
-         
+        
         protected override void Initialize()
         {
             // TODO: Add your initialization logic here
@@ -36,15 +38,28 @@ namespace GMRTSClient
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
             // TODO: use this.Content to load your game content here
-            tank = Content.Load<Texture2D>("Tank");
+            tank = new Tank(Vector2.Zero, 0f, Content.Load<Texture2D>("Tank"), Content.Load<Texture2D>("SelectionMarker"));
             map = Content.Load<Texture2D>("Map");
         }
         Vector2 mouseWorldPos;
         protected override void Update(GameTime gameTime)
         {
-            mouseWorldPos = mainCamera.ScreenToWorldSpace(viewport, new Vector2(InputManager.MouseState.X, InputManager.MouseState.Y));
+            mouseWorldPos = mainCamera.ScreenToWorldSpace(new Vector2(InputManager.MouseState.X, InputManager.MouseState.Y));
 
-            mainCamera.ZoomTowardsPoint(viewport, mouseWorldPos, (InputManager.MouseState.ScrollWheelValue - InputManager.LastMouseState.ScrollWheelValue)/1000f);
+            if(InputManager.MouseState.MiddleButton == ButtonState.Pressed)
+            {
+                var panDelta = InputManager.MouseState.Position - InputManager.LastMouseState.Position;
+                mainCamera.Pan(panDelta.ToVector2());
+            }
+            else
+            {
+                var zoomDelta = InputManager.MouseState.ScrollWheelValue - InputManager.LastMouseState.ScrollWheelValue;
+                if (zoomDelta != 0)
+                {
+                    mainCamera.ZoomTowardsPoint(viewport, mouseWorldPos, (zoomDelta) / 1000f);
+                }
+            }
+
 
             // TODO: Add your update logic here
             InputManager.Update();

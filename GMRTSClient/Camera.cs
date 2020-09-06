@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
+using System.Reflection.Metadata;
 using System.Text;
 
 namespace GMRTSClient
@@ -11,6 +12,7 @@ namespace GMRTSClient
         private Vector2 position;
         private float rotation;
         private float zoom;
+        private Viewport viewport;
 
         public Vector2 Position
         {
@@ -27,32 +29,43 @@ namespace GMRTSClient
             get { return zoom; }
             set { zoom = Math.Max(value, float.Epsilon); }
         }
+        private float minZoom;
+        private float maxZoom;
 
-
-        public Camera()
+        public Camera(float minZoom = 0.5f, float maxZoom = 10)
         {
+            this.minZoom = minZoom;
+            this.maxZoom = maxZoom;
+
             position = Vector2.One;
             zoom = 1;
+        }
+        public void Pan(Vector2 distance, bool worldSpace = false)
+        {
+            if (worldSpace)
+                position -= distance;
+            else
+                position -= distance * (1/Zoom );
         }
         public void ZoomTowardsPoint(Viewport viewport, Vector2 point, float deltaZoom)
         {
             var newZoom = Zoom + deltaZoom;
-            if (newZoom <= float.Epsilon)
+            if (newZoom <= minZoom || newZoom >= maxZoom)
                 return;
 
-            var cameraCenter = ScreenToWorldSpace(viewport, new Vector2(viewport.Width/2, viewport.Height/2));
+            var cameraCenter = ScreenToWorldSpace(new Vector2(viewport.Width/2, viewport.Height/2));
 
             var width = point.X - cameraCenter.X;
             var height = point.Y - cameraCenter.Y;
             position.X += width * (1 - Zoom / newZoom);
             position.Y += height * (1 - Zoom / newZoom);
-            Zoom = Math.Clamp(newZoom, float.Epsilon, 2);
+            Zoom = newZoom;
         }
-        public Vector2 WorldToScreenSpace(Viewport viewport, Vector2 worldPosition)
+        public Vector2 WorldToScreenSpace(Vector2 worldPosition)
         {
             return Vector2.Transform(worldPosition, Transform(viewport));
         }
-        public Vector2 ScreenToWorldSpace(Viewport viewport, Vector2 point)
+        public Vector2 ScreenToWorldSpace(Vector2 point)
         {
             Matrix invertedMatrix = Matrix.Invert(Transform(viewport));
             return Vector2.Transform(point, invertedMatrix);
@@ -61,6 +74,7 @@ namespace GMRTSClient
         {
             int viewportWidth = viewport.Width;
             int viewportHeight = viewport.Height;
+            this.viewport = viewport;
 
             return
                 Matrix.CreateTranslation(new Vector3(-Position.X - viewportWidth / 2, -Position.Y - viewportHeight / 2, 0)) * // Translation Matrix
