@@ -37,6 +37,13 @@
 /processorParam:TextureFormat=Color
 /build:SelectionMarker.png
 
+#begin smallfont.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:smallfont.spritefont
+
 #begin Tank.png
 /importer:TextureImporter
 /processor:TextureProcessor

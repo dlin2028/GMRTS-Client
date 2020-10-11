@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Text;
 using GMRTSClasses.Units;
 
-namespace GMRTSClient.Unit
+namespace GMRTSClient.Units
 {
-    class Unit : GMRTSClasses.Unit
+    class Unit : GMRTSClasses.Units.Unit
     {
 
     }

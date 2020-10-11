@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using GMRTSClient.Units;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
@@ -9,14 +10,18 @@ namespace GMRTSClient
 {
     class SelectionRectangle
     {
+        public List<ISelectable> SelectedUnits;
+
         private Point selectionBegin;
         private Rectangle selectionRect;
+
+        private Camera camera;
         private Texture2D pixel;
 
-        public SelectionRectangle(Camera camera)
+        public SelectionRectangle(Camera camera, Texture2D pixel)
         {
-            Texture2D pixel = new Texture2D(GraphicsDevice, 1, 1);
-            pixel.SetData(new[] { Color.White });
+            this.camera = camera;
+            this.pixel = pixel;
         }
 
         private Rectangle createRectangle(Point a, Point b)
@@ -27,23 +32,71 @@ namespace GMRTSClient
                Math.Max(Math.Abs(a.Y - b.Y), 1));
         }
 
-        public void Update(ISelectable[] selectableUnits)
+        public void Update(ISelectable[] selectableUnits, UIElement[] elements)
         {
             if(InputManager.MouseState.LeftButton == ButtonState.Pressed)
             {
-                if (InputManager.LastMouseState.LeftButton != ButtonState.Pressed)
+                if(InputManager.LastMouseState.LeftButton == ButtonState.Released)
+                    selectionBegin = camera.ScreenToWorldSpace(InputManager.MouseState.Position.ToVector2()).ToPoint();
+
+                foreach (var element in elements)
                 {
-                    selectionBegin = InputManager.MouseState.Position;
+                    if (element.rectangle.Contains(camera.WorldToScreenSpace(selectionBegin.ToVector2())))
+                    {
+                        selectionRect = new Rectangle(0, 0, 0, 0);
+                        return;
+                    }
                 }
-                selectionRect = createRectangle(selectionBegin, InputManager.MouseState.Position);
+
+                selectionRect = createRectangle(selectionBegin, camera.ScreenToWorldSpace(InputManager.MouseState.Position.ToVector2()).ToPoint());
             }
-            else if (InputManager.MouseState.LeftButton != ButtonState.Pressed && InputManager.LastMouseState.LeftButton == ButtonState.Pressed)
+
+            if(InputManager.MouseState.RightButton == ButtonState.Released && InputManager.LastMouseState.RightButton == ButtonState.Pressed && !InputManager.Keys.IsKeyDown(Keys.LeftShift))
             {
                 foreach (var unit in selectableUnits)
                 {
-                    if (selectionRect.Contains(unit.SelectionRect))
-                    {
+                    unit.Selected = false;
+                }
+            }
 
+            if (InputManager.MouseState.LeftButton == ButtonState.Released && InputManager.LastMouseState.LeftButton == ButtonState.Pressed)
+            {
+                foreach (var element in elements)
+                {
+                    if (element.rectangle.Contains(camera.WorldToScreenSpace(selectionBegin.ToVector2())))
+                    {
+                        selectionRect = new Rectangle(0, 0, 0, 0);
+                        return;
+                    }
+                }
+
+                SelectedUnits = new List<ISelectable>();
+                foreach (var unit in selectableUnits)
+                {
+                    if(!InputManager.Keys.IsKeyDown(Keys.LeftShift))
+                    {
+                        unit.Selected = false;
+                    }
+
+                    if (selectionRect.Intersects(unit.SelectionRect))
+                    {
+                        if (InputManager.Keys.IsKeyDown(Keys.LeftShift))
+                        {
+                            unit.Selected = !unit.Selected;
+                        }
+                        else
+                        {
+                            unit.Selected = true;
+                        }
+
+                        if (unit.Selected)
+                        {
+                            SelectedUnits.Add(unit);
+                        }
+                        else if (SelectedUnits.Contains(unit))
+                        {
+                            SelectedUnits.Remove(unit);
+                        }
                     }
                 }
             }
@@ -53,7 +106,7 @@ namespace GMRTSClient
         {
             if(InputManager.MouseState.LeftButton == ButtonState.Pressed)
             {
-                sb.Draw(pixel, new Rectangle(10, 20, 80, 30),Color.Green);
+                sb.Draw(pixel, selectionRect,Color.Green);
             }
         }
     }

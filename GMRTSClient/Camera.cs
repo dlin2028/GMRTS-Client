@@ -32,7 +32,7 @@ namespace GMRTSClient
         private float minZoom;
         private float maxZoom;
 
-        public Camera(float minZoom = 0.5f, float maxZoom = 10)
+        public Camera(float minZoom = 0.5f, float maxZoom = 15f)
         {
             this.minZoom = minZoom;
             this.maxZoom = maxZoom;
