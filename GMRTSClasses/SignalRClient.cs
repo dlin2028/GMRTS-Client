@@ -1,4 +1,8 @@
-﻿using GMRTSClasses.STCTransferData;
+﻿using GMRTSClasses.CTSTransferData;
+using GMRTSClasses.CTSTransferData.MetaActions;
+using GMRTSClasses.CTSTransferData.UnitGround;
+using GMRTSClasses.CTSTransferData.UnitUnit;
+using GMRTSClasses.STCTransferData;
 using GMRTSClasses.Units;
 
 using Microsoft.AspNet.SignalR.Client;
@@ -37,6 +41,64 @@ namespace GMRTSClasses
             hubProxy.On<Guid, ChangingData<Vector2>>("UpdatePosition", PosUpdate);
             hubProxy.On<Guid, ChangingData<float>>("UpdateHealth", HealthUpdate);
             hubProxy.On<Guid, ChangingData<float>>("UpdateRotation", RotationUpdate);
+            hubProxy.On<Guid>("KillUnit", KillUnit);
+            hubProxy.On<UnitSpawnData>("AddUnit", AddUnit);
+            hubProxy.On<DateTime>("GameStarted", GameStart);
+        }
+
+        public async Task<bool> JoinGameByName(string gameName, string userName)
+        {
+            return await hubProxy.Invoke<bool>("Join", gameName, userName);
+        }
+
+        public async Task<bool> JoinGameByNameAndCreateIfNeeded(string gameName, string userName)
+        {
+            return await hubProxy.Invoke<bool>("JoinAndMaybeCreate", gameName, userName);
+        }
+
+        public async Task RequestGameStart()
+        {
+            await hubProxy.Invoke("ReqStartGame");
+        }
+
+        public async Task LeaveGame()
+        {
+            await hubProxy.Invoke("Leave");
+        }
+
+        public async Task AssistAction(AssistAction action)
+        {
+            await hubProxy.Invoke("Assist", action);
+        }
+
+        public async Task AttackAction(AttackAction action)
+        {
+            await hubProxy.Invoke("Attack", action);
+        }
+
+        public async Task BuildFactoryAction(BuildBuildingAction action)
+        {
+            await hubProxy.Invoke("BuildBuilding", action);
+        }
+
+        public async Task MoveAction(MoveAction action)
+        {
+            await hubProxy.Invoke("Move", action);
+        }
+
+        public async Task DeleteAction(DeleteAction action)
+        {
+            await hubProxy.Invoke("Delete", action);
+        }
+
+        public async Task ReplaceAction(ReplaceAction action)
+        {
+            await hubProxy.Invoke("Replace", action);
+        }
+        
+        public async Task ArbitraryNonmeta(ClientAction action)
+        {
+            await hubProxy.Invoke("Arbitrary", action);
         }
 
         public async Task<bool> TryStart()
@@ -64,6 +126,9 @@ namespace GMRTSClasses
         public event Action<Unit, ChangingData<Vector2>> OnPositionUpdate;
         public event Action<Unit, ChangingData<float>> OnHealthUpdate;
         public event Action<Unit, ChangingData<float>> OnRotationUpdate;
+        public event Action<Unit> TriggerUnitDeath;
+        public event Action<UnitSpawnData> SpawnUnit;
+        public event Action<DateTime> OnGameStart;
 
         private async void Beat()
         {
@@ -90,6 +155,22 @@ namespace GMRTSClasses
             Unit unit = getUnit(id);
             unit.Rotation = new Changing<float>(newRotation.Value, newRotation.Delta, unit.Rotation.Changer, newRotation.StartTime);
             OnRotationUpdate?.Invoke(unit, newRotation);
+        }
+
+        private void KillUnit(Guid id)
+        {
+            Unit unit = getUnit(id);
+            TriggerUnitDeath?.Invoke(unit);
+        }
+
+        private void AddUnit(UnitSpawnData spawnInfo)
+        {
+            SpawnUnit?.Invoke(spawnInfo);
+        }
+
+        private void GameStart(DateTime time)
+        {
+            OnGameStart?.Invoke(time);
         }
     }
 }
