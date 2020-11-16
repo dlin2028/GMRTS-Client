@@ -1,10 +1,12 @@
-﻿using GMRTSClient.Units;
+﻿using GMRTSClasses;
+using GMRTSClient.Units;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace GMRTSClient
 {
@@ -13,17 +15,32 @@ namespace GMRTSClient
         private GraphicsDeviceManager graphics;
         private SpriteBatch spriteBatch;
         private Viewport viewport => graphics.GraphicsDevice.Viewport;
-
         private Camera mainCamera;
 
-        private Texture2D map;
-
-        List<Tank> tanks = new List<Tank>();
+        List<Unit> units;
+        Dictionary<Guid, Unit> unitDic;
 
         private GameUI gameUI;
-
         private FrameCounter frameCounter = new FrameCounter();
         SpriteFont smallFont;
+
+
+        Random rng = new Random();
+
+        SignalRClient client;
+        Stopwatch stopwatch = new Stopwatch();
+
+        private void Client_OnGameStart(DateTime obj)
+        {
+            stopwatch.Restart();
+        }
+
+        private void Client_SpawnUnit(GMRTSClasses.STCTransferData.UnitSpawnData obj)
+        {
+            var tank = new Tank(Guid.NewGuid(), new Vector2(rng.Next(-500, 500), rng.Next(-500, 500)), 0f, 0.01f, Content.Load<Texture2D>("Tank"), Content.Load<Texture2D>("SelectionMarker"));
+            units.Add(tank);
+            unitDic.Add(tank.ID, tank);
+        }
 
         public Game1()
         {
@@ -33,11 +50,15 @@ namespace GMRTSClient
             Window.AllowUserResizing = true;
             IsFixedTimeStep = false;
             //graphics.SynchronizeWithVerticalRetrace = false;
+
+            units = new List<Unit>();
+            unitDic = new Dictionary<Guid, Unit>();
+
+            stopwatch = new Stopwatch();
         }
         
         protected override void Initialize()
         {
-            // TODO: Add your initialization logic here
             mainCamera = new Camera();
 
             pixel = new Texture2D(GraphicsDevice, 1, 1);
@@ -46,21 +67,26 @@ namespace GMRTSClient
             gameUI = new GameUI(mainCamera, GraphicsDevice, pixel);
             Window.ClientSizeChanged += (s, e) => { gameUI = new GameUI(mainCamera, GraphicsDevice, pixel); };
 
+
+            client = new SignalRClient("http://localhost:61337/", "GameHub", a => unitDic[a], TimeSpan.FromMilliseconds(400));
+            client.OnGameStart += Client_OnGameStart;
+            client.SpawnUnit += Client_SpawnUnit;
+            client.TryStart().Wait();
+            Task.Run(async () =>
+            {
+                await client.JoinGameByNameAndCreateIfNeeded("aaaaa", Guid.NewGuid().ToString());
+                await client.RequestGameStart();
+            });
+
             base.Initialize();
         }
+
         Texture2D pixel;
         protected override void LoadContent()
         {
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
             smallFont = Content.Load<SpriteFont>("smallfont");
-
-            Random rng = new Random();
-            for (int i = 0; i < 50; i++)
-            {
-                tanks.Add(new Tank(new Vector2(rng.Next(-500, 500), rng.Next(-500, 500)), 0f, 0.01f, Content.Load<Texture2D>("Tank"), Content.Load<Texture2D>("SelectionMarker")));
-            }
-            map = Content.Load<Texture2D>("Map");
         }
         protected override void Update(GameTime gameTime)
         {
@@ -83,14 +109,14 @@ namespace GMRTSClient
             }
             #endregion
 
-            // TODO: Add your update logic here
             InputManager.Update();
-            foreach (var tank in tanks)
+            gameUI.Update(units.ToArray());
+
+            foreach (var unit in units)
             {
-                //tank.Update();
+                unit.Update((ulong)stopwatch.ElapsedMilliseconds);
             }
-            //tank.Update((ulong)gameTime.ElapsedGameTime.TotalMilliseconds);
-            gameUI.Update(tanks.ToArray()) ;
+
             base.Update(gameTime);
         }
 
@@ -100,15 +126,10 @@ namespace GMRTSClient
             frameCounter.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
 
 
-            // TODO: Add your drawing code here
             spriteBatch.Begin(SpriteSortMode.BackToFront, BlendState.AlphaBlend, null, null, null, null, mainCamera.Transform(viewport));
-            //spriteBatch.Begin();
-            //spriteBatch.Draw(map, new Rectangle(-400, -400, 1000, 1000), Color.White);
-
-            foreach (var tank in tanks)
+            foreach (var unit in units)
             {
-                tank.Draw(spriteBatch);
-                //tank.DrawSelectionRect(spriteBatch, pixel);
+                unit.Draw(spriteBatch);
             }
             gameUI.DrawWorld(spriteBatch);
             spriteBatch.End();

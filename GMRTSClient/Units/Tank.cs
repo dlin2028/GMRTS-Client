@@ -14,7 +14,8 @@ namespace GMRTSClient.Units
         private Texture2D texture;
         private Texture2D selectionTexture;
         private float scale;
-        public Tank(Vector2 position, float rotation, float scale, Texture2D texture, Texture2D selectionTexture)
+        public Tank(Guid id, Vector2 position, float rotation, float scale, Texture2D texture, Texture2D selectionTexture)
+            :base(id)
         {
             this.scale = scale;
             CurrentPosition = position;
@@ -27,7 +28,7 @@ namespace GMRTSClient.Units
         {
             return new Rectangle(CurrentPosition.ToPoint(), new Point((int)(texture.Width * scale), (int)(texture.Height * scale)));
         }
-        public void Draw(SpriteBatch sb)
+        public override void Draw(SpriteBatch sb)
         {
             sb.Draw(texture, CurrentPosition, null, Color.White, rotation, Vector2.Zero, scale, SpriteEffects.None, 0.1f);
            

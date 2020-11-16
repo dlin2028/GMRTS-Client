@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using GMRTSClasses.Units;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace GMRTSClient.Units
 {
@@ -13,11 +14,21 @@ namespace GMRTSClient.Units
         public bool Selectable = true;
         public bool Selected = false;
 
-        public Unit()
+        public Unit(Guid id)
+            :base(id)
         {
             Orders = new LinkedList<UnitAction>();
         }
 
+        public virtual void Draw(SpriteBatch sb)
+        {
+
+        }
+
+        public virtual void Update()
+        {
+
+        }
 
         public virtual Rectangle GetSelectionRect()
         {
