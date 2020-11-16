@@ -30,6 +30,7 @@ namespace GMRTSClient
         public GameUI(Camera camera, GraphicsDevice graphics, Texture2D pixel)
         {
             actions = new List<UnitAction>();
+            pendingActions = new List<UnitAction>();
 
             this.pixel = pixel;
             this.camera = camera;
@@ -87,7 +88,7 @@ namespace GMRTSClient
                         var assistTarget = units.FirstOrDefault(x => x.GetSelectionRect().Contains(mouseWorldPos));
                         if(assistTarget != null) //&&unit is friendly
                         {
-                            newAction = new AssistAction(selectionRect.SelectedUnits, pixel, attackTarget);
+                            newAction = new AssistAction(selectionRect.SelectedUnits, pixel, assistTarget);
                             actions.Add(newAction);
                             pendingActions.Add(newAction);
                         }

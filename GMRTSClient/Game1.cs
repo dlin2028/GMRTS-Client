@@ -68,7 +68,7 @@ namespace GMRTSClient
             gameUI = new GameUI(mainCamera, GraphicsDevice, pixel);
             Window.ClientSizeChanged += (s, e) => { gameUI = new GameUI(mainCamera, GraphicsDevice, pixel); };
 
-            /*
+            
             client = new SignalRClient("http://localhost:61337/", "GameHub", a => unitDic[a], TimeSpan.FromMilliseconds(400));
             client.OnGameStart += Client_OnGameStart;
             client.SpawnUnit += Client_SpawnUnit;
@@ -77,7 +77,7 @@ namespace GMRTSClient
             {
                 await client.JoinGameByNameAndCreateIfNeeded("aaaaa", Guid.NewGuid().ToString());
                 await client.RequestGameStart();
-            });*/
+            });
 
             base.Initialize();
         }
