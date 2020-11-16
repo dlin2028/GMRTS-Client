@@ -39,8 +39,13 @@ namespace GMRTSClient
         {
             // TODO: Add your initialization logic here
             mainCamera = new Camera();
-            gameUI = new GameUI(mainCamera, GraphicsDevice);
-            Window.ClientSizeChanged += (s, e) => { gameUI = new GameUI(mainCamera, GraphicsDevice); };
+
+            pixel = new Texture2D(GraphicsDevice, 1, 1);
+            pixel.SetData(new[] { Color.White });
+
+            gameUI = new GameUI(mainCamera, GraphicsDevice, pixel);
+            Window.ClientSizeChanged += (s, e) => { gameUI = new GameUI(mainCamera, GraphicsDevice, pixel); };
+
             base.Initialize();
         }
         Texture2D pixel;
@@ -49,9 +54,6 @@ namespace GMRTSClient
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
             smallFont = Content.Load<SpriteFont>("smallfont");
-
-            pixel = new Texture2D(GraphicsDevice, 1, 1);
-            pixel.SetData(new[] { Color.White });
 
             Random rng = new Random();
             for (int i = 0; i < 50; i++)
@@ -108,8 +110,7 @@ namespace GMRTSClient
                 tank.Draw(spriteBatch);
                 //tank.DrawSelectionRect(spriteBatch, pixel);
             }
-            gameUI.DrawSelectionRect(spriteBatch);
-
+            gameUI.DrawWorld(spriteBatch);
             spriteBatch.End();
 
 

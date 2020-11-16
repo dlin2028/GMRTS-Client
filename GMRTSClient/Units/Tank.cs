@@ -8,16 +8,8 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace GMRTSClient.Units
 {
-    class Tank : Unit, ISelectable
+    class Tank : Unit
     {
-        public bool Selected
-        {
-            get; set;
-        }
-        public Rectangle SelectionRect { get { return new Rectangle(position.ToPoint(), new Point((int)(texture.Width*scale), (int)(texture.Height*scale))); } }
-        
-
-        private Vector2 position;
         private float rotation;
         private Texture2D texture;
         private Texture2D selectionTexture;
@@ -25,23 +17,26 @@ namespace GMRTSClient.Units
         public Tank(Vector2 position, float rotation, float scale, Texture2D texture, Texture2D selectionTexture)
         {
             this.scale = scale;
-            this.position = position;
+            CurrentPosition = position;
             this.rotation = rotation;
             this.texture = texture;
             this.selectionTexture = selectionTexture; 
+        }
 
-            
-        } 
+        public override Rectangle GetSelectionRect()
+        {
+            return new Rectangle(CurrentPosition.ToPoint(), new Point((int)(texture.Width * scale), (int)(texture.Height * scale)));
+        }
         public void Draw(SpriteBatch sb)
         {
-            sb.Draw(texture, position, null, Color.White, rotation, Vector2.Zero, scale, SpriteEffects.None, 0.1f);
+            sb.Draw(texture, CurrentPosition, null, Color.White, rotation, Vector2.Zero, scale, SpriteEffects.None, 0.1f);
            
             if (Selected)
-                sb.Draw(selectionTexture, SelectionRect, null, Color.White, rotation, Vector2.Zero, SpriteEffects.None, 0f); 
+                sb.Draw(selectionTexture, GetSelectionRect(), null, Color.White, rotation, Vector2.Zero, SpriteEffects.None, 0f); 
         }
         public void DrawSelectionRect(SpriteBatch sb, Texture2D pixel)
         {
-            sb.Draw(selectionTexture, SelectionRect, Color.White);
+            sb.Draw(selectionTexture, GetSelectionRect(), Color.White);
         }
     }
 }

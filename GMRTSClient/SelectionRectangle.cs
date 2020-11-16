@@ -10,7 +10,7 @@ namespace GMRTSClient
 {
     class SelectionRectangle
     {
-        public List<ISelectable> SelectedUnits;
+        public List<Unit> SelectedUnits;
 
         private Point selectionBegin;
         private Rectangle selectionRect;
@@ -32,7 +32,7 @@ namespace GMRTSClient
                Math.Max(Math.Abs(a.Y - b.Y), 1));
         }
 
-        public void Update(ISelectable[] selectableUnits, UIElement[] elements)
+        public void Update(Unit[] selectableUnits, UIElement[] elements)
         {
             if(InputManager.MouseState.LeftButton == ButtonState.Pressed)
             {
@@ -70,7 +70,7 @@ namespace GMRTSClient
                     }
                 }
 
-                SelectedUnits = new List<ISelectable>();
+                SelectedUnits = new List<Unit>();
                 foreach (var unit in selectableUnits)
                 {
                     if(!InputManager.Keys.IsKeyDown(Keys.LeftShift))
@@ -78,7 +78,7 @@ namespace GMRTSClient
                         unit.Selected = false;
                     }
 
-                    if (selectionRect.Intersects(unit.SelectionRect))
+                    if (selectionRect.Intersects(unit.GetSelectionRect()))
                     {
                         if (InputManager.Keys.IsKeyDown(Keys.LeftShift))
                         {

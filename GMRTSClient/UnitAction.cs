@@ -1,7 +1,9 @@
 ﻿using GMRTSClient.Units;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace GMRTSClient
@@ -14,66 +16,147 @@ namespace GMRTSClient
         Assist,
         Patrol
     }
+
     abstract class UnitAction
     {
-        public Vector2 Position;
-        public Guid TargetUnit;
         public ActionType ActionType;
-        List<Unit> Units;
+        public List<Unit> Units;
+        public Vector2 Position;
 
-        public UnitAction(List<Unit> units)
+        protected Texture2D pixel;
+
+        private HashSet<UnitAction> prevOrders;
+        private HashSet<Unit> currentUnits;
+
+
+        public UnitAction(List<Unit> units, Texture2D pixel)
         {
             Units = units;
+            this.pixel = pixel;
+            currentUnits = new HashSet<Unit>();
+
+            foreach (var unit in units)
+            {
+                unit.Orders.AddLast(this);
+            }
+        }
+
+        public virtual void Update()
+        {
+            prevOrders = new HashSet<UnitAction>();
+            foreach (var unit in Units)
+            {
+                var prevOrder = unit.Orders.Find(this).Previous;
+                if (prevOrder != null)
+                    prevOrders.Add(prevOrder.Value);
+                else
+                    currentUnits.Add(unit);
+            }
+        }
+
+        public virtual void Draw(SpriteBatch sb)
+            => draw(sb, Color.White);
+
+        protected void draw(SpriteBatch sb, Color color)
+        {
+            if(currentUnits.Count != 0)
+            {
+                var avgPosition = new Vector2(currentUnits.Average(x => x.CurrentPosition.X), currentUnits.Average(x => x.CurrentPosition.Y));
+                sb.Draw(pixel, new Rectangle((int)avgPosition.X, (int)avgPosition.Y, (int)(avgPosition - Position).Length(), (int)currentUnits.Count), null, color, (float)Math.Atan2(Position.Y - avgPosition.Y, Position.X - avgPosition.X), Vector2.Zero, SpriteEffects.None, 0f);
+            }
+            foreach (var order in prevOrders)
+            {
+                sb.Draw(pixel, new Rectangle((int)order.Position.X, (int)order.Position.Y, (int)(order.Position - Position).Length(), order.Units.Where(x => { var y = x.Orders.Find(order).Next; return y != null && y.Value == this; }).Count()), null, color, (float)Math.Atan2(Position.Y - order.Position.Y, Position.X - order.Position.X), Vector2.Zero, SpriteEffects.None, 0f);
+            }
         }
     }
 
-    class PatrolAction : UnitAction
+    abstract class UnitGroundAction : UnitAction
     {
-        public PatrolAction(Vector2 position, List<Unit> units)
-            :base(units)
+        public Vector2 Target;
+        
+        public UnitGroundAction(List<Unit> units, Texture2D pixel, Vector2 target)
+            :base(units, pixel)
         {
-            ActionType = ActionType.Patrol;
-            Position = position;
+            Position = target;
+            Target = target;
         }
     }
 
-    class AttackAction : UnitAction
+    abstract class UnitUnitAction : UnitAction
     {
-        bool GroundFire;
-
-        public AttackAction(Guid targetUnit, List<Unit> units)
-            : base(units)
+        public Unit Target;
+        
+        public UnitUnitAction(List<Unit> units, Texture2D pixel, Unit target)
+            : base(units, pixel)
         {
-            ActionType = ActionType.Attack;
-            TargetUnit = targetUnit;
-            GroundFire = false;
+            Target = target;
         }
 
-        public AttackAction(Vector2 position, List<Unit> units)
-            : base(units)
+        public override void Update()
         {
-            Position = position;
-            GroundFire = true;
+            Position = Target.CurrentPosition;
+            base.Update();
         }
     }
 
-    class MoveAction : UnitAction
+    class PatrolAction : UnitGroundAction
     {
-        public MoveAction(Vector2 position, List<Unit> units)
-            : base(units)
+        List<UnitAction> lastPatrols;
+
+        public PatrolAction(List<Unit> units, Texture2D pixel, Vector2 target)
+            : base(units, pixel, target)
         {
-            ActionType = ActionType.Move;
-            Position = position;
+            lastPatrols = new List<UnitAction>();
+        }
+
+        public override void Update()
+        {
+            foreach (var unit in Units)
+            {
+                lastPatrols.Add(unit.Orders.Where(x => x is PatrolAction).Last());
+            }
+            base.Update();
+        }
+        public override void Draw(SpriteBatch sb)
+        {
+
+            foreach (var order in lastPatrols)
+            {
+                sb.Draw(pixel, new Rectangle((int)order.Position.X, (int)order.Position.Y, (int)(order.Position - Position).Length(), (int)Math.Sqrt(Math.Min(Units.Count, order.Units.Count))), null, Color.Green, (int)Math.Atan2(Position.Y - order.Position.Y, Position.X - order.Position.X), Vector2.Zero, SpriteEffects.None, 0f);
+            }
+
+            draw(sb, Color.Green);
         }
     }
 
-    class AssistAction : UnitAction
+    class AttackAction : UnitUnitAction
     {
-        public AssistAction(Guid targetUnit, List<Unit> units)
-            : base(units)
+        public AttackAction(List<Unit> units, Texture2D pixel, Unit target)
+            : base(units, pixel, target)
         {
-            ActionType = ActionType.Assist;
-            TargetUnit = targetUnit;
         }
+        public override void Draw(SpriteBatch sb)
+            => draw(sb, Color.Red);
+    }
+
+    class MoveAction : UnitGroundAction
+    {
+        public MoveAction(List<Unit> units, Texture2D pixel, Vector2 target)
+            : base(units, pixel, target)
+        {
+        }
+        public override void Draw(SpriteBatch sb)
+            => draw(sb, Color.Blue);
+    }
+
+    class AssistAction : UnitUnitAction
+    {
+        public AssistAction(List<Unit> units, Texture2D pixel, Unit target)
+            : base(units, pixel, target)
+        {
+        }
+        public override void Draw(SpriteBatch sb)
+            => draw(sb, Color.Yellow);
     }
 }

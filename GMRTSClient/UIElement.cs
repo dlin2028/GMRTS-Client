@@ -25,13 +25,13 @@ namespace GMRTSClient
         public bool Hovering { get; private set; }
         private Texture2D pixel;
         public Rectangle rectangle;
-        public Color blue;
+        public Color color;
 
         public UIElement(Texture2D pixel, Rectangle rectangle, Color blue)
         {
             this.pixel = pixel;
             this.rectangle = rectangle;
-            this.blue = blue;
+            this.color = blue;
         }
 
         public void Release()
@@ -80,7 +80,7 @@ namespace GMRTSClient
 
         public void Draw(SpriteBatch sb)
         {
-            sb.Draw(pixel, rectangle, blue);
+            sb.Draw(pixel, rectangle, color);
         }
     }
 }
