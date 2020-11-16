@@ -14,14 +14,15 @@ namespace GMRTSClient.Units
         private Texture2D texture;
         private Texture2D selectionTexture;
         private float scale;
-        public Tank(Guid id, Vector2 position, float rotation, float scale, Texture2D texture, Texture2D selectionTexture)
+        public Tank(Guid id, float rotation, float scale, Texture2D texture, Texture2D selectionTexture)
             :base(id)
         {
             this.scale = scale;
-            CurrentPosition = position;
             this.rotation = rotation;
             this.texture = texture;
-            this.selectionTexture = selectionTexture; 
+            this.selectionTexture = selectionTexture;
+
+            Update();
         }
 
         public override Rectangle GetSelectionRect()

@@ -6,6 +6,7 @@ using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace GMRTSClient
@@ -37,7 +38,7 @@ namespace GMRTSClient
 
         private void Client_SpawnUnit(GMRTSClasses.STCTransferData.UnitSpawnData obj)
         {
-            var tank = new Tank(Guid.NewGuid(), new Vector2(rng.Next(-500, 500), rng.Next(-500, 500)), 0f, 0.01f, Content.Load<Texture2D>("Tank"), Content.Load<Texture2D>("SelectionMarker"));
+            var tank = new Tank(Guid.NewGuid(), 0f, 0.01f, Content.Load<Texture2D>("Tank"), Content.Load<Texture2D>("SelectionMarker"));
             units.Add(tank);
             unitDic.Add(tank.ID, tank);
         }
@@ -67,7 +68,7 @@ namespace GMRTSClient
             gameUI = new GameUI(mainCamera, GraphicsDevice, pixel);
             Window.ClientSizeChanged += (s, e) => { gameUI = new GameUI(mainCamera, GraphicsDevice, pixel); };
 
-
+            /*
             client = new SignalRClient("http://localhost:61337/", "GameHub", a => unitDic[a], TimeSpan.FromMilliseconds(400));
             client.OnGameStart += Client_OnGameStart;
             client.SpawnUnit += Client_SpawnUnit;
@@ -76,7 +77,7 @@ namespace GMRTSClient
             {
                 await client.JoinGameByNameAndCreateIfNeeded("aaaaa", Guid.NewGuid().ToString());
                 await client.RequestGameStart();
-            });
+            });*/
 
             base.Initialize();
         }
@@ -111,6 +112,26 @@ namespace GMRTSClient
 
             InputManager.Update();
             gameUI.Update(units.ToArray());
+
+            foreach (var newAction in gameUI.GetPendingActions())
+            {
+                switch (newAction.ActionType)
+                {
+                    case ActionType.None:
+                        break;
+                    case ActionType.Move:
+                        client.MoveAction(new GMRTSClasses.CTSTransferData.UnitGround.MoveAction() { ActionID = newAction.ID, Position = new System.Numerics.Vector2(newAction.Position.X, newAction.Position.Y), UnitIDs = newAction.Units.Select(x => x.ID).ToList(), RequeueOnCompletion = false});
+                        break;
+                    case ActionType.Attack:
+                        break;
+                    case ActionType.Assist:
+                        break;
+                    case ActionType.Patrol:
+                        break;
+                    default:
+                        break;
+                }
+            }
 
             foreach (var unit in units)
             {

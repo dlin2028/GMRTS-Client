@@ -22,15 +22,18 @@ namespace GMRTSClient
         public ActionType ActionType;
         public List<Unit> Units;
         public Vector2 Position;
+        public Guid ID;
 
         protected Texture2D pixel;
 
         private HashSet<UnitAction> prevOrders;
         private HashSet<Unit> currentUnits;
 
-
         public UnitAction(List<Unit> units, Texture2D pixel)
+            : this(Guid.NewGuid(), units, pixel) { }
+        public UnitAction(Guid id, List<Unit> units, Texture2D pixel)
         {
+            ID = id;
             Units = units;
             this.pixel = pixel;
             currentUnits = new HashSet<Unit>();
