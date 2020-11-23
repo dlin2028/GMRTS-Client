@@ -123,10 +123,13 @@ namespace GMRTSClient
                         client.MoveAction(new GMRTSClasses.CTSTransferData.UnitGround.MoveAction() { ActionID = newAction.ID, Position = new System.Numerics.Vector2(newAction.Position.X, newAction.Position.Y), UnitIDs = newAction.Units.Select(x => x.ID).ToList(), RequeueOnCompletion = false});
                         break;
                     case ActionType.Attack:
+                        client.AttackAction(new GMRTSClasses.CTSTransferData.UnitUnit.AttackAction() { ActionID = newAction.ID, Target = ((UnitUnitAction)newAction).Target.ID, UnitIDs = newAction.Units.Select(x => x.ID).ToList()});
                         break;
                     case ActionType.Assist:
+                        client.AssistAction(new GMRTSClasses.CTSTransferData.UnitUnit.AssistAction() { ActionID = newAction.ID, Target = ((UnitUnitAction)newAction).Target.ID, UnitIDs = newAction.Units.Select(x => x.ID).ToList() });
                         break;
                     case ActionType.Patrol:
+                        client.MoveAction(new GMRTSClasses.CTSTransferData.UnitGround.MoveAction() { ActionID = newAction.ID, Position = new System.Numerics.Vector2(newAction.Position.X, newAction.Position.Y), UnitIDs = newAction.Units.Select(x => x.ID).ToList(), RequeueOnCompletion = true });
                         break;
                     default:
                         break;
