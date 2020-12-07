@@ -11,6 +11,9 @@ namespace GMRTSClient
 {
     class GameUI
     {
+        public List<UnitAction> Actions;
+
+
         private Camera camera;
         private SelectionRectangle selectionRect;
 
@@ -22,14 +25,13 @@ namespace GMRTSClient
 
         private ActionType currentAction;
 
-        private List<UnitAction> actions;
         private List<UnitAction> pendingActions;
 
         private Texture2D pixel;
 
         public GameUI(Camera camera, GraphicsDevice graphics, Texture2D pixel)
         {
-            actions = new List<UnitAction>();
+            Actions = new List<UnitAction>();
             pendingActions = new List<UnitAction>();
 
             this.pixel = pixel;
@@ -72,29 +74,29 @@ namespace GMRTSClient
                         break;
                     case ActionType.Move:
                         newAction = new MoveAction(selectionRect.SelectedUnits, pixel, mouseWorldPos);
-                        actions.Add(newAction);
+                        Actions.Add(newAction);
                         pendingActions.Add(newAction);
                         break;
                     case ActionType.Attack:
-                        var attackTarget = units.FirstOrDefault(x => x.GetSelectionRect().Contains(mouseWorldPos));
+                        var attackTarget = units.FirstOrDefault(x => x.Intersecting(mouseWorldPos));
                         if (attackTarget != null) //&& unit is enemy
                         {
                             newAction = new AttackAction(selectionRect.SelectedUnits, pixel, attackTarget);
-                            actions.Add(newAction);
+                            Actions.Add(newAction);
                             pendingActions.Add(newAction);
                         }
                         break;
                     case ActionType.Assist:
-                        var assistTarget = units.FirstOrDefault(x => x.GetSelectionRect().Contains(mouseWorldPos));
+                        var assistTarget = units.FirstOrDefault(x => x.Intersecting(mouseWorldPos));
                         if(assistTarget != null) //&&unit is friendly
                         {
                             newAction = new AssistAction(selectionRect.SelectedUnits, pixel, assistTarget);
-                            actions.Add(newAction);
+                            Actions.Add(newAction);
                             pendingActions.Add(newAction);
                         }
                         break;
                     case ActionType.Patrol:
-                        actions.Add(new PatrolAction(selectionRect.SelectedUnits, pixel, camera.ScreenToWorldSpace(mouseWorldPos)));
+                        Actions.Add(new PatrolAction(selectionRect.SelectedUnits, pixel, camera.ScreenToWorldSpace(mouseWorldPos)));
                         break;
                     default:
                         break;
@@ -102,7 +104,7 @@ namespace GMRTSClient
 
             }
 
-            foreach (var action in actions)
+            foreach (var action in Actions)
             {
                 action.Update();
             }
@@ -124,7 +126,7 @@ namespace GMRTSClient
 
         public void DrawWorld(SpriteBatch sb)
         {
-            foreach (var action in actions)
+            foreach (var action in Actions)
             {
                 action.Draw(sb);
             }

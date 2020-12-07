@@ -14,7 +14,8 @@ namespace GMRTSClient
         Move,
         Attack,
         Assist,
-        Patrol
+        Patrol,
+        Delete
     }
 
     abstract class UnitAction
@@ -71,6 +72,13 @@ namespace GMRTSClient
             {
                 sb.Draw(pixel, new Rectangle((int)order.Position.X, (int)order.Position.Y, (int)(order.Position - Position).Length(), order.Units.Where(x => { var y = x.Orders.Find(order).Next; return y != null && y.Value == this; }).Count()), null, color, (float)Math.Atan2(Position.Y - order.Position.Y, Position.X - order.Position.X), Vector2.Zero, SpriteEffects.None, 0f);
             }
+        }
+    }
+
+    class DeleteAction : UnitAction
+    {
+        public DeleteAction(List<Unit> units, Texture2D pixel) : base(units, pixel)
+        {
         }
     }
 

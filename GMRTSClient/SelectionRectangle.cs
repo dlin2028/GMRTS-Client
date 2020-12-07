@@ -78,7 +78,7 @@ namespace GMRTSClient
                         unit.Selected = false;
                     }
 
-                    if (selectionRect.Intersects(unit.GetSelectionRect()))
+                    if (unit.Intersecting(selectionRect))
                     {
                         if (InputManager.Keys.IsKeyDown(Keys.LeftShift))
                         {

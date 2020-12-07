@@ -18,18 +18,18 @@ namespace GMRTSClient
         private Viewport viewport => graphics.GraphicsDevice.Viewport;
         private Camera mainCamera;
 
-        List<Unit> units;
-        Dictionary<Guid, Unit> unitDic;
+        private List<Unit> units;
+        private Dictionary<Guid, Unit> unitDic;
+        private Dictionary<Guid, UnitAction> actionDic;
 
         private GameUI gameUI;
         private FrameCounter frameCounter = new FrameCounter();
-        SpriteFont smallFont;
+        private SpriteFont smallFont;
 
+        private SignalRClient client;
+        private Stopwatch stopwatch = new Stopwatch();
 
-        Random rng = new Random();
-
-        SignalRClient client;
-        Stopwatch stopwatch = new Stopwatch();
+        private Texture2D pixel;
 
         private void Client_OnGameStart(DateTime obj)
         {
@@ -38,9 +38,21 @@ namespace GMRTSClient
 
         private void Client_SpawnUnit(GMRTSClasses.STCTransferData.UnitSpawnData obj)
         {
-            var tank = new Tank(Guid.NewGuid(), 0f, 0.01f, Content.Load<Texture2D>("Tank"), Content.Load<Texture2D>("SelectionMarker"));
-            units.Add(tank);
-            unitDic.Add(tank.ID, tank);
+            Unit unit = null;
+            switch (obj.Type)
+            {
+                case "Tank":
+                    new Tank(obj.ID, 0f, 0.01f, Content.Load<Texture2D>("Tank"), Content.Load<Texture2D>("SelectionMarker"));
+                    break;
+                case "Builder":
+                    unit = new Builder(obj.ID, 0f, 0.01f, Content.Load<Texture2D>("Builder"), Content.Load<Texture2D>("SelectionMarker"));
+                    break;
+                default:
+                    throw new Exception();
+            }
+
+            units.Add(unit);
+            unitDic.Add(unit.ID, unit);
         }
 
         public Game1()
@@ -54,6 +66,7 @@ namespace GMRTSClient
 
             units = new List<Unit>();
             unitDic = new Dictionary<Guid, Unit>();
+            actionDic = new Dictionary<Guid, UnitAction>();
 
             stopwatch = new Stopwatch();
         }
@@ -65,11 +78,12 @@ namespace GMRTSClient
             pixel = new Texture2D(GraphicsDevice, 1, 1);
             pixel.SetData(new[] { Color.White });
 
+            
             gameUI = new GameUI(mainCamera, GraphicsDevice, pixel);
-            Window.ClientSizeChanged += (s, e) => { gameUI = new GameUI(mainCamera, GraphicsDevice, pixel); };
+            Window.ClientSizeChanged += (s, e) => { gameUI = new GameUI(mainCamera, GraphicsDevice, pixel) { Actions = gameUI.Actions}; };
 
             
-            client = new SignalRClient("http://localhost:61337/", "GameHub", a => unitDic[a], TimeSpan.FromMilliseconds(400));
+            client = new SignalRClient("http://localhost:61337/server", a => unitDic[a], TimeSpan.FromMilliseconds(400));
             client.OnGameStart += Client_OnGameStart;
             client.SpawnUnit += Client_SpawnUnit;
             client.TryStart().Wait();
@@ -79,16 +93,23 @@ namespace GMRTSClient
                 await client.RequestGameStart();
             });
 
+
+            Random rng = new Random();
+            for (int i = 0; i < 10; i++)
+            {
+                units.Add(new ClientOnlyUnit(new Vector2(rng.Next(-50, 50), rng.Next(-500, 500)), (float)rng.NextDouble(), 0.1f, Content.Load<Texture2D>("Tank"), Content.Load<Texture2D>("SelectionMarker")));
+            }
+
             base.Initialize();
         }
 
-        Texture2D pixel;
         protected override void LoadContent()
         {
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
             smallFont = Content.Load<SpriteFont>("smallfont");
         }
+
         protected override void Update(GameTime gameTime)
         {
             #region camera
@@ -115,6 +136,7 @@ namespace GMRTSClient
 
             foreach (var newAction in gameUI.GetPendingActions())
             {
+                actionDic.Add(newAction.ID, newAction);
                 switch (newAction.ActionType)
                 {
                     case ActionType.None:
@@ -154,6 +176,7 @@ namespace GMRTSClient
             foreach (var unit in units)
             {
                 unit.Draw(spriteBatch);
+                //((ClientOnlyUnit)unit).DrawTest(pixel, spriteBatch);
             }
             gameUI.DrawWorld(spriteBatch);
             spriteBatch.End();
