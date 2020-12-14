@@ -11,7 +11,7 @@ namespace GMRTSClient
 {
     class GameUI
     {
-        public List<UnitAction> Actions;
+        public List<ClientAction> Actions;
 
 
         private Camera camera;
@@ -25,16 +25,18 @@ namespace GMRTSClient
 
         private ActionType currentAction;
 
-        private List<UnitAction> pendingActions;
+        private List<ClientAction> pendingActions;
 
         private Texture2D pixel;
+        private Texture2D circle;
 
-        public GameUI(Camera camera, GraphicsDevice graphics, Texture2D pixel)
+        public GameUI(Camera camera, GraphicsDevice graphics, Texture2D pixel, Texture2D circle)
         {
-            Actions = new List<UnitAction>();
-            pendingActions = new List<UnitAction>();
+            Actions = new List<ClientAction>();
+            pendingActions = new List<ClientAction>();
 
             this.pixel = pixel;
+            this.circle = circle;
             this.camera = camera;
             selectionRect = new SelectionRectangle(camera, pixel);
 
@@ -61,19 +63,67 @@ namespace GMRTSClient
             actionButtons.Add(patrolButton);
         }
 
-        public void Update(Unit[] units)
+        public void Update(Unit[] units, GameTime gameTime)
         {
-            if (InputManager.MouseState.RightButton == ButtonState.Released && InputManager.LastMouseState.RightButton == ButtonState.Pressed)
+            selectionRect.Update(units, actionButtons.ToArray());
+
+            if (InputManager.MouseState.RightButton == ButtonState.Released && InputManager.LastMouseState.RightButton == ButtonState.Pressed && selectionRect.SelectedUnits.Count() > 0)
             {
                 var mouseWorldPos = camera.ScreenToWorldSpace(InputManager.MouseState.Position.ToVector2());
 
-                UnitAction newAction;
+                if (!InputManager.Keys.IsKeyDown(Keys.LeftShift))
+                {
+                    List<UnitAction> oldOrders = new List<UnitAction>();
+
+                    foreach (var unit in selectionRect.SelectedUnits)
+                    {
+                        var currOrder = unit.Orders.First;
+                        while (currOrder != null)
+                        {
+                            currOrder.Value.Units.Remove(unit);
+
+                            if (!oldOrders.Contains(currOrder.Value))
+                            {
+                                oldOrders.Add(currOrder.Value);
+                            }
+                            currOrder = currOrder.Next;
+
+                            if (currOrder != null)
+                                unit.Orders.Remove(currOrder.Previous);
+                            else
+                            {
+                                unit.Orders.RemoveLast();
+                            }
+                        }
+                    }
+                    pendingActions.AddRange(oldOrders.Select(x => new ReplaceAction(x)));
+                }
+
+                ClientAction newAction;
                 switch (currentAction)
                 {
                     case ActionType.None:
+                        var target = units.FirstOrDefault(x => x.Intersecting(mouseWorldPos));
+                        if (target != null) //&& unit is enemy
+                        {
+                            newAction = new AttackAction(selectionRect.SelectedUnits, pixel, target, circle);
+                            Actions.Add(newAction);
+                            pendingActions.Add(newAction);
+                            break;
+                        }
+                        else if (target != null) //&&unit is friendly
+                        {
+                            newAction = new AssistAction(selectionRect.SelectedUnits, pixel, target, circle);
+                            Actions.Add(newAction);
+                            pendingActions.Add(newAction);
+                            break;
+                        }
+                        newAction = new MoveAction(selectionRect.SelectedUnits, pixel, mouseWorldPos, circle);
+                        Actions.Add(newAction);
+                        pendingActions.Add(newAction);
                         break;
                     case ActionType.Move:
-                        newAction = new MoveAction(selectionRect.SelectedUnits, pixel, mouseWorldPos);
+                        newAction = new MoveAction(selectionRect.SelectedUnits, pixel, mouseWorldPos, circle);
                         Actions.Add(newAction);
                         pendingActions.Add(newAction);
                         break;
@@ -81,55 +131,59 @@ namespace GMRTSClient
                         var attackTarget = units.FirstOrDefault(x => x.Intersecting(mouseWorldPos));
                         if (attackTarget != null) //&& unit is enemy
                         {
-                            newAction = new AttackAction(selectionRect.SelectedUnits, pixel, attackTarget);
+                            newAction = new AttackAction(selectionRect.SelectedUnits, pixel, attackTarget, circle);
                             Actions.Add(newAction);
                             pendingActions.Add(newAction);
                         }
                         break;
                     case ActionType.Assist:
                         var assistTarget = units.FirstOrDefault(x => x.Intersecting(mouseWorldPos));
-                        if(assistTarget != null) //&&unit is friendly
+                        if (assistTarget != null) //&&unit is friendly
                         {
-                            newAction = new AssistAction(selectionRect.SelectedUnits, pixel, assistTarget);
+                            newAction = new AssistAction(selectionRect.SelectedUnits, pixel, assistTarget, circle);
                             Actions.Add(newAction);
                             pendingActions.Add(newAction);
                         }
                         break;
                     case ActionType.Patrol:
-                        Actions.Add(new PatrolAction(selectionRect.SelectedUnits, pixel, camera.ScreenToWorldSpace(mouseWorldPos)));
+                        Actions.Add(new PatrolAction(selectionRect.SelectedUnits, pixel, camera.ScreenToWorldSpace(mouseWorldPos), circle));
                         break;
                     default:
                         break;
                 }
 
+                if (!InputManager.Keys.IsKeyDown(Keys.LeftShift))
+                {
+                    selectionRect.DeselectAll();
+                }
             }
 
             foreach (var action in Actions)
             {
-                action.Update();
+                ((UnitAction)action).Update(gameTime);
             }
 
             foreach (var element in actionButtons)
             {
                 element.Update();
             }
-
-            selectionRect.Update(units, actionButtons.ToArray());
         }
 
-        public List<UnitAction> GetPendingActions()
+        public List<ClientAction> GetPendingActions()
         {
-            var output = new List<UnitAction>(pendingActions);
+            var output = new List<ClientAction>(pendingActions);
             pendingActions.Clear();
             return output;
         }
 
         public void DrawWorld(SpriteBatch sb)
         {
-            foreach (var action in Actions)
+            foreach (UnitAction action in Actions.Where(x => x is UnitAction))
             {
                 action.Draw(sb);
+
             }
+
             selectionRect.Draw(sb);
         }
 

@@ -20,7 +20,7 @@ namespace GMRTSClient
 
         private List<Unit> units;
         private Dictionary<Guid, Unit> unitDic;
-        private Dictionary<Guid, UnitAction> actionDic;
+        private Dictionary<Guid, ClientAction> actionDic;
 
         private GameUI gameUI;
         private FrameCounter frameCounter = new FrameCounter();
@@ -66,7 +66,7 @@ namespace GMRTSClient
 
             units = new List<Unit>();
             unitDic = new Dictionary<Guid, Unit>();
-            actionDic = new Dictionary<Guid, UnitAction>();
+            actionDic = new Dictionary<Guid, ClientAction>();
 
             stopwatch = new Stopwatch();
         }
@@ -79,8 +79,8 @@ namespace GMRTSClient
             pixel.SetData(new[] { Color.White });
 
             
-            gameUI = new GameUI(mainCamera, GraphicsDevice, pixel);
-            Window.ClientSizeChanged += (s, e) => { gameUI = new GameUI(mainCamera, GraphicsDevice, pixel) { Actions = gameUI.Actions}; };
+            gameUI = new GameUI(mainCamera, GraphicsDevice, pixel, Content.Load<Texture2D>("Circle"));
+            Window.ClientSizeChanged += (s, e) => { gameUI = new GameUI(mainCamera, GraphicsDevice, pixel, Content.Load<Texture2D>("Circle")) { Actions = gameUI.Actions}; };
 
             
             client = new SignalRClient("http://localhost:61337/server", a => unitDic[a], TimeSpan.FromMilliseconds(400));
@@ -132,7 +132,7 @@ namespace GMRTSClient
             #endregion
 
             InputManager.Update();
-            gameUI.Update(units.ToArray());
+            gameUI.Update(units.ToArray(), gameTime);
 
             foreach (var newAction in gameUI.GetPendingActions())
             {
@@ -142,16 +142,16 @@ namespace GMRTSClient
                     case ActionType.None:
                         break;
                     case ActionType.Move:
-                        client.MoveAction(new GMRTSClasses.CTSTransferData.UnitGround.MoveAction() { ActionID = newAction.ID, Position = new System.Numerics.Vector2(newAction.Position.X, newAction.Position.Y), UnitIDs = newAction.Units.Select(x => x.ID).ToList(), RequeueOnCompletion = false});
+                        client.MoveAction(new GMRTSClasses.CTSTransferData.UnitGround.MoveAction() { ActionID = newAction.ID, Position = new System.Numerics.Vector2(((UnitAction)newAction).Position.X, ((UnitAction)newAction).Position.Y), UnitIDs = ((UnitAction)newAction).Units.Select(x => x.ID).ToList(), RequeueOnCompletion = false});
                         break;
                     case ActionType.Attack:
-                        client.AttackAction(new GMRTSClasses.CTSTransferData.UnitUnit.AttackAction() { ActionID = newAction.ID, Target = ((UnitUnitAction)newAction).Target.ID, UnitIDs = newAction.Units.Select(x => x.ID).ToList()});
+                        client.AttackAction(new GMRTSClasses.CTSTransferData.UnitUnit.AttackAction() { ActionID = newAction.ID, Target = ((UnitUnitAction)newAction).Target.ID, UnitIDs = ((UnitAction)newAction).Units.Select(x => x.ID).ToList()});
                         break;
                     case ActionType.Assist:
-                        client.AssistAction(new GMRTSClasses.CTSTransferData.UnitUnit.AssistAction() { ActionID = newAction.ID, Target = ((UnitUnitAction)newAction).Target.ID, UnitIDs = newAction.Units.Select(x => x.ID).ToList() });
+                        client.AssistAction(new GMRTSClasses.CTSTransferData.UnitUnit.AssistAction() { ActionID = newAction.ID, Target = ((UnitUnitAction)newAction).Target.ID, UnitIDs = ((UnitAction)newAction).Units.Select(x => x.ID).ToList() });
                         break;
                     case ActionType.Patrol:
-                        client.MoveAction(new GMRTSClasses.CTSTransferData.UnitGround.MoveAction() { ActionID = newAction.ID, Position = new System.Numerics.Vector2(newAction.Position.X, newAction.Position.Y), UnitIDs = newAction.Units.Select(x => x.ID).ToList(), RequeueOnCompletion = true });
+                        client.MoveAction(new GMRTSClasses.CTSTransferData.UnitGround.MoveAction() { ActionID = newAction.ID, Position = new System.Numerics.Vector2(((UnitAction)newAction).Position.X, ((UnitAction)newAction).Position.Y), UnitIDs = ((UnitAction)newAction).Units.Select(x => x.ID).ToList(), RequeueOnCompletion = true });
                         break;
                     default:
                         break;
@@ -176,7 +176,6 @@ namespace GMRTSClient
             foreach (var unit in units)
             {
                 unit.Draw(spriteBatch);
-                //((ClientOnlyUnit)unit).DrawTest(pixel, spriteBatch);
             }
             gameUI.DrawWorld(spriteBatch);
             spriteBatch.End();

@@ -51,14 +51,6 @@ namespace GMRTSClient
                 selectionRect = createRectangle(selectionBegin, camera.ScreenToWorldSpace(InputManager.MouseState.Position.ToVector2()).ToPoint());
             }
 
-            if(InputManager.MouseState.RightButton == ButtonState.Released && InputManager.LastMouseState.RightButton == ButtonState.Pressed && !InputManager.Keys.IsKeyDown(Keys.LeftShift))
-            {
-                foreach (var unit in selectableUnits)
-                {
-                    unit.Selected = false;
-                }
-            }
-
             if (InputManager.MouseState.LeftButton == ButtonState.Released && InputManager.LastMouseState.LeftButton == ButtonState.Pressed)
             {
                 foreach (var element in elements)
@@ -88,18 +80,27 @@ namespace GMRTSClient
                         {
                             unit.Selected = true;
                         }
+                    }
 
-                        if (unit.Selected)
-                        {
-                            SelectedUnits.Add(unit);
-                        }
-                        else if (SelectedUnits.Contains(unit))
-                        {
-                            SelectedUnits.Remove(unit);
-                        }
+                    if (unit.Selected)
+                    {
+                        SelectedUnits.Add(unit);
+                    }
+                    else if (SelectedUnits.Contains(unit))
+                    {
+                        SelectedUnits.Remove(unit);
                     }
                 }
             }
+        }
+
+        public void DeselectAll()
+        {
+            foreach (var unit in SelectedUnits)
+            {
+                unit.Selected = false;
+            }
+            SelectedUnits.Clear();
         }
 
         public void Draw(SpriteBatch sb)
