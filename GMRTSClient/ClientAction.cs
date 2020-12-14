@@ -46,6 +46,7 @@ namespace GMRTSClient
 
         public ReplaceAction(UnitAction replacedAction)
         {
+            NewAction = replacedAction;
             OldId = replacedAction.ID;
             replacedAction.ID = Guid.NewGuid();
             ActionType = ActionType.Replace;
@@ -115,11 +116,13 @@ namespace GMRTSClient
                 if (currentUnits.Count != 0)
                 {
                     var avgPosition = new Vector2(currentUnits.Average(x => x.CurrentPosition.X), currentUnits.Average(x => x.CurrentPosition.Y));
-                    sb.Draw(pixel, new Rectangle((int)avgPosition.X, (int)avgPosition.Y, (int)(avgPosition - Position).Length(), (int)currentUnits.Count), null, color, (float)Math.Atan2(Position.Y - avgPosition.Y, Position.X - avgPosition.X), Vector2.Zero, SpriteEffects.None, 0f);
+                    sb.Draw(pixel, avgPosition, null, color, (float)Math.Atan2(Position.Y - avgPosition.Y, Position.X - avgPosition.X), new Vector2(0, (float)pixel.Height/2f), new Vector2((avgPosition - Position).Length(), (float)currentUnits.Count / 2), SpriteEffects.None, 0f);
                 }
                 foreach (var order in prevOrders)
                 {
-                    sb.Draw(pixel, new Rectangle((int)order.Position.X, (int)order.Position.Y, (int)(order.Position - Position).Length(), order.Units.Where(x => { var y = x.Orders.Find(order).Next; return y != null && y.Value == this; }).Count()), null, color, (float)Math.Atan2(Position.Y - order.Position.Y, Position.X - order.Position.X), Vector2.Zero, SpriteEffects.None, 0f);
+                    //order.Units.Where(x => { var y = x.Orders.Find(order).Next; return y != null && y.Value == this; }).Count()
+                    
+                    sb.Draw(pixel, order.Position, null, color, (float)Math.Atan2(Position.Y - order.Position.Y, Position.X - order.Position.X), new Vector2(0, (float)pixel.Height/2f), new Vector2((order.Position - Position).Length(), (float)order.Units.Where(x => { var y = x.Orders.Find(order).Next; return y != null && y.Value == this; }).Count()/2), SpriteEffects.None, 0f);
                 }
             }
         }
@@ -161,6 +164,7 @@ namespace GMRTSClient
         public PatrolAction(List<Unit> units, Texture2D pixel, Vector2 target, Texture2D circle)
             : base(units, pixel, target, circle)
         {
+            ActionType = ActionType.Patrol;
             lastPatrols = new List<UnitAction>();
         }
 
@@ -188,6 +192,7 @@ namespace GMRTSClient
     {
         public AttackAction(List<Unit> units, Texture2D pixel, Unit target, Texture2D circle) : base(units, pixel, target, circle)
         {
+            ActionType = ActionType.Attack;
         }
 
         public override void Draw(SpriteBatch sb)
@@ -198,6 +203,7 @@ namespace GMRTSClient
     {
         public MoveAction(List<Unit> units, Texture2D pixel, Vector2 target, Texture2D circle) : base(units, pixel, target, circle)
         {
+            ActionType = ActionType.Move;
         }
 
         public override void Draw(SpriteBatch sb)
@@ -208,6 +214,7 @@ namespace GMRTSClient
     {
         public AssistAction(List<Unit> units, Texture2D pixel, Unit target, Texture2D circle) : base(units, pixel, target, circle)
         {
+            ActionType = ActionType.Assist;
         }
 
         public override void Draw(SpriteBatch sb)

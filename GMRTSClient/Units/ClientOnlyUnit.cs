@@ -28,7 +28,7 @@ namespace GMRTSClient.Units
             sb.Draw(texture, CurrentPosition, null, Color.White, rotation, new Vector2(texture.Width, texture.Height)/2f, scale, SpriteEffects.None, 0.1f);
 
             if (Selected)
-                sb.Draw(selectionTexture, new Rectangle((int)CurrentPosition.X, (int)CurrentPosition.Y, (int)(texture.Width * scale), (int)(texture.Height * scale)),null, Color.White, rotation, new Vector2(texture.Width, texture.Height) / 2f, SpriteEffects.None, 0f);
+                sb.Draw(selectionTexture, new Rectangle((int)CurrentPosition.X, (int)CurrentPosition.Y, (int)(texture.Width * scale), (int)(texture.Height * scale)),null, Color.White, rotation, new Vector2(selectionTexture.Width, selectionTexture.Height) / 2f, SpriteEffects.None, 0f);
         }
         public override bool Intersecting(Vector2 vector)
         {

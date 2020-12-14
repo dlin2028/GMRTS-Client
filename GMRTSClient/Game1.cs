@@ -153,7 +153,33 @@ namespace GMRTSClient
                     case ActionType.Patrol:
                         client.MoveAction(new GMRTSClasses.CTSTransferData.UnitGround.MoveAction() { ActionID = newAction.ID, Position = new System.Numerics.Vector2(((UnitAction)newAction).Position.X, ((UnitAction)newAction).Position.Y), UnitIDs = ((UnitAction)newAction).Units.Select(x => x.ID).ToList(), RequeueOnCompletion = true });
                         break;
-                    default:
+                    case ActionType.Replace:
+
+                        //awful disgusting code pls delete asap
+                        GMRTSClasses.CTSTransferData.ClientAction replacementAction = null;
+                        ClientAction localReplacementAction = ((ReplaceAction)newAction).NewAction;
+
+                        switch (((ReplaceAction)newAction).NewAction.ActionType)
+                        {
+                            case ActionType.None:
+                                break;
+                            case ActionType.Move:
+                                replacementAction = new GMRTSClasses.CTSTransferData.UnitGround.MoveAction() { ActionID = newAction.ID, Position = new System.Numerics.Vector2(((UnitAction)localReplacementAction).Position.X, ((UnitAction)localReplacementAction).Position.Y), UnitIDs = ((UnitAction)localReplacementAction).Units.Select(x => x.ID).ToList(), RequeueOnCompletion = false };
+                                break;
+                            case ActionType.Attack:
+                                replacementAction = new GMRTSClasses.CTSTransferData.UnitUnit.AttackAction() { ActionID = newAction.ID, Target = ((UnitUnitAction)localReplacementAction).Target.ID, UnitIDs = ((UnitAction)localReplacementAction).Units.Select(x => x.ID).ToList() };
+                                break;
+                            case ActionType.Assist:
+                                replacementAction = new GMRTSClasses.CTSTransferData.UnitUnit.AssistAction() { ActionID = newAction.ID, Target = ((UnitUnitAction)localReplacementAction).Target.ID, UnitIDs = ((UnitAction)localReplacementAction).Units.Select(x => x.ID).ToList() };
+                                break;
+                            case ActionType.Patrol:
+                                replacementAction = new GMRTSClasses.CTSTransferData.UnitGround.MoveAction() { ActionID = newAction.ID, Position = new System.Numerics.Vector2(((UnitAction)localReplacementAction).Position.X, ((UnitAction)localReplacementAction).Position.Y), UnitIDs = ((UnitAction)localReplacementAction).Units.Select(x => x.ID).ToList(), RequeueOnCompletion = true };
+                                break;
+                            default:
+                                throw new Exception("action type invalid");
+                        }
+
+                        client.ReplaceAction(new GMRTSClasses.CTSTransferData.MetaActions.ReplaceAction() { AffectedUnits = replacementAction.UnitIDs, NewAction = replacementAction, TargetActionID = ((ReplaceAction)newAction).OldId });
                         break;
                 }
             }

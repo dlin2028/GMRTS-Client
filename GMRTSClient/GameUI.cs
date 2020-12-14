@@ -11,8 +11,7 @@ namespace GMRTSClient
 {
     class GameUI
     {
-        public List<ClientAction> Actions;
-
+        public List<UnitAction> Actions;
 
         private Camera camera;
         private SelectionRectangle selectionRect;
@@ -32,7 +31,7 @@ namespace GMRTSClient
 
         public GameUI(Camera camera, GraphicsDevice graphics, Texture2D pixel, Texture2D circle)
         {
-            Actions = new List<ClientAction>();
+            Actions = new List<UnitAction>();
             pendingActions = new List<ClientAction>();
 
             this.pixel = pixel;
@@ -99,7 +98,7 @@ namespace GMRTSClient
                     pendingActions.AddRange(oldOrders.Select(x => new ReplaceAction(x)));
                 }
 
-                ClientAction newAction;
+                UnitAction newAction;
                 switch (currentAction)
                 {
                     case ActionType.None:
@@ -158,10 +157,18 @@ namespace GMRTSClient
                 }
             }
 
-            foreach (var action in Actions)
+            for (int i = 0; i < Actions.Count; i++)
             {
-                ((UnitAction)action).Update(gameTime);
+                if(Actions[i].Units.Count > 0)
+                {
+                    Actions[i].Update(gameTime);
+                }
+                else
+                {
+                    Actions.RemoveAt(i--);
+                }
             }
+            
 
             foreach (var element in actionButtons)
             {
@@ -181,12 +188,10 @@ namespace GMRTSClient
             foreach (UnitAction action in Actions.Where(x => x is UnitAction))
             {
                 action.Draw(sb);
-
             }
 
             selectionRect.Draw(sb);
         }
-
 
         public void Draw(SpriteBatch sb)
         {
