@@ -15,15 +15,21 @@ namespace GMRTSClient.Units
         private Texture2D texture;
         private Texture2D selectionTexture;
         private float scale;
-        public Tank(Guid id, float rotation, float scale, Texture2D texture, Texture2D selectionTexture)
-            :base(id)
+        public Tank(Guid ID, float rotation, float scale, Texture2D texture, Texture2D selectionTexture)
+            : base(ID)
         {
             this.scale = scale;
             this.rotation = rotation;
             this.texture = texture;
             this.selectionTexture = selectionTexture;
         }
+        public override void Draw(SpriteBatch sb)
+        {
+            sb.Draw(texture, CurrentPosition, null, Color.White, rotation, new Vector2(texture.Width, texture.Height) / 2f, scale, SpriteEffects.None, 0.1f);
 
+            if (Selected)
+                sb.Draw(selectionTexture, new Rectangle((int)CurrentPosition.X, (int)CurrentPosition.Y, (int)(texture.Width * scale), (int)(texture.Height * scale)), null, Color.White, rotation, new Vector2(selectionTexture.Width, selectionTexture.Height) / 2f, SpriteEffects.None, 0f);
+        }
         public override bool Intersecting(Vector2 vector)
         {
             var size = new Vector2(texture.Width, texture.Height) * scale;
@@ -85,21 +91,13 @@ namespace GMRTSClient.Units
                 var projs = verticies.Select(x => Vector2.Dot(x, proj));
                 var rectProjs = rectVerticies.Select(x => Vector2.Dot(x, proj));
 
-                if(!(rectProjs.Min() <= projs.Max() && projs.Min() <= rectProjs.Max()))
+                if (!(rectProjs.Min() <= projs.Max() && projs.Min() <= rectProjs.Max()))
                 {
                     return false;
                 }
             }
 
             return true;
-        }
-
-        public override void Draw(SpriteBatch sb)
-        {
-            sb.Draw(texture, CurrentPosition, null, Color.White, rotation, Vector2.Zero, scale, SpriteEffects.None, 0.1f);
-           
-            if (Selected)
-                sb.Draw(selectionTexture, CurrentPosition, null, Color.White, rotation, Vector2.Zero, scale, SpriteEffects.None, 0.1f);
         }
     }
 }

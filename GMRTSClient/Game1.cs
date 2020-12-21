@@ -42,7 +42,7 @@ namespace GMRTSClient
             switch (obj.Type)
             {
                 case "Tank":
-                    new Tank(obj.ID, 0f, 0.01f, Content.Load<Texture2D>("Tank"), Content.Load<Texture2D>("SelectionMarker"));
+                    unit = new Tank(obj.ID, 0f, 0.01f, Content.Load<Texture2D>("Tank"), Content.Load<Texture2D>("SelectionMarker"));
                     break;
                 case "Builder":
                     unit = new Builder(obj.ID, 0f, 0.01f, Content.Load<Texture2D>("Builder"), Content.Load<Texture2D>("SelectionMarker"));
