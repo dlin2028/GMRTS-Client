@@ -190,7 +190,7 @@ namespace GMRTSClient
                         client.ReplaceAction(new GMRTSClasses.CTSTransferData.MetaActions.ReplaceAction() { AffectedUnits = replacementAction.UnitIDs, NewAction = replacementAction, TargetActionID = ((ReplaceAction)newAction).OldId });
                         break;
                     case ActionType.Delete:
-                        client.DeleteAction(new GMRTSClasses.CTSTransferData.MetaActions.DeleteAction() { AffectedUnits = ((UnitAction)actionDic[((DeleteAction)newAction).ID]).Units.Select(x => x.ID).ToList(), TargetActionID = ((DeleteAction)newAction).ID });
+                        client.DeleteAction(new GMRTSClasses.CTSTransferData.MetaActions.DeleteAction() { AffectedUnits = ((UnitAction)actionDic[((DeleteAction)newAction).ActionToDelete]).Units.Select(x => x.ID).ToList(), TargetActionID = ((DeleteAction)newAction).ActionToDelete });
                         break;
                 }
             }

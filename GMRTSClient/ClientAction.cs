@@ -33,7 +33,7 @@ namespace GMRTSClient
 
     class DeleteAction : ClientAction
     {
-        Guid ActionToDelete;
+        public Guid ActionToDelete;
         public DeleteAction(Guid actionToDelete)
         {
             ActionToDelete = actionToDelete;
