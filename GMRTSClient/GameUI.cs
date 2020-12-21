@@ -65,6 +65,7 @@ namespace GMRTSClient
         public void RemoveAction(UnitAction action, Unit unit)
         {
             unit.Orders.Remove(action);
+            action.Units.Remove(unit);
             if(action.Units.Count <= 0)
             {
                 Actions.Remove(action);
