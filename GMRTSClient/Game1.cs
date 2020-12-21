@@ -86,6 +86,7 @@ namespace GMRTSClient
             client = new SignalRClient("http://localhost:61337/server", a => unitDic[a], TimeSpan.FromMilliseconds(400));
             client.OnGameStart += Client_OnGameStart;
             client.SpawnUnit += Client_SpawnUnit;
+            client.OnActionFinish += Client_OnActionFinish;
             client.TryStart().Wait();
             Task.Run(async () =>
             {
@@ -101,6 +102,14 @@ namespace GMRTSClient
             }
 
             base.Initialize();
+        }
+
+        private void Client_OnActionFinish(GMRTSClasses.STCTransferData.ActionOver obj)
+        {
+            foreach (var unit in obj.Units)
+            {
+                gameUI.RemoveAction((UnitAction)actionDic[obj.ActionID], unitDic[unit]);
+            }
         }
 
         protected override void LoadContent()

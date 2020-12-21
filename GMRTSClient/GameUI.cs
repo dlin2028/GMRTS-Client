@@ -62,6 +62,15 @@ namespace GMRTSClient
             actionButtons.Add(patrolButton);
         }
 
+        public void RemoveAction(UnitAction action, Unit unit)
+        {
+            unit.Orders.Remove(action);
+            if(action.Units.Count <= 0)
+            {
+                Actions.Remove(action);
+            }
+        }
+
         public void Update(Unit[] units, GameTime gameTime)
         {
             selectionRect.Update(units, actionButtons.ToArray());
