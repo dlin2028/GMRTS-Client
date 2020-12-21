@@ -33,8 +33,10 @@ namespace GMRTSClient
 
     class DeleteAction : ClientAction
     {
-        public DeleteAction()
+        Guid ActionToDelete;
+        public DeleteAction(Guid actionToDelete)
         {
+            ActionToDelete = actionToDelete;
             ActionType = ActionType.Delete;
         }
     }
@@ -65,6 +67,8 @@ namespace GMRTSClient
         private HashSet<Unit> currentUnits;
 
         private TimeSpan animationTime;
+
+        private float scale = 0.01f;
 
         public UnitAction(List<Unit> units, Texture2D pixel, Texture2D circle)
             : this(Guid.NewGuid(), units, pixel, circle) { }
@@ -103,6 +107,11 @@ namespace GMRTSClient
         public virtual void Draw(SpriteBatch sb)
             => draw(sb, Color.White);
 
+        public bool Intersecting(Vector2 other)
+        {
+            return (other - Position).Length() < circle.Width * scale;
+        }
+
         protected void draw(SpriteBatch sb, Color color)
         {
             if(animationTime.TotalMilliseconds > 0)
@@ -112,7 +121,7 @@ namespace GMRTSClient
 
             if(InputManager.Keys.IsKeyDown(Keys.LeftShift))
             {
-                sb.Draw(circle, Position, null, color, 0f, new Vector2(circle.Width, circle.Height) / 2, 0.01f, SpriteEffects.None, 0f);
+                sb.Draw(circle, Position, null, color, 0f, new Vector2(circle.Width, circle.Height) / 2, scale, SpriteEffects.None, 0f);
                 if (currentUnits.Count != 0)
                 {
                     var avgPosition = new Vector2(currentUnits.Average(x => x.CurrentPosition.X), currentUnits.Average(x => x.CurrentPosition.Y));
@@ -120,8 +129,6 @@ namespace GMRTSClient
                 }
                 foreach (var order in prevOrders)
                 {
-                    //order.Units.Where(x => { var y = x.Orders.Find(order).Next; return y != null && y.Value == this; }).Count()
-                    
                     sb.Draw(pixel, order.Position, null, color, (float)Math.Atan2(Position.Y - order.Position.Y, Position.X - order.Position.X), new Vector2(0, (float)pixel.Height/2f), new Vector2((order.Position - Position).Length(), (float)order.Units.Where(x => { var y = x.Orders.Find(order).Next; return y != null && y.Value == this; }).Count()/2), SpriteEffects.None, 0f);
                 }
             }
@@ -159,29 +166,48 @@ namespace GMRTSClient
 
     class PatrolAction : UnitGroundAction
     {
-        List<UnitAction> lastPatrols;
+        List<LinkedListNode<UnitAction>> lastPatrols;
 
         public PatrolAction(List<Unit> units, Texture2D pixel, Vector2 target, Texture2D circle)
             : base(units, pixel, target, circle)
         {
             ActionType = ActionType.Patrol;
-            lastPatrols = new List<UnitAction>();
+            lastPatrols = new List<LinkedListNode<UnitAction>>();
         }
 
         public override void Update(GameTime gameTime)
         {
+            lastPatrols.Clear();
             foreach (var unit in Units)
             {
-                lastPatrols.Add(unit.Orders.Where(x => x is PatrolAction).Last());
+                LinkedListNode<UnitAction> curr = unit.Orders.First;
+                LinkedListNode<UnitAction> last = null;
+                while(curr != null)
+                {
+                    if(curr.Value.ActionType == ActionType.Patrol)
+                    {
+                        last = curr;
+                    }
+
+                    curr = curr.Next;
+                }
+                if(last != null)
+                {
+                    lastPatrols.Add(last);
+                }
             }
             base.Update(gameTime);
         }
         public override void Draw(SpriteBatch sb)
         {
 
-            foreach (var order in lastPatrols)
+            foreach (var orderNode in lastPatrols)
             {
-                sb.Draw(pixel, new Rectangle((int)order.Position.X, (int)order.Position.Y, (int)(order.Position - Position).Length(), (int)Math.Sqrt(Math.Min(Units.Count, order.Units.Count))), null, Color.Green, (int)Math.Atan2(Position.Y - order.Position.Y, Position.X - order.Position.X), Vector2.Zero, SpriteEffects.None, 0f);
+                if(orderNode.List.First(x => x.ActionType == ActionType.Patrol).ID == ID)
+                {
+                    var order = orderNode.Value;
+                    sb.Draw(pixel, order.Position, null, Color.Green, (float)Math.Atan2(Position.Y - order.Position.Y, Position.X - order.Position.X), new Vector2(0, (float)pixel.Height/2f), new Vector2((order.Position - Position).Length(), (float)order.Units.Where(x => { var y = x.Orders.Find(order).Next; return y != null && y.Value == this; }).Count()/2), SpriteEffects.None, 0f);
+                }
             }
 
             draw(sb, Color.Green);

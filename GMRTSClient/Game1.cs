@@ -115,7 +115,6 @@ namespace GMRTSClient
             #region camera
             var mouseWorldPos = mainCamera.ScreenToWorldSpace(new Vector2(InputManager.MouseState.X, InputManager.MouseState.Y));
 
-            // Debug.Print(InputManager.MouseState.MiddleButton.ToString());
             if(InputManager.MouseState.MiddleButton == ButtonState.Pressed)
             {
                 var panDelta = InputManager.MouseState.Position - InputManager.LastMouseState.Position;
