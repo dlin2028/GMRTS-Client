@@ -200,13 +200,13 @@ namespace GMRTSClient
         }
         public override void Draw(SpriteBatch sb)
         {
-
-            foreach (var orderNode in lastPatrols)
+            var groups = lastPatrols.GroupBy(x => x);
+            foreach (var orderGroup in groups)
             {
-                if(orderNode.List.First(x => x.ActionType == ActionType.Patrol).ID == ID)
+                if(orderGroup.Key.List.First(x => x.ActionType == ActionType.Patrol).ID == ID)
                 {
-                    var order = orderNode.Value;
-                    sb.Draw(pixel, order.Position, null, Color.Green, (float)Math.Atan2(Position.Y - order.Position.Y, Position.X - order.Position.X), new Vector2(0, (float)pixel.Height/2f), new Vector2((order.Position - Position).Length(), (float)order.Units.Where(x => { var y = x.Orders.Find(order).Next; return y != null && y.Value == this; }).Count()/2), SpriteEffects.None, 0f);
+                    var order = orderGroup.Key.Value;
+                    sb.Draw(pixel, order.Position, null, Color.Green, (float)Math.Atan2(Position.Y - order.Position.Y, Position.X - order.Position.X), new Vector2(0, (float)pixel.Height/2f), new Vector2((order.Position - Position).Length(), orderGroup.Count()/2), SpriteEffects.None, 0f);
                 }
             }
 
