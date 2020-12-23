@@ -10,7 +10,7 @@ namespace GMRTSClient.Units
     class Unit : GMRTSClasses.Units.Unit
     {
         public LinkedList<UnitAction> Orders;
-        public Vector2 CurrentPosition => new Vector2(Position.Value.X, Position.Value.Y);
+        public /*readonly*/ Vector2 CurrentPosition => new Vector2(Position.Value.X, Position.Value.Y);
         public bool Selectable = true;
         public bool Selected = false;
         public Unit(Guid id)

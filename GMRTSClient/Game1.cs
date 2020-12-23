@@ -33,6 +33,7 @@ namespace GMRTSClient
 
         private void Client_OnGameStart(DateTime obj)
         {
+            ;
             stopwatch.Restart();
         }
 
@@ -83,7 +84,7 @@ namespace GMRTSClient
             Window.ClientSizeChanged += (s, e) => { gameUI = new GameUI(mainCamera, GraphicsDevice, pixel, Content.Load<Texture2D>("Circle")) { Actions = gameUI.Actions}; };
 
             
-            client = new SignalRClient("http://localhost:61337/server", a => unitDic[a], TimeSpan.FromMilliseconds(400));
+            client = new SignalRClient("http://localhost:53694/server", a => unitDic[a], TimeSpan.FromMilliseconds(400));
             client.OnGameStart += Client_OnGameStart;
             client.SpawnUnit += Client_SpawnUnit;
             client.OnActionFinish += Client_OnActionFinish;
@@ -95,11 +96,11 @@ namespace GMRTSClient
             });
 
 
-            Random rng = new Random();
-            for (int i = 0; i < 10; i++)
-            {
-                units.Add(new ClientOnlyUnit(new Vector2(rng.Next(-50, 50), rng.Next(-500, 500)), (float)rng.NextDouble(), 0.1f, Content.Load<Texture2D>("Tank"), Content.Load<Texture2D>("SelectionMarker")));
-            }
+            //Random rng = new Random();
+            //for (int i = 0; i < 10; i++)
+            //{
+            //    units.Add(new ClientOnlyUnit(new Vector2(rng.Next(-50, 50), rng.Next(-500, 500)), (float)rng.NextDouble(), 0.1f, Content.Load<Texture2D>("Tank"), Content.Load<Texture2D>("SelectionMarker")));
+            //}
 
             base.Initialize();
         }

@@ -3,6 +3,8 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+
+using GMRTSClasses;
 using GMRTSClasses.Units;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -22,6 +24,10 @@ namespace GMRTSClient.Units
             this.rotation = rotation;
             this.texture = texture;
             this.selectionTexture = selectionTexture;
+
+            Position = new GMRTSClasses.Changing<System.Numerics.Vector2>(System.Numerics.Vector2.Zero, System.Numerics.Vector2.Zero, Vector2Changer.VectorChanger, 0);
+            Rotation = new GMRTSClasses.Changing<float>(0, 0, FloatChanger.FChanger, 0);
+            Health = new GMRTSClasses.Changing<float>(100, 0, FloatChanger.FChanger, 0);
         }
         public override void Draw(SpriteBatch sb)
         {

@@ -4,12 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GMRTSServer
+namespace GMRTSServerCore.SimClasses.UnitStates
 {
-    class Program
+    public enum ContOrStop
     {
-        static void Main(string[] args)
-        {
-        }
+        Continue,
+        Stop,
+        Requeue
     }
 }
