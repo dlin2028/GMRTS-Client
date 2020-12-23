@@ -102,6 +102,8 @@ namespace GMRTSClient
                 else
                     currentUnits.Add(unit);
             }
+
+
         }
 
         public virtual void Draw(SpriteBatch sb)
@@ -177,36 +179,20 @@ namespace GMRTSClient
 
         public override void Update(GameTime gameTime)
         {
-            lastPatrols.Clear();
-            foreach (var unit in Units)
-            {
-                LinkedListNode<UnitAction> curr = unit.Orders.First;
-                LinkedListNode<UnitAction> last = null;
-                while(curr != null)
-                {
-                    if(curr.Value.ActionType == ActionType.Patrol)
-                    {
-                        last = curr;
-                    }
-
-                    curr = curr.Next;
-                }
-                if(last != null)
-                {
-                    lastPatrols.Add(last);
-                }
-            }
             base.Update(gameTime);
         }
         public override void Draw(SpriteBatch sb)
         {
-            var groups = lastPatrols.GroupBy(x => x);
-            foreach (var orderGroup in groups)
+            if (InputManager.Keys.IsKeyDown(Keys.LeftShift))
             {
-                if(orderGroup.Key.List.First(x => x.ActionType == ActionType.Patrol).ID == ID)
+                var lastOrderNodes = Units.Select(x => x.Orders).Select(x => x.Last).Distinct();
+                foreach (var lastOrderNode in lastOrderNodes)
                 {
-                    var order = orderGroup.Key.Value;
-                    sb.Draw(pixel, order.Position, null, Color.Green, (float)Math.Atan2(Position.Y - order.Position.Y, Position.X - order.Position.X), new Vector2(0, (float)pixel.Height/2f), new Vector2((order.Position - Position).Length(), orderGroup.Count()/2), SpriteEffects.None, 0f);
+                    if (lastOrderNode.List.First(x => x.ActionType == ActionType.Patrol).ID == ID)
+                    {
+                        var lastOrder = lastOrderNode.Value;
+                        sb.Draw(pixel, lastOrder.Position, null, Color.Green, (float)Math.Atan2(Position.Y - lastOrder.Position.Y, Position.X - lastOrder.Position.X), new Vector2(0, (float)pixel.Height / 2f), new Vector2((lastOrder.Position - Position).Length(), (float)lastOrderNodes.Where(x => x.Value == lastOrder).Count() / 2), SpriteEffects.None, 0f);
+                    }
                 }
             }
 

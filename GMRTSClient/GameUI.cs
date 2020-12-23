@@ -172,7 +172,32 @@ namespace GMRTSClient
                             }
                             break;
                         case ActionType.Patrol:
-                            Actions.Add(new PatrolAction(selectionRect.SelectedUnits, pixel, mouseWorldPos, circle));
+                            List<(UnitAction?, IEnumerable<Unit>)> prevActions = new List<(UnitAction?, IEnumerable<Unit>)>();
+                            foreach (var uniqueAction in selectionRect.SelectedUnits.Select(x => x.Orders).Select(x => x.LastOrDefault()).Distinct())
+                            {
+                                prevActions.Add((uniqueAction, selectionRect.SelectedUnits.Where(x => x.Orders.LastOrDefault() == uniqueAction)));
+                            }
+                            foreach (var prevAction in prevActions)
+                            {
+                                if(prevAction.Item1 == null)
+                                {
+                                    var posList = prevAction.Item2.Select(x => x.CurrentPosition);
+                                    var avgpos = new Vector2(posList.Average(x => x.X), posList.Average(x => x.Y));
+                                    newAction = new PatrolAction(prevAction.Item2.ToList(), pixel, avgpos, circle);
+                                    Actions.Add(newAction);
+                                    pendingActions.Add(newAction);
+                                }
+                                else
+                                {
+                                    newAction = new PatrolAction(prevAction.Item2.ToList(), pixel, prevAction.Item1.Position, circle);
+                                    Actions.Add(newAction);
+                                    pendingActions.Add(newAction);
+                                }
+                            }
+
+                            newAction = new PatrolAction(selectionRect.SelectedUnits, pixel, mouseWorldPos, circle);
+                            Actions.Add(newAction);
+                            pendingActions.Add(newAction);
                             break;
                         default:
                             break;
