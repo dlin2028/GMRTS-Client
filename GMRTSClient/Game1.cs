@@ -96,11 +96,11 @@ namespace GMRTSClient
             });
 
 
-            //Random rng = new Random();
-            //for (int i = 0; i < 10; i++)
-            //{
-            //    units.Add(new ClientOnlyUnit(new Vector2(rng.Next(-50, 50), rng.Next(-500, 500)), (float)rng.NextDouble(), 0.1f, Content.Load<Texture2D>("Tank"), Content.Load<Texture2D>("SelectionMarker")));
-            //}
+            Random rng = new Random();
+            for (int i = 0; i < 10; i++)
+            {
+                units.Add(new ClientOnlyUnit(new Vector2(rng.Next(-50, 50), rng.Next(-500, 500)), (float)rng.NextDouble(), 0.1f, Content.Load<Texture2D>("Tank"), Content.Load<Texture2D>("SelectionMarker")));
+            }
 
             base.Initialize();
         }
