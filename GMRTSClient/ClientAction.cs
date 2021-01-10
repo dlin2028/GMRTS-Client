@@ -17,7 +17,8 @@ namespace GMRTSClient
         Assist,
         Patrol,
         Delete,
-        Replace
+        Replace,
+        Build
     }
 
     abstract class ClientAction
@@ -164,6 +165,17 @@ namespace GMRTSClient
             Position = Target.CurrentPosition;
             base.Update(gameTime);
         }
+    }
+
+    class BuildAction : UnitGroundAction
+    {
+        public BuildAction(List<Unit> units, Texture2D pixel, Vector2 target, Texture2D circle) : base(units, pixel, target, circle)
+        {
+            ActionType = ActionType.Build;
+        }
+
+        public override void Draw(SpriteBatch sb)
+            => draw(sb, Color.Gray);
     }
 
     class PatrolAction : UnitGroundAction

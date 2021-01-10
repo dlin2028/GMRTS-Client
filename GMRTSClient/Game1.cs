@@ -76,12 +76,8 @@ namespace GMRTSClient
         {
             mainCamera = new Camera();
 
-            pixel = new Texture2D(GraphicsDevice, 1, 1);
-            pixel.SetData(new[] { Color.White });
-
-            
-            gameUI = new GameUI(mainCamera, GraphicsDevice, pixel, Content.Load<Texture2D>("Circle"));
-            Window.ClientSizeChanged += (s, e) => { gameUI = new GameUI(mainCamera, GraphicsDevice, pixel, Content.Load<Texture2D>("Circle")) { Actions = gameUI.Actions}; };
+            gameUI = new GameUI(mainCamera, GraphicsDevice, Content);
+            Window.ClientSizeChanged += (s, e) => { gameUI = new GameUI(mainCamera, GraphicsDevice, Content) { Actions = gameUI.Actions}; };
 
             
             client = new SignalRClient("http://localhost:53694/server", a => unitDic[a], TimeSpan.FromMilliseconds(400));

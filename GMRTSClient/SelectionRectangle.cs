@@ -32,7 +32,7 @@ namespace GMRTSClient
                Math.Max(Math.Abs(a.Y - b.Y), 1));
         }
 
-        public void Update(Unit[] selectableUnits, UIElement[] elements)
+        public void Update(Unit[] selectableUnits, Button[] elements)
         {
             if(InputManager.MouseState.LeftButton == ButtonState.Pressed)
             {
@@ -41,7 +41,7 @@ namespace GMRTSClient
 
                 foreach (var element in elements)
                 {
-                    if (element.rectangle.Contains(camera.WorldToScreenSpace(selectionBegin.ToVector2())))
+                    if (element.Rect.Contains(camera.WorldToScreenSpace(selectionBegin.ToVector2())))
                     {
                         selectionRect = new Rectangle(0, 0, 0, 0);
                         return;
@@ -55,7 +55,7 @@ namespace GMRTSClient
             {
                 foreach (var element in elements)
                 {
-                    if (element.rectangle.Contains(camera.WorldToScreenSpace(selectionBegin.ToVector2())))
+                    if (element.Rect.Contains(camera.WorldToScreenSpace(selectionBegin.ToVector2())))
                     {
                         selectionRect = new Rectangle(0, 0, 0, 0);
                         return;

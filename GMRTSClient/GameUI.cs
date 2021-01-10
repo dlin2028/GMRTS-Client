@@ -1,5 +1,6 @@
 ﻿using GMRTSClient.Units;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
@@ -16,11 +17,14 @@ namespace GMRTSClient
         private Camera camera;
         private SelectionRectangle selectionRect;
 
-        private UIElement moveButton;
-        private UIElement attackButton;
-        private UIElement assistButton;
-        private UIElement patrolButton;
-        private List<UIElement> actionButtons = new List<UIElement>();
+        private Button moveButton;
+        private Button attackButton;
+        private Button assistButton;
+        private Button patrolButton;
+        private Button buildButton;
+
+
+        private List<Button> actionButtons = new List<Button>();
 
         private ActionType currentAction;
 
@@ -29,37 +33,47 @@ namespace GMRTSClient
         private Texture2D pixel;
         private Texture2D circle;
 
-        public GameUI(Camera camera, GraphicsDevice graphics, Texture2D pixel, Texture2D circle)
+        BuildPreviewElement buildPreview;
+
+        public GameUI(Camera camera, GraphicsDevice graphics, ContentManager content)
         {
             Actions = new List<UnitAction>();
             pendingActions = new List<ClientAction>();
 
-            this.pixel = pixel;
-            this.circle = circle;
+            pixel = new Texture2D(graphics, 1, 1);
+            pixel.SetData(new[] { Color.White });
+            this.circle = content.Load<Texture2D>("circle");
             this.camera = camera;
             selectionRect = new SelectionRectangle(camera, pixel);
 
-            moveButton = new UIElement(pixel, new Rectangle(graphics.Viewport.Width - 400, graphics.Viewport.Height - 100, 100, 100), Color.Blue);
+            buildPreview = new BuildPreviewElement(content.Load<Texture2D>("Factory"), content.Load<Texture2D>("Factory"), content.Load<Texture2D>("Factory"), 0.25f);
+
+            moveButton = new Button(pixel, new Rectangle(graphics.Viewport.Width - 400, graphics.Viewport.Height - 100, 100, 100), Color.Blue);
             moveButton.onClick += (sender, e) => { foreach (var button in actionButtons) button.Release(); moveButton.color = Color.DarkBlue; currentAction = ActionType.Move; };
             moveButton.onRelease += (sender, e) => moveButton.color = Color.Blue;
 
-            attackButton = new UIElement(pixel, new Rectangle(graphics.Viewport.Width - 300, graphics.Viewport.Height - 100, 100, 100), Color.Red);
+            attackButton = new Button(pixel, new Rectangle(graphics.Viewport.Width - 300, graphics.Viewport.Height - 100, 100, 100), Color.Red);
             attackButton.onClick += (sender, e) => { foreach (var button in actionButtons) button.Release(); attackButton.color = Color.DarkRed; currentAction = ActionType.Attack; };
             attackButton.onRelease += (sender, e) => attackButton.color = Color.Red;
 
-            assistButton = new UIElement(pixel, new Rectangle(graphics.Viewport.Width - 200, graphics.Viewport.Height - 100, 100, 100), Color.Yellow);
+            assistButton = new Button(pixel, new Rectangle(graphics.Viewport.Width - 200, graphics.Viewport.Height - 100, 100, 100), Color.Yellow);
             assistButton.onClick += (sender, e) => { foreach (var button in actionButtons) button.Release(); assistButton.color = Color.Gold; currentAction = ActionType.Assist; };
             assistButton.onRelease += (sender, e) => assistButton.color = Color.Yellow;
 
 
-            patrolButton = new UIElement(pixel, new Rectangle(graphics.Viewport.Width - 100, graphics.Viewport.Height - 100, 100, 100), Color.Green);
+            patrolButton = new Button(pixel, new Rectangle(graphics.Viewport.Width - 100, graphics.Viewport.Height - 100, 100, 100), Color.Green);
             patrolButton.onClick += (sender, e) => { foreach (var button in actionButtons) button.Release(); patrolButton.color = Color.DarkGreen; currentAction = ActionType.Patrol; };
             patrolButton.onRelease += (sender, e) => patrolButton.color = Color.Green;
+
+            buildButton = new Button(pixel, new Rectangle(0, graphics.Viewport.Height - 100, 100, 100), Color.Gray);
+            buildButton.onClick += (sender, e) => { foreach (var button in actionButtons) button.Release(); buildButton.color = Color.DarkGray; currentAction = ActionType.Build; buildPreview.Enabled = true; };
+            buildButton.onRelease += (sender, e) => { buildButton.color = Color.Gray; buildPreview.Enabled = false; };
 
             actionButtons.Add(moveButton);
             actionButtons.Add(attackButton);
             actionButtons.Add(assistButton);
             actionButtons.Add(patrolButton);
+            actionButtons.Add(buildButton);
         }
 
         public void RemoveAction(UnitAction action, Unit unit)
@@ -199,6 +213,9 @@ namespace GMRTSClient
                             Actions.Add(newAction);
                             pendingActions.Add(newAction);
                             break;
+                        case ActionType.Build:
+                            newAction = new BuildAction(selectionRect.SelectedUnits.Where(x => x is Builder).ToList(), pixel, mouseWorldPos, circle);
+                            break;
                         default:
                             break;
                     }
@@ -228,6 +245,7 @@ namespace GMRTSClient
             {
                 element.Update();
             }
+            buildPreview.Update();
         }
 
         public List<ClientAction> GetPendingActions()
@@ -243,16 +261,16 @@ namespace GMRTSClient
             {
                 action.Draw(sb);
             }
-
             selectionRect.Draw(sb);
         }
 
         public void Draw(SpriteBatch sb)
         {
-            moveButton.Draw(sb);
-            attackButton.Draw(sb);
-            assistButton.Draw(sb);
-            patrolButton.Draw(sb);
+            foreach (var element in actionButtons)
+            {
+                element.Draw(sb);
+            }
+            buildPreview.Draw(sb, BuildingType.Factory);
         }
     }
 }

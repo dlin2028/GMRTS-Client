@@ -1,86 +1,62 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 using System;
+using System.Collections.Generic;
+using System.Text;
 
 namespace GMRTSClient
 {
-    public enum UIButtonState
+    abstract class UIElement
     {
-        None,
-        Hovering,
-        Pressed,
-    }
+        protected Texture2D texture;
+        protected Color color;
+        protected Rectangle rect;
 
-    class UIElement
-    {
-        public delegate void ButtonEventHandler(object sender, EventArgs e);
-        public event ButtonEventHandler onClick;
-        public event ButtonEventHandler onHover;
-        public event ButtonEventHandler onPress;
-        public event ButtonEventHandler onRelease;
-
-
-        public UIButtonState ButtonState;
-        public bool Hovering { get; private set; }
-        private Texture2D pixel;
-        public Rectangle rectangle;
-        public Color color;
-
-        public UIElement(Texture2D pixel, Rectangle rectangle, Color blue)
+        public Texture2D Texture
         {
-            this.pixel = pixel;
-            this.rectangle = rectangle;
-            this.color = blue;
+            get { return texture; }
+            set { texture = value; }
         }
 
-        public void Release()
+        public Rectangle Rect
         {
-            onRelease.Invoke(this, EventArgs.Empty);
+            get { return rect; }
+            set { rect = value; }
         }
 
+        public Color Color
+        {
+            get { return color; }
+            set { color = value; }
+        }
+
+        public bool Enabled { get; set; }
+
+        public UIElement(Texture2D texture, Rectangle rect, Color color)
+        {
+            this.texture = texture;
+            this.rect = rect;
+            this.color = color;
+        }
         public void Update()
         {
-            if (rectangle.Contains(InputManager.MouseState.Position))
+            if(Enabled)
             {
-                if(!Hovering)
-                {
-                    onHover?.Invoke(this, EventArgs.Empty);
-                }
-                Hovering = true;
-
-                if (InputManager.MouseState.LeftButton == Microsoft.Xna.Framework.Input.ButtonState.Pressed)
-                {
-                    ButtonState = UIButtonState.Pressed;
-                    if (Hovering)
-                    {
-                        onPress?.Invoke(this, EventArgs.Empty);
-                    }
-                    else
-                    {
-                        Hovering = true;
-                    }
-                }
-                else if (InputManager.LastMouseState.LeftButton == Microsoft.Xna.Framework.Input.ButtonState.Pressed)
-                {
-                    onClick?.Invoke(this, EventArgs.Empty);
-                }
-                else
-                {
-                    Hovering = false;
-                    ButtonState = UIButtonState.Hovering;
-                }
-            }
-            else
-            {
-                Hovering = false;
+                update();
             }
         }
-
+        protected abstract void update();
 
         public void Draw(SpriteBatch sb)
         {
-            sb.Draw(pixel, rectangle, color);
+            if(Enabled)
+            {
+                draw(sb);
+            }
+        }
+        protected virtual void draw(SpriteBatch sb)
+        {
+            sb.Draw(texture, rect, Color);
         }
     }
 }
