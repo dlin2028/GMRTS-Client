@@ -12,7 +12,10 @@ namespace GMRTSClient
 {
     class GameUI
     {
-        public List<UnitAction> Actions;
+        public GMRTSClasses.Changing<float> Money { get; set; }
+        public GMRTSClasses.Changing<float> Minerals { get; set; }
+
+        public List<UnitAction> Actions { get; set; }
 
         private Camera camera;
         private SelectionRectangle selectionRect;
@@ -21,22 +24,34 @@ namespace GMRTSClient
         private Button attackButton;
         private Button assistButton;
         private Button patrolButton;
-        private Button buildButton;
 
+        private ToggleButton buildButton;
+
+        private Button buildFactoryButton;
+        private Button buildMarketButton;
+        private Button buildMineButton;
 
         private List<Button> actionButtons = new List<Button>();
+        private List<Button> buildButtons = new List<Button>();
+        private List<UIElement> uiElements = new List<UIElement>();
 
         private ActionType currentAction;
+        private BuildingType currentBuilding;
 
         private List<ClientAction> pendingActions;
 
         private Texture2D pixel;
         private Texture2D circle;
 
-        BuildPreviewElement buildPreview;
+        private BuildPreviewElement buildPreview;
+
+
+        ContentManager content;
 
         public GameUI(Camera camera, GraphicsDevice graphics, ContentManager content)
         {
+            this.content = content;
+
             Actions = new List<UnitAction>();
             pendingActions = new List<ClientAction>();
 
@@ -46,34 +61,59 @@ namespace GMRTSClient
             this.camera = camera;
             selectionRect = new SelectionRectangle(camera, pixel);
 
-            buildPreview = new BuildPreviewElement(content.Load<Texture2D>("Factory"), content.Load<Texture2D>("Factory"), content.Load<Texture2D>("Factory"), 0.25f);
+            buildPreview = new BuildPreviewElement(content.Load<Texture2D>("Factory"), content.Load<Texture2D>("Mine"), content.Load<Texture2D>("Market"), 0.25f);
+            buildPreview.Enabled = false;
 
             moveButton = new Button(pixel, new Rectangle(graphics.Viewport.Width - 400, graphics.Viewport.Height - 100, 100, 100), Color.Blue);
-            moveButton.onClick += (sender, e) => { foreach (var button in actionButtons) button.Release(); moveButton.color = Color.DarkBlue; currentAction = ActionType.Move; };
-            moveButton.onRelease += (sender, e) => moveButton.color = Color.Blue;
+            moveButton.onClick += (sender, e) => { foreach (var button in actionButtons) button.Release(); moveButton.Color = Color.DarkBlue; currentAction = ActionType.Move; };
+            moveButton.onRelease += (sender, e) => moveButton.Color = Color.Blue;
 
             attackButton = new Button(pixel, new Rectangle(graphics.Viewport.Width - 300, graphics.Viewport.Height - 100, 100, 100), Color.Red);
-            attackButton.onClick += (sender, e) => { foreach (var button in actionButtons) button.Release(); attackButton.color = Color.DarkRed; currentAction = ActionType.Attack; };
-            attackButton.onRelease += (sender, e) => attackButton.color = Color.Red;
+            attackButton.onClick += (sender, e) => { foreach (var button in actionButtons) button.Release(); attackButton.Color = Color.DarkRed; currentAction = ActionType.Attack; };
+            attackButton.onRelease += (sender, e) => attackButton.Color = Color.Red;
 
             assistButton = new Button(pixel, new Rectangle(graphics.Viewport.Width - 200, graphics.Viewport.Height - 100, 100, 100), Color.Yellow);
-            assistButton.onClick += (sender, e) => { foreach (var button in actionButtons) button.Release(); assistButton.color = Color.Gold; currentAction = ActionType.Assist; };
-            assistButton.onRelease += (sender, e) => assistButton.color = Color.Yellow;
+            assistButton.onClick += (sender, e) => { foreach (var button in actionButtons) button.Release(); assistButton.Color = Color.Gold; currentAction = ActionType.Assist; };
+            assistButton.onRelease += (sender, e) => assistButton.Color = Color.Yellow;
 
 
             patrolButton = new Button(pixel, new Rectangle(graphics.Viewport.Width - 100, graphics.Viewport.Height - 100, 100, 100), Color.Green);
-            patrolButton.onClick += (sender, e) => { foreach (var button in actionButtons) button.Release(); patrolButton.color = Color.DarkGreen; currentAction = ActionType.Patrol; };
-            patrolButton.onRelease += (sender, e) => patrolButton.color = Color.Green;
+            patrolButton.onClick += (sender, e) => { foreach (var button in actionButtons) button.Release(); patrolButton.Color = Color.DarkGreen; currentAction = ActionType.Patrol; };
+            patrolButton.onRelease += (sender, e) => patrolButton.Color = Color.Green;
 
-            buildButton = new Button(pixel, new Rectangle(0, graphics.Viewport.Height - 100, 100, 100), Color.Gray);
-            buildButton.onClick += (sender, e) => { foreach (var button in actionButtons) button.Release(); buildButton.color = Color.DarkGray; currentAction = ActionType.Build; buildPreview.Enabled = true; };
-            buildButton.onRelease += (sender, e) => { buildButton.color = Color.Gray; buildPreview.Enabled = false; };
+            buildButton = new ToggleButton(pixel, new Rectangle(0, graphics.Viewport.Height - 100, 100, 100), Color.Gray);
+            buildButton.OnToggleOn += (sender, e) => { foreach (var button in actionButtons) button.Enabled = false; foreach (var button in buildButtons) { button.Enabled = true; button.Release(); } buildButton.Color = Color.DarkGray; currentAction = ActionType.Build; buildPreview.Enabled = true; };
+            buildButton.OnToggleOff += (sender, e) => { foreach (var button in actionButtons) { button.Enabled = true; button.Release(); } foreach (var button in buildButtons) button.Enabled = false; buildButton.Color = Color.Gray; buildPreview.Enabled = false; };
+
+            buildFactoryButton = new Button(content.Load<Texture2D>("Factory"), new Rectangle(graphics.Viewport.Width - 300, graphics.Viewport.Height - 100, 100, 100), Color.White);
+            buildFactoryButton.onClick += (sender, e) => { foreach (var button in buildButtons) button.Release(); moveButton.Color = Color.Gray; currentBuilding = BuildingType.Factory; buildPreview.CurrentBuilding = currentBuilding; };
+            buildFactoryButton.onRelease += (sender, e) => moveButton.Color = Color.White;
+            buildFactoryButton.Enabled = false;
+
+            buildMarketButton = new Button(content.Load<Texture2D>("Market"), new Rectangle(graphics.Viewport.Width - 200, graphics.Viewport.Height - 100, 100, 100), Color.White);
+            buildMarketButton.onClick += (sender, e) => { foreach (var button in buildButtons) button.Release(); attackButton.Color = Color.Gray; currentBuilding = BuildingType.Market; buildPreview.CurrentBuilding = currentBuilding; };
+            buildMarketButton.onRelease += (sender, e) => attackButton.Color = Color.White;
+            buildMarketButton.Enabled = false;
+
+            buildMineButton = new Button(content.Load<Texture2D>("Mine"), new Rectangle(graphics.Viewport.Width - 100, graphics.Viewport.Height - 100, 100, 100), Color.White);
+            buildMineButton.onClick += (sender, e) => { foreach (var button in buildButtons) button.Release(); assistButton.Color = Color.Gray; currentBuilding = BuildingType.Mine; buildPreview.CurrentBuilding = currentBuilding; };
+            buildMineButton.onRelease += (sender, e) => assistButton.Color = Color.White;
+            buildMineButton.Enabled = false;
 
             actionButtons.Add(moveButton);
             actionButtons.Add(attackButton);
             actionButtons.Add(assistButton);
             actionButtons.Add(patrolButton);
-            actionButtons.Add(buildButton);
+
+            buildButtons.Add(buildFactoryButton);
+            buildButtons.Add(buildMarketButton);
+            buildButtons.Add(buildMineButton);
+
+            uiElements.Add(buildButton);
+
+            uiElements.AddRange(actionButtons);
+            uiElements.AddRange(buildButtons);
+            uiElements.Add(buildPreview);
         }
 
         public void RemoveAction(UnitAction action, Unit unit)
@@ -88,7 +128,7 @@ namespace GMRTSClient
 
         public void Update(Unit[] units, GameTime gameTime)
         {
-            selectionRect.Update(units, actionButtons.ToArray());
+            selectionRect.Update(units, uiElements.ToArray());
 
             if (InputManager.MouseState.RightButton == ButtonState.Released && InputManager.LastMouseState.RightButton == ButtonState.Pressed)
             {
@@ -214,7 +254,10 @@ namespace GMRTSClient
                             pendingActions.Add(newAction);
                             break;
                         case ActionType.Build:
-                            newAction = new BuildAction(selectionRect.SelectedUnits.Where(x => x is Builder).ToList(), pixel, mouseWorldPos, circle);
+                            newAction = new BuildAction(selectionRect.SelectedUnits.Where(x => x == x /* uncomment this later ------------------------------------------
+                                                                                                   is Builder */).ToList(), pixel, mouseWorldPos, currentBuilding, circle, content);
+                            Actions.Add(newAction);
+                            pendingActions.Add(newAction);
                             break;
                         default:
                             break;
@@ -240,8 +283,7 @@ namespace GMRTSClient
                 }
             }
 
-
-            foreach (var element in actionButtons)
+            foreach (var element in uiElements)
             {
                 element.Update();
             }
@@ -266,11 +308,10 @@ namespace GMRTSClient
 
         public void Draw(SpriteBatch sb)
         {
-            foreach (var element in actionButtons)
+            foreach (var element in uiElements)
             {
                 element.Draw(sb);
             }
-            buildPreview.Draw(sb, BuildingType.Factory);
         }
     }
 }

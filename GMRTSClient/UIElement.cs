@@ -32,8 +32,21 @@ namespace GMRTSClient
 
         public bool Enabled { get; set; }
 
+        public Point Location
+        {
+            get
+            {
+                return new Point(rect.X, rect.Y);
+            }
+            set
+            {
+                rect = new Rectangle(value.X, value.Y, rect.Width, rect.Height);
+            }
+        }
+
         public UIElement(Texture2D texture, Rectangle rect, Color color)
         {
+            Enabled = true;
             this.texture = texture;
             this.rect = rect;
             this.color = color;

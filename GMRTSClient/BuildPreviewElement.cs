@@ -12,15 +12,12 @@ namespace GMRTSClient
         Mine,
         Market
     }
-    class BuildPreviewElement
+    class BuildPreviewElement : UIElement
     {
-        private Rectangle rect;
         private Texture2D factoryTexture;
         private Texture2D mineTexture;
         private Texture2D marketTexture;
-        private Texture2D currentTexture;
 
-        public bool Enabled;
         private BuildingType currentBuilding;
         private float scale;
 
@@ -32,47 +29,39 @@ namespace GMRTSClient
                 switch (currentBuilding)
                 {
                     case BuildingType.Factory:
-                        currentTexture = factoryTexture;
+                        Texture = factoryTexture;
                         break;
                     case BuildingType.Mine:
-                        currentTexture = mineTexture;
+                        Texture = mineTexture;
                         break;
                     case BuildingType.Market:
-                        currentTexture = marketTexture;
+                        Texture = marketTexture;
                         break;
                     default:
                         break;
                 }
-                rect.Width = (int)(currentTexture.Width * scale);
-                rect.Height = (int)(currentTexture.Height * scale);
+                rect.Width = (int)(Texture.Width * scale);
+                rect.Height = (int)(Texture.Height * scale);
             }
         }
 
 
         public BuildPreviewElement(Texture2D factoryTexture, Texture2D mineTexture, Texture2D marketTexture, float scale)
+            :base(factoryTexture, new Rectangle(), Color.White)
         {
             this.scale = scale;
             this.factoryTexture = factoryTexture;
             this.mineTexture = mineTexture;
             this.marketTexture = marketTexture;
-            rect = new Rectangle();
             CurrentBuilding = BuildingType.Factory;
         }
 
-        public void Update()
+        protected override void update()
         {
             if(Enabled)
             {
                 rect.X = (int)(InputManager.MouseState.Position.X - rect.Width / 2f);
                 rect.Y = (int)(InputManager.MouseState.Position.Y - rect.Height / 2f);
-            }
-        }
-
-        public void Draw(SpriteBatch sb, BuildingType buildingType)
-        {
-            if(Enabled)
-            {
-                sb.Draw(currentTexture, rect, Color.White);
             }
         }
     }

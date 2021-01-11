@@ -95,7 +95,7 @@ namespace GMRTSClient
             Random rng = new Random();
             for (int i = 0; i < 10; i++)
             {
-                units.Add(new ClientOnlyUnit(new Vector2(rng.Next(-50, 50), rng.Next(-500, 500)), (float)rng.NextDouble(), 0.1f, Content.Load<Texture2D>("Tank"), Content.Load<Texture2D>("SelectionMarker")));
+                units.Add(new ClientOnlyUnit(new Vector2(rng.Next(-50, 50), rng.Next(-500, 500)), (float)rng.NextDouble(), 0.1f, Content.Load<Texture2D>("Builder"), Content.Load<Texture2D>("SelectionMarker")));
             }
 
             base.Initialize();
@@ -189,6 +189,9 @@ namespace GMRTSClient
                     case ActionType.Delete:
                         client.DeleteAction(new GMRTSClasses.CTSTransferData.MetaActions.DeleteAction() { AffectedUnits = ((UnitAction)actionDic[((DeleteAction)newAction).ActionToDelete]).Units.Select(x => x.ID).ToList(), TargetActionID = ((DeleteAction)newAction).ActionToDelete });
                         break;
+                    case ActionType.Build:
+                        //hi
+                        break;
                 }
             }
 
@@ -197,7 +200,7 @@ namespace GMRTSClient
                 unit.Update((ulong)stopwatch.ElapsedMilliseconds);
             }
 
-            base.Update(gameTime);
+            base.Update(gameTime); 
         }
 
         protected override void Draw(GameTime gameTime)
@@ -217,7 +220,8 @@ namespace GMRTSClient
 
             spriteBatch.Begin(SpriteSortMode.BackToFront);
             gameUI.Draw(spriteBatch);
-            spriteBatch.DrawString(smallFont, string.Format("FPS: {0}", frameCounter.AverageFramesPerSecond), new Vector2(1, 1), Color.Black);
+            //this should be moved to ui later
+            spriteBatch.DrawString(smallFont, string.Format("FPS: {0} \n Money {1} \n Minerals {2}", frameCounter.AverageFramesPerSecond, 5, 5), new Vector2(1, 1), Color.Black);
             spriteBatch.End();
 
             base.Draw(gameTime);

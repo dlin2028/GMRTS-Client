@@ -24,7 +24,6 @@ namespace GMRTSClient
         public UIButtonState ButtonState;
         public bool Hovering { get; private set; }
         private Texture2D pixel;
-        public Color color;
 
         public Button(Texture2D pixel, Rectangle rect, Color color)
             :base(pixel, rect, color)

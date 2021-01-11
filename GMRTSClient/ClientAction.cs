@@ -1,5 +1,6 @@
 ﻿using GMRTSClient.Units;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
@@ -169,13 +170,22 @@ namespace GMRTSClient
 
     class BuildAction : UnitGroundAction
     {
-        public BuildAction(List<Unit> units, Texture2D pixel, Vector2 target, Texture2D circle) : base(units, pixel, target, circle)
+        public BuildingType BuildingType;
+
+        BuildPreviewElement buildPreview;
+        public BuildAction(List<Unit> units, Texture2D pixel, Vector2 target, BuildingType buildingType, Texture2D circle, ContentManager content) : base(units, pixel, target, circle)
         {
-            ActionType = ActionType.Build;
+            BuildingType = buildingType;
+            buildPreview = new BuildPreviewElement(content.Load<Texture2D>("Factory"), content.Load<Texture2D>("Mine"), content.Load<Texture2D>("Market"), 0.25f);
+            buildPreview.CurrentBuilding = buildingType;
+            buildPreview.Location = target.ToPoint() - (buildPreview.Rect.Size.ToVector2()/2).ToPoint();
         }
 
         public override void Draw(SpriteBatch sb)
-            => draw(sb, Color.Gray);
+        {
+            buildPreview.Draw(sb);
+            draw(sb, Color.Gray);
+        }
     }
 
     class PatrolAction : UnitGroundAction
