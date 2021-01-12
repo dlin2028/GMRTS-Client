@@ -1,10 +1,13 @@
 ﻿using GMRTSClasses.CTSTransferData;
+using GMRTSClasses.CTSTransferData.MetaActions;
 
 using GMRTSClient.Units;
+
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -33,15 +36,29 @@ namespace GMRTSClient
         {
             ID = Guid.NewGuid();
         }
+
+        // Bad. Pls delete. Probably should be replaced by refiguring out this class structure.
+        public abstract GMRTSClasses.CTSTransferData.ClientAction ToDTONonmetaAction();
+        public abstract GMRTSClasses.CTSTransferData.MetaActions.MetaAction ToDTOMetaAction();
     }
 
     class DeleteAction : ClientAction
     {
-        public Guid ActionToDelete;
-        public DeleteAction(Guid actionToDelete)
+        public ClientAction ActionToDelete;
+        public DeleteAction(ClientAction actionToDelete)
         {
             ActionToDelete = actionToDelete;
             ActionType = ActionType.Delete;
+        }
+
+        public override GMRTSClasses.CTSTransferData.MetaActions.MetaAction ToDTOMetaAction()
+        {
+            return new GMRTSClasses.CTSTransferData.MetaActions.DeleteAction() { AffectedUnits = ((UnitAction)ActionToDelete).Units.Select(a => a.ID).ToList(), TargetActionID = ActionToDelete.ID };
+        }
+
+        public override GMRTSClasses.CTSTransferData.ClientAction ToDTONonmetaAction()
+        {
+            return null;
         }
     }
 
@@ -56,6 +73,17 @@ namespace GMRTSClient
             OldId = replacedAction.ID;
             replacedAction.ID = Guid.NewGuid();
             ActionType = ActionType.Replace;
+        }
+
+        public override MetaAction ToDTOMetaAction()
+        {
+            var replacementAction = NewAction.ToDTONonmetaAction();
+            return new GMRTSClasses.CTSTransferData.MetaActions.ReplaceAction() { AffectedUnits = replacementAction.UnitIDs, NewAction = replacementAction, TargetActionID = OldId };
+        }
+
+        public override GMRTSClasses.CTSTransferData.ClientAction ToDTONonmetaAction()
+        {
+            return null;
         }
     }
 
@@ -78,7 +106,7 @@ namespace GMRTSClient
             : this(Guid.NewGuid(), units, pixel, circle) { }
         public UnitAction(Guid id, List<Unit> units, Texture2D pixel, Texture2D circle)
         {
-            animationTime = new TimeSpan(0,0,0,0,500);
+            animationTime = new TimeSpan(0, 0, 0, 0, 500);
             ID = id;
             Units = new List<Unit>(units.ToArray());
             this.pixel = pixel;
@@ -120,22 +148,22 @@ namespace GMRTSClient
 
         protected void draw(SpriteBatch sb, Color color)
         {
-            if(animationTime.TotalMilliseconds > 0)
+            if (animationTime.TotalMilliseconds > 0)
             {
-                sb.Draw(circle, Position, null, color * (float)(animationTime.TotalMilliseconds / 500.0), 0f, new Vector2(circle.Width, circle.Height)/2, 0.01f, SpriteEffects.None, 0f);
+                sb.Draw(circle, Position, null, color * (float)(animationTime.TotalMilliseconds / 500.0), 0f, new Vector2(circle.Width, circle.Height) / 2, 0.01f, SpriteEffects.None, 0f);
             }
 
-            if(InputManager.Keys.IsKeyDown(Keys.LeftShift))
+            if (InputManager.Keys.IsKeyDown(Keys.LeftShift))
             {
                 sb.Draw(circle, Position, null, color, 0f, new Vector2(circle.Width, circle.Height) / 2, scale, SpriteEffects.None, 0f);
                 if (currentUnits.Count != 0)
                 {
                     var avgPosition = new Vector2(currentUnits.Average(x => x.CurrentPosition.X), currentUnits.Average(x => x.CurrentPosition.Y));
-                    sb.Draw(pixel, avgPosition, null, color, (float)Math.Atan2(Position.Y - avgPosition.Y, Position.X - avgPosition.X), new Vector2(0, (float)pixel.Height/2f), new Vector2((avgPosition - Position).Length(), (float)currentUnits.Count / 2), SpriteEffects.None, 0f);
+                    sb.Draw(pixel, avgPosition, null, color, (float)Math.Atan2(Position.Y - avgPosition.Y, Position.X - avgPosition.X), new Vector2(0, (float)pixel.Height / 2f), new Vector2((avgPosition - Position).Length(), (float)currentUnits.Count / 2), SpriteEffects.None, 0f);
                 }
                 foreach (var order in prevOrders)
                 {
-                    sb.Draw(pixel, order.Position, null, color, (float)Math.Atan2(Position.Y - order.Position.Y, Position.X - order.Position.X), new Vector2(0, (float)pixel.Height/2f), new Vector2((order.Position - Position).Length(), (float)order.Units.Where(x => { var y = x.Orders.Find(order).Next; return y != null && y.Value == this; }).Count()/2), SpriteEffects.None, 0f);
+                    sb.Draw(pixel, order.Position, null, color, (float)Math.Atan2(Position.Y - order.Position.Y, Position.X - order.Position.X), new Vector2(0, (float)pixel.Height / 2f), new Vector2((order.Position - Position).Length(), (float)order.Units.Where(x => { var y = x.Orders.Find(order).Next; return y != null && y.Value == this; }).Count() / 2), SpriteEffects.None, 0f);
                 }
             }
         }
@@ -144,9 +172,9 @@ namespace GMRTSClient
     abstract class UnitGroundAction : UnitAction
     {
         public Vector2 Target;
-        
+
         public UnitGroundAction(List<Unit> units, Texture2D pixel, Vector2 target, Texture2D circle)
-            :base(units, pixel, circle)
+            : base(units, pixel, circle)
         {
             Position = target;
             Target = target;
@@ -156,7 +184,7 @@ namespace GMRTSClient
     abstract class UnitUnitAction : UnitAction
     {
         public Unit Target;
-        
+
         public UnitUnitAction(List<Unit> units, Texture2D pixel, Unit target, Texture2D circle)
             : base(units, pixel, circle)
         {
@@ -181,13 +209,23 @@ namespace GMRTSClient
             BuildingType = buildingType;
             buildPreview = new BuildPreviewElement(content.Load<Texture2D>("Factory"), content.Load<Texture2D>("Mine"), content.Load<Texture2D>("Market"), 0.25f);
             buildPreview.CurrentBuilding = buildingType;
-            buildPreview.Location = target.ToPoint() - (buildPreview.Rect.Size.ToVector2()/2).ToPoint();
+            buildPreview.Location = target.ToPoint() - (buildPreview.Rect.Size.ToVector2() / 2).ToPoint();
         }
 
         public override void Draw(SpriteBatch sb)
         {
             buildPreview.Draw(sb);
             draw(sb, Color.Gray);
+        }
+
+        public override MetaAction ToDTOMetaAction()
+        {
+            return null;
+        }
+
+        public override GMRTSClasses.CTSTransferData.ClientAction ToDTONonmetaAction()
+        {
+            return new GMRTSClasses.CTSTransferData.UnitGround.BuildBuildingAction() { ActionID = ID, BuildingType = BuildingType, Position = new System.Numerics.Vector2(Position.X, Position.Y), UnitIDs = new List<Guid>() { Units.First().ID } };
         }
     }
 
@@ -223,6 +261,16 @@ namespace GMRTSClient
 
             draw(sb, Color.Green);
         }
+
+        public override GMRTSClasses.CTSTransferData.ClientAction ToDTONonmetaAction()
+        {
+            return new GMRTSClasses.CTSTransferData.UnitGround.MoveAction() { ActionID = ID, Position = new System.Numerics.Vector2(Position.X, Position.Y), UnitIDs = Units.Select(x => x.ID).ToList(), RequeueOnCompletion = true };
+        }
+
+        public override MetaAction ToDTOMetaAction()
+        {
+            return null;
+        }
     }
 
     class AttackAction : UnitUnitAction
@@ -234,6 +282,16 @@ namespace GMRTSClient
 
         public override void Draw(SpriteBatch sb)
             => draw(sb, Color.Red);
+
+        public override MetaAction ToDTOMetaAction()
+        {
+            return null;
+        }
+
+        public override GMRTSClasses.CTSTransferData.ClientAction ToDTONonmetaAction()
+        {
+            return new GMRTSClasses.CTSTransferData.UnitUnit.AttackAction() { ActionID = ID, Target = Target.ID, UnitIDs = Units.Select(x => x.ID).ToList() };
+        }
     }
 
     class MoveAction : UnitGroundAction
@@ -245,6 +303,16 @@ namespace GMRTSClient
 
         public override void Draw(SpriteBatch sb)
             => draw(sb, Color.Blue);
+
+        public override MetaAction ToDTOMetaAction()
+        {
+            return null;
+        }
+
+        public override GMRTSClasses.CTSTransferData.ClientAction ToDTONonmetaAction()
+        {
+            return new GMRTSClasses.CTSTransferData.UnitGround.MoveAction() { ActionID = ID, Position = new System.Numerics.Vector2(Position.X, Position.Y), UnitIDs = Units.Select(x => x.ID).ToList(), RequeueOnCompletion = false };
+        }
     }
 
     class AssistAction : UnitUnitAction
@@ -256,5 +324,15 @@ namespace GMRTSClient
 
         public override void Draw(SpriteBatch sb)
             => draw(sb, Color.Yellow);
+
+        public override MetaAction ToDTOMetaAction()
+        {
+            return null;
+        }
+
+        public override GMRTSClasses.CTSTransferData.ClientAction ToDTONonmetaAction()
+        {
+            return new GMRTSClasses.CTSTransferData.UnitUnit.AssistAction() { ActionID = ID, Target = Target.ID, UnitIDs = Units.Select(x => x.ID).ToList() };
+        }
     }
 }

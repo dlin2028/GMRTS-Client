@@ -142,7 +142,7 @@ namespace GMRTSClient
                     {
                         if (Actions[i].Intersecting(mouseWorldPos))
                         {
-                            pendingActions.Add(new DeleteAction(Actions[i].ID));
+                            pendingActions.Add(new DeleteAction(Actions[i]));
                             foreach (var unit in Actions[i].Units)
                             {
                                 unit.Orders.Remove(Actions[i]);
