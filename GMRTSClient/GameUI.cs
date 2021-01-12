@@ -151,7 +151,7 @@ namespace GMRTSClient
                         }
                     }
                 }
-                else if (selectionRect.SelectedUnits.Count() > 0)
+                else if (selectionRect.SelectedUnits.Count > 0)
                 {
                     if (!InputManager.Keys.IsKeyDown(Keys.LeftShift))
                     {
