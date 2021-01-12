@@ -1,4 +1,6 @@
-﻿using Microsoft.Xna.Framework;
+﻿using GMRTSClasses.CTSTransferData;
+
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
@@ -6,12 +8,6 @@ using System.Text;
 
 namespace GMRTSClient
 {
-    public enum BuildingType
-    {
-        Factory,
-        Mine,
-        Market
-    }
     class BuildPreviewElement : UIElement
     {
         private Texture2D factoryTexture;
@@ -34,7 +30,7 @@ namespace GMRTSClient
                     case BuildingType.Mine:
                         Texture = mineTexture;
                         break;
-                    case BuildingType.Market:
+                    case BuildingType.Supermarket:
                         Texture = marketTexture;
                         break;
                     default:

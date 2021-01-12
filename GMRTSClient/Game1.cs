@@ -84,7 +84,8 @@ namespace GMRTSClient
             client.OnGameStart += Client_OnGameStart;
             client.SpawnUnit += Client_SpawnUnit;
             client.OnActionFinish += Client_OnActionFinish;
-            client.TryStart().Wait();
+            Task<bool> startConnectionTask = client.TryStart();
+            startConnectionTask.Wait();
             Task.Run(async () =>
             {
                 await client.JoinGameByNameAndCreateIfNeeded("aaaaa", Guid.NewGuid().ToString());
@@ -92,10 +93,13 @@ namespace GMRTSClient
             });
 
 
-            Random rng = new Random();
-            for (int i = 0; i < 10; i++)
+            if (!startConnectionTask.Result)
             {
-                units.Add(new ClientOnlyUnit(new Vector2(rng.Next(-50, 50), rng.Next(-500, 500)), (float)rng.NextDouble(), 0.1f, Content.Load<Texture2D>("Builder"), Content.Load<Texture2D>("SelectionMarker")));
+                Random rng = new Random();
+                for (int i = 0; i < 10; i++)
+                {
+                    units.Add(new ClientOnlyUnit(new Vector2(rng.Next(-50, 50), rng.Next(-500, 500)), (float)rng.NextDouble(), 0.1f, Content.Load<Texture2D>("Builder"), Content.Load<Texture2D>("SelectionMarker")));
+                }
             }
 
             base.Initialize();
@@ -190,7 +194,7 @@ namespace GMRTSClient
                         client.DeleteAction(new GMRTSClasses.CTSTransferData.MetaActions.DeleteAction() { AffectedUnits = ((UnitAction)actionDic[((DeleteAction)newAction).ActionToDelete]).Units.Select(x => x.ID).ToList(), TargetActionID = ((DeleteAction)newAction).ActionToDelete });
                         break;
                     case ActionType.Build:
-                        //hi
+                        client.BuildFactoryAction(new GMRTSClasses.CTSTransferData.UnitGround.BuildBuildingAction() { ActionID = newAction.ID, BuildingType = ((BuildAction)newAction).BuildingType, Position = new System.Numerics.Vector2(((UnitAction)newAction).Position.X, ((UnitAction)newAction).Position.Y), UnitIDs = new List<Guid>() { ((BuildAction)newAction).Units.First().ID } });
                         break;
                 }
             }

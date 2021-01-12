@@ -1,4 +1,6 @@
-﻿using GMRTSClient.Units;
+﻿using GMRTSClasses.CTSTransferData;
+
+using GMRTSClient.Units;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -175,6 +177,7 @@ namespace GMRTSClient
         BuildPreviewElement buildPreview;
         public BuildAction(List<Unit> units, Texture2D pixel, Vector2 target, BuildingType buildingType, Texture2D circle, ContentManager content) : base(units, pixel, target, circle)
         {
+            ActionType = ActionType.Build;
             BuildingType = buildingType;
             buildPreview = new BuildPreviewElement(content.Load<Texture2D>("Factory"), content.Load<Texture2D>("Mine"), content.Load<Texture2D>("Market"), 0.25f);
             buildPreview.CurrentBuilding = buildingType;

@@ -1,4 +1,6 @@
-﻿using GMRTSClient.Units;
+﻿using GMRTSClasses.CTSTransferData;
+
+using GMRTSClient.Units;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -91,7 +93,7 @@ namespace GMRTSClient
             buildFactoryButton.Enabled = false;
 
             buildMarketButton = new Button(content.Load<Texture2D>("Market"), new Rectangle(graphics.Viewport.Width - 200, graphics.Viewport.Height - 100, 100, 100), Color.White);
-            buildMarketButton.onClick += (sender, e) => { foreach (var button in buildButtons) button.Release(); attackButton.Color = Color.Gray; currentBuilding = BuildingType.Market; buildPreview.CurrentBuilding = currentBuilding; };
+            buildMarketButton.onClick += (sender, e) => { foreach (var button in buildButtons) button.Release(); attackButton.Color = Color.Gray; currentBuilding = BuildingType.Supermarket; buildPreview.CurrentBuilding = currentBuilding; };
             buildMarketButton.onRelease += (sender, e) => attackButton.Color = Color.White;
             buildMarketButton.Enabled = false;
 
