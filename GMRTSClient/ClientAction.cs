@@ -78,7 +78,14 @@ namespace GMRTSClient
         public override MetaAction ToDTOMetaAction()
         {
             var replacementAction = NewAction.ToDTONonmetaAction();
-            return new GMRTSClasses.CTSTransferData.MetaActions.ReplaceAction() { AffectedUnits = replacementAction.UnitIDs, NewAction = replacementAction, TargetActionID = OldId };
+            return replacementAction switch
+            {
+                GMRTSClasses.CTSTransferData.UnitGround.MoveAction mv => new GMRTSClasses.CTSTransferData.MetaActions.ReplaceAction<GMRTSClasses.CTSTransferData.UnitGround.MoveAction>() { AffectedUnits = replacementAction.UnitIDs, NewAction = mv, TargetActionID = OldId },
+                GMRTSClasses.CTSTransferData.UnitGround.BuildBuildingAction bb => new GMRTSClasses.CTSTransferData.MetaActions.ReplaceAction<GMRTSClasses.CTSTransferData.UnitGround.BuildBuildingAction>() { AffectedUnits = replacementAction.UnitIDs, NewAction = bb, TargetActionID = OldId },
+                GMRTSClasses.CTSTransferData.UnitUnit.AttackAction at => new GMRTSClasses.CTSTransferData.MetaActions.ReplaceAction<GMRTSClasses.CTSTransferData.UnitUnit.AttackAction>() { AffectedUnits = replacementAction.UnitIDs, NewAction = at, TargetActionID = OldId },
+                GMRTSClasses.CTSTransferData.UnitUnit.AssistAction assist => new GMRTSClasses.CTSTransferData.MetaActions.ReplaceAction<GMRTSClasses.CTSTransferData.UnitUnit.AssistAction>() { AffectedUnits = replacementAction.UnitIDs, NewAction = assist, TargetActionID = OldId },
+                _ => throw new Exception()
+            };
         }
 
         public override GMRTSClasses.CTSTransferData.ClientAction ToDTONonmetaAction()

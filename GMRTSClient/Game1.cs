@@ -156,18 +156,7 @@ namespace GMRTSClient
                 }
                 else
                 {
-                    if (meta is GMRTSClasses.CTSTransferData.MetaActions.ReplaceAction replace)
-                    {
-                        client.ReplaceAction(replace);
-                    }
-                    else if (meta is GMRTSClasses.CTSTransferData.MetaActions.DeleteAction delete)
-                    {
-                        client.DeleteAction(delete);
-                    }
-                    else
-                    {
-                        throw new Exception();
-                    }
+                    client.ArbitraryMeta(meta);
                 }
             }
 
