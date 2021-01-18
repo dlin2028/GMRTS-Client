@@ -45,15 +45,17 @@ namespace GMRTSClient
     class DeleteAction : ClientAction
     {
         public ClientAction ActionToDelete;
-        public DeleteAction(ClientAction actionToDelete)
+        public Unit[] Units;
+        public DeleteAction(Unit[] units, ClientAction actionToDelete)
         {
             ActionToDelete = actionToDelete;
             ActionType = ActionType.Delete;
+            Units = units;
         }
 
         public override GMRTSClasses.CTSTransferData.MetaActions.MetaAction ToDTOMetaAction()
         {
-            return new GMRTSClasses.CTSTransferData.MetaActions.DeleteAction() { AffectedUnits = ((UnitAction)ActionToDelete).Units.Select(a => a.ID).ToList(), TargetActionID = ActionToDelete.ID };
+            return new GMRTSClasses.CTSTransferData.MetaActions.DeleteAction() { AffectedUnits = Units.Select(a => a.ID).ToList(), TargetActionID = ActionToDelete.ID };
         }
 
         public override GMRTSClasses.CTSTransferData.ClientAction ToDTONonmetaAction()
@@ -67,11 +69,11 @@ namespace GMRTSClient
         public Guid OldId;
         public UnitAction NewAction;
 
-        public ReplaceAction(UnitAction replacedAction)
+        public ReplaceAction(UnitAction newAction, Guid oldID)
         {
-            NewAction = replacedAction;
-            OldId = replacedAction.ID;
-            replacedAction.ID = Guid.NewGuid();
+            NewAction = newAction;
+            OldId = oldID;
+            newAction.ID = Guid.NewGuid();
             ActionType = ActionType.Replace;
         }
 

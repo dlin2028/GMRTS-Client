@@ -142,7 +142,7 @@ namespace GMRTSClient
                     {
                         if (Actions[i].Intersecting(mouseWorldPos))
                         {
-                            pendingActions.Add(new DeleteAction(Actions[i]));
+                            pendingActions.Add(new DeleteAction(Actions[i].Units.ToArray(), Actions[i]));
                             foreach (var unit in Actions[i].Units)
                             {
                                 unit.Orders.Remove(Actions[i]);
@@ -178,7 +178,7 @@ namespace GMRTSClient
                                 }
                             }
                         }
-                        pendingActions.AddRange(oldOrders.Select(x => new ReplaceAction(x)));
+                        pendingActions.AddRange(oldOrders.Select(x => new DeleteAction(selectionRect.SelectedUnits.ToArray(), x)));
                     }
 
                     UnitAction newAction;
