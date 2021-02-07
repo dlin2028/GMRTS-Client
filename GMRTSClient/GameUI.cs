@@ -185,7 +185,7 @@ namespace GMRTSClient
                     switch (currentAction)
                     {
                         case ActionType.None:
-                            var target = units.FirstOrDefault(x => x.Intersecting(mouseWorldPos));
+                            var target = units.FirstOrDefault(x => x.Rect.Intersecting(mouseWorldPos));
                             if (target != null) //&& unit is enemy
                             {
                                 newAction = new AttackAction(selectionRect.SelectedUnits, pixel, target, circle);
@@ -210,7 +210,7 @@ namespace GMRTSClient
                             pendingActions.Add(newAction);
                             break;
                         case ActionType.Attack:
-                            var attackTarget = units.FirstOrDefault(x => x.Intersecting(mouseWorldPos));
+                            var attackTarget = units.FirstOrDefault(x => x.Rect.Intersecting(mouseWorldPos));
                             if (attackTarget != null) //&& unit is enemy
                             {
                                 newAction = new AttackAction(selectionRect.SelectedUnits, pixel, attackTarget, circle);
@@ -219,7 +219,7 @@ namespace GMRTSClient
                             }
                             break;
                         case ActionType.Assist:
-                            var assistTarget = units.FirstOrDefault(x => x.Intersecting(mouseWorldPos));
+                            var assistTarget = units.FirstOrDefault(x => x.Rect.Intersecting(mouseWorldPos));
                             if (assistTarget != null) //&&unit is friendly
                             {
                                 newAction = new AssistAction(selectionRect.SelectedUnits, pixel, assistTarget, circle);

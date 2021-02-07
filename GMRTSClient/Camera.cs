@@ -32,13 +32,13 @@ namespace GMRTSClient
         private float minZoom;
         private float maxZoom;
 
-        public Camera(float minZoom = 0.5f, float maxZoom = 15f)
+        public Camera(float minZoom = 0.005f, float maxZoom = 0.25f)
         {
             this.minZoom = minZoom;
             this.maxZoom = maxZoom;
 
-            position = Vector2.One;
-            zoom = 1;
+            position = Vector2.Zero;
+            zoom = (maxZoom + minZoom)/2f;
         }
         public void Pan(Vector2 distance, bool worldSpace = false)
         {
@@ -49,7 +49,7 @@ namespace GMRTSClient
         }
         public void ZoomTowardsPoint(Viewport viewport, Vector2 point, float deltaZoom)
         {
-            var newZoom = Zoom + deltaZoom;
+            var newZoom = Zoom + Zoom * deltaZoom;
             if (newZoom <= minZoom || newZoom >= maxZoom)
                 return;
 

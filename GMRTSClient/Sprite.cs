@@ -5,7 +5,10 @@ using Microsoft.Xna.Framework.Graphics;
 
 public abstract class Sprite
 {
-    private Vector2 position;
+
+    //this class looks oddly similar to the Unit class...
+
+    public Vector2 position;
     private Vector2 origin;
     private float rotation;
     private float scale;
@@ -34,6 +37,11 @@ public abstract class Sprite
         get { return scale; }
         set { scale = value; updateTransform(); }
     }
+    public Vector2 Position
+    {
+        get { return position; }
+        set { position = value; updateTransform(); }
+    }
 
     public List<Matrix> Children
     {
@@ -49,7 +57,16 @@ public abstract class Sprite
     public Sprite(Texture2D texture, float scale)
     {
         Texture = texture;
-        Scale = scale;
+        this.position = Vector2.Zero;
+        this.scale = scale;
+        updateTransform();
+    }
+    public Sprite(Texture2D texture, Vector2 position, float scale)
+    {
+        Texture = texture;
+        this.position = position;
+        this.scale = scale;
+        updateTransform();
     }
     protected void updateTransform()
     {
@@ -154,6 +171,6 @@ public abstract class Sprite
 
     protected virtual void draw(SpriteBatch sb)
     {
-        sb.Draw(Texture, position, null, Color);
+        sb.Draw(Texture, Vector2.Transform(Position, Transform), null, Color);
     }
 }

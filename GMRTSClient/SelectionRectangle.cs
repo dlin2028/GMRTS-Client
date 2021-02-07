@@ -50,8 +50,7 @@ namespace GMRTSClient
 
                 selectionRect = createRectangle(selectionBegin, camera.ScreenToWorldSpace(InputManager.MouseState.Position.ToVector2()).ToPoint());
             }
-
-            if (InputManager.MouseState.LeftButton == ButtonState.Released && InputManager.LastMouseState.LeftButton == ButtonState.Pressed)
+            else if (InputManager.LastMouseState.LeftButton == ButtonState.Pressed)
             {
                 foreach (var element in elements)
                 {
@@ -70,7 +69,7 @@ namespace GMRTSClient
                         unit.Selected = false;
                     }
 
-                    if (unit.Intersecting(selectionRect))
+                    if (unit.Rect.Intersecting(selectionRect))
                     {
                         if (InputManager.Keys.IsKeyDown(Keys.LeftShift))
                         {

@@ -43,10 +43,10 @@ namespace GMRTSClient
             switch (obj.Type)
             {
                 case "Tank":
-                    unit = new Tank(obj.ID, 0f, 0.1f, Content.Load<Texture2D>("Tank"), Content.Load<Texture2D>("SelectionMarker"));
+                    unit = new Tank(obj.ID, Content);
                     break;
                 case "Builder":
-                    unit = new Builder(obj.ID, 0f, 0.1f, Content.Load<Texture2D>("Builder"), Content.Load<Texture2D>("SelectionMarker"));
+                    unit = new Builder(obj.ID, Content);
                     break;
                 default:
                     throw new Exception();
@@ -62,7 +62,8 @@ namespace GMRTSClient
             Content.RootDirectory = "Content";
             IsMouseVisible = true; 
             Window.AllowUserResizing = true;
-            IsFixedTimeStep = false;
+            //uncomment for 3000 FPS ultimate gamer mode
+            //IsFixedTimeStep = false;
             //graphics.SynchronizeWithVerticalRetrace = false;
 
             units = new List<Unit>();
@@ -93,14 +94,15 @@ namespace GMRTSClient
             });
 
 
-            if (!startConnectionTask.Result)
+            if (true)//!startConnectionTask.Result)
             {
                 Random rng = new Random();
                 for (int i = 0; i < 10; i++)
                 {
-                    units.Add(new ClientOnlyUnit(new Vector2(rng.Next(-50, 50), rng.Next(-500, 500)), (float)rng.NextDouble(), 0.1f, Content.Load<Texture2D>("Builder"), Content.Load<Texture2D>("SelectionMarker")));
+                    //units.Add(new ClientOnlyUnit(Content.Load<Texture2D>("Builder"), Content.Load<Texture2D>("SelectionMarker"), new Vector2(rng.Next(-50, 50), rng.Next(-500, 500)), (float)rng.NextDouble(), 0.1f));
                 }
             }
+            units.Add(new ClientOnlyUnit(Content.Load<Texture2D>("Builder"), Content.Load<Texture2D>("SelectionMarker"), Vector2.Zero, 0f, 1f));
 
             base.Initialize();
         }
@@ -135,7 +137,7 @@ namespace GMRTSClient
                 var zoomDelta = InputManager.MouseState.ScrollWheelValue - InputManager.LastMouseState.ScrollWheelValue;
                 if (zoomDelta != 0)
                 {
-                    mainCamera.ZoomTowardsPoint(viewport, mouseWorldPos, (zoomDelta) / 100f);
+                    mainCamera.ZoomTowardsPoint(viewport, mouseWorldPos, zoomDelta / 300f);
                 }
             }
             #endregion
@@ -186,7 +188,7 @@ namespace GMRTSClient
             spriteBatch.Begin(SpriteSortMode.BackToFront);
             gameUI.Draw(spriteBatch);
             //this should be moved to ui later
-            spriteBatch.DrawString(smallFont, string.Format("FPS: {0} \n Money {1} \n Minerals {2}", frameCounter.AverageFramesPerSecond, 5, 5), new Vector2(1, 1), Color.Black);
+            //spriteBatch.DrawString(smallFont, string.Format("FPS: {0} \n Money {1} \n Minerals {2}", frameCounter.AverageFramesPerSecond, 5, 5), new Vector2(1, 1), Color.Black);
             spriteBatch.End();
 
             base.Draw(gameTime);
