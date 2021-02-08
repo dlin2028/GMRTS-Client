@@ -39,14 +39,14 @@ namespace GMRTSClient
                 if(InputManager.LastMouseState.LeftButton == ButtonState.Released)
                     selectionBegin = camera.ScreenToWorldSpace(InputManager.MouseState.Position.ToVector2()).ToPoint();
 
-                foreach (var element in elements)
-                {
-                    if (element.Rect.Contains(camera.WorldToScreenSpace(selectionBegin.ToVector2())))
-                    {
-                        selectionRect = new Rectangle(0, 0, 0, 0);
-                        return;
-                    }
-                }
+                //foreach (var element in elements)
+                //{
+                //    if (element.Rect.Contains(camera.WorldToScreenSpace(selectionBegin.ToVector2())))
+                //    {
+                //        selectionRect = new Rectangle(0, 0, 0, 0);
+                //        return;
+                //    }
+                //}
 
                 selectionRect = createRectangle(selectionBegin, camera.ScreenToWorldSpace(InputManager.MouseState.Position.ToVector2()).ToPoint());
             }

@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "GMRTSClient": {
+      "commandName": "Project",
+      "nativeDebugging": true
+    }
+  }
+}

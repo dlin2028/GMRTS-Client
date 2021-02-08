@@ -54,6 +54,13 @@ namespace GMRTSClient.Units
             SelectionTexture = selectionTexture;
         }
 
+        public override void Update(ulong currentMilliseconds)
+        {
+            Transform.UpdateTransform(CurrentPosition, Vector2.Zero, Vector2.One, CurrentRotation);
+
+            base.Update(currentMilliseconds);
+        }
+
         public void Draw(SpriteBatch sb)
         {
             if (Enabled)
@@ -62,14 +69,20 @@ namespace GMRTSClient.Units
                 
                 if(Selected)
                 {
-                    draw(sb, SelectionTexture);
+                    drawSelection(sb, SelectionTexture);
                 }
             }
         }
-
+        protected virtual void drawSelection(SpriteBatch sb, Texture2D texture)
+        {
+            Vector2 worldPosition = Transform.WorldPosition;
+            Vector2 worldScale = Transform.WorldScale;
+            //sb.Draw(texture, new Rectangle((int)worldPosition.X, (int)worldPosition.Y, (int)(worldScale.X * Texture.Width), (int)(Transform.LocalScale.Y * Texture.Height)), null, Color.White, 0f, Vector2.Zero, SpriteEffects.None, 0);
+            sb.Draw(texture, new Rectangle((int)worldPosition.X, (int)worldPosition.Y, (int)(worldScale.X * Texture.Width), (int)(Transform.LocalScale.Y * Texture.Height)), null, Color.White, Transform.WorldRotation, Transform.WorldOrigin, SpriteEffects.None, 0);
+        }
         protected virtual void draw(SpriteBatch sb, Texture2D texture)
         {
-            sb.Draw(Texture, CurrentPosition, null, Color.White);
+            sb.Draw(texture, Transform.WorldPosition, null, Color.White, Transform.WorldRotation, Transform.WorldOrigin, Transform.WorldScale, SpriteEffects.None, 0);
         }
     }
 }

@@ -29,8 +29,6 @@ namespace GMRTSClient
         private SignalRClient client;
         private Stopwatch stopwatch = new Stopwatch();
 
-        private Texture2D pixel;
-
         private void Client_OnGameStart(DateTime obj)
         {
             ;
@@ -94,15 +92,14 @@ namespace GMRTSClient
             });
 
 
-            if (true)//!startConnectionTask.Result)
+            if (!startConnectionTask.Result)
             {
                 Random rng = new Random();
                 for (int i = 0; i < 10; i++)
                 {
-                    //units.Add(new ClientOnlyUnit(Content.Load<Texture2D>("Builder"), Content.Load<Texture2D>("SelectionMarker"), new Vector2(rng.Next(-50, 50), rng.Next(-500, 500)), (float)rng.NextDouble(), 0.1f));
+                    units.Add(new ClientOnlyUnit(Content.Load<Texture2D>("Builder"), Content.Load<Texture2D>("SelectionMarker"), new Vector2(rng.Next(-5000, 5000), rng.Next(-5000, 5000)), (float)rng.NextDouble()));
                 }
             }
-            units.Add(new ClientOnlyUnit(Content.Load<Texture2D>("Builder"), Content.Load<Texture2D>("SelectionMarker"), Vector2.Zero, 0f, 1f));
 
             base.Initialize();
         }
@@ -188,7 +185,7 @@ namespace GMRTSClient
             spriteBatch.Begin(SpriteSortMode.BackToFront);
             gameUI.Draw(spriteBatch);
             //this should be moved to ui later
-            //spriteBatch.DrawString(smallFont, string.Format("FPS: {0} \n Money {1} \n Minerals {2}", frameCounter.AverageFramesPerSecond, 5, 5), new Vector2(1, 1), Color.Black);
+            spriteBatch.DrawString(smallFont, string.Format("FPS: {0} \n Money {1} \n Minerals {2}", frameCounter.AverageFramesPerSecond, 5, 5), new Vector2(1, 1), Color.Black);
             spriteBatch.End();
 
             base.Draw(gameTime);

@@ -10,13 +10,45 @@ namespace GMRTSClient
         public Matrix? Parent { get; set; }
         public Matrix Matrix { get; set; }
 
+        public Vector2 WorldPosition
+        {
+            get
+            {
+                return Parent == null ? LocalPosition : Vector2.Transform(LocalPosition, Parent.Value);
+            }
+        }
+        public Vector2 WorldOrigin
+        {
+            get
+            {
+                return Parent == null ? LocalOrigin : Vector2.Transform(LocalOrigin, Parent.Value);
+            }
+        }
+
+        public float WorldRotation
+        {
+            get
+            {
+                //idk how this works
+                return Parent == null ? LocalRotation : (float)Math.Atan2(Parent.Value.M12, Parent.Value.M22) + LocalRotation;
+            }
+        }
+
+        public Vector2 WorldScale
+        {
+            get
+            {
+                return Parent == null ? LocalScale : Vector2.TransformNormal(LocalScale, Parent.Value);
+            }
+        }
+
         public Vector2 LocalOrigin
         {
             get { return origin; }
             set { origin = value; updateTransform(); }
         }
 
-        public float LocalScale
+        public Vector2 LocalScale
         {
             get { return scale; }
             set { scale = value; updateTransform(); }
@@ -46,15 +78,13 @@ namespace GMRTSClient
 
         private Vector2 position;
         private Vector2 origin;
-        private float scale;
+        private Vector2 scale;
         private float rotation;
         private List<Matrix> children;
 
-        public Transform(float rotation = 0, float scale = 1)
-            :this(Vector2.Zero, rotation, scale) {}
-        public Transform(Vector2 position, float rotation = 0, float scale = 1)
-            : this(Vector2.Zero, Vector2.Zero, rotation, scale) {}
-        public Transform(Vector2 position, Vector2 origin, float rotation = 0, float scale = 1)
+        public Transform(Vector2 position, float rotation = 0)
+            : this(position, Vector2.Zero, Vector2.One, rotation) {}
+        public Transform(Vector2 position, Vector2 origin, Vector2 scale, float rotation = 0)
         {
             Parent = null;
             this.position = position;
@@ -64,10 +94,19 @@ namespace GMRTSClient
             updateTransform();
         }
 
+        public void UpdateTransform(Vector2 position, Vector2 origin, Vector2 scale, float rotation)
+        {
+            this.origin = origin;
+            this.scale = scale;
+            this.rotation = rotation;
+            this.position = position;
+            updateTransform();
+        }
+
         protected void updateTransform()
         {
             Matrix = Matrix.CreateTranslation(new Vector3(-origin, 0))
-                            * Matrix.CreateScale(scale)
+                            * Matrix.CreateScale(new Vector3(scale, 0))
                             * Matrix.CreateRotationZ(rotation)
                             * Matrix.CreateTranslation(new Vector3(LocalPosition, 0));
         }
