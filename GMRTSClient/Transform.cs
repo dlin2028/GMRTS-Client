@@ -1,27 +1,44 @@
 ﻿using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Text;
 
 namespace GMRTSClient
 {
-    class Transform
+    public class Transform
     {
-        public Matrix? Parent { get; set; }
+        private Vector2 position;
+        private Vector2 origin;
+        private Vector2 scale;
+        private float rotation;
+        private ObservableCollection<Transform> children;
+
+        public Transform? Parent { get; set; }
         public Matrix Matrix { get; set; }
+        public Matrix WorldMatrix
+        {
+            get
+            {
+                return Parent == null ? Matrix : Parent.WorldMatrix * Matrix;
+            }
+        }
 
         public Vector2 WorldPosition
         {
             get
             {
-                return Parent == null ? LocalPosition : Vector2.Transform(LocalPosition, Parent.Value);
+                return Parent == null ? LocalPosition : Vector2.Transform(LocalPosition, Parent.WorldMatrix);
             }
         }
+        /// <summary>
+        /// the origin relative to the parent
+        /// </summary>
         public Vector2 WorldOrigin
         {
             get
             {
-                return Parent == null ? LocalOrigin : Vector2.Transform(LocalOrigin, Parent.Value);
+                return Parent == null ? LocalOrigin : Vector2.TransformNormal(LocalOrigin, Parent.WorldMatrix);
             }
         }
 
@@ -30,7 +47,7 @@ namespace GMRTSClient
             get
             {
                 //idk how this works
-                return Parent == null ? LocalRotation : (float)Math.Atan2(Parent.Value.M12, Parent.Value.M22) + LocalRotation;
+                return Parent == null ? LocalRotation : (float)Math.Atan2(Parent.WorldMatrix.M12, Parent.WorldMatrix.M22) + LocalRotation;
             }
         }
 
@@ -38,7 +55,7 @@ namespace GMRTSClient
         {
             get
             {
-                return Parent == null ? LocalScale : Vector2.TransformNormal(LocalScale, Parent.Value);
+                return Parent == null ? LocalScale : Vector2.TransformNormal(LocalScale, Parent.WorldMatrix);
             }
         }
 
@@ -65,25 +82,34 @@ namespace GMRTSClient
             set { LocalRotation = value; updateTransform(); }
         }
 
-        public List<Matrix> Children
+        public ObservableCollection<Transform> Children
         {
             get
             {
-                if (children == null) children = new List<Matrix>();
+                if (children == null)
+                {
+                    children = new ObservableCollection<Transform>();
+                    children.CollectionChanged += Children_CollectionChanged;
+                }
 
                 return children;
             }
-            set { children = value; }
         }
 
-        private Vector2 position;
-        private Vector2 origin;
-        private Vector2 scale;
-        private float rotation;
-        private List<Matrix> children;
+        private void Children_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            foreach (var newItem in e.NewItems)
+            {
+                ((Transform)newItem).Parent = this;
+            }
+            foreach (var oldItem in e.OldItems)
+            {
+                ((Transform)oldItem).Parent = null;
+            }
+        }
 
         public Transform(Vector2 position, float rotation = 0)
-            : this(position, Vector2.Zero, Vector2.One, rotation) {}
+            : this(position, Vector2.Zero, Vector2.One, rotation) { }
         public Transform(Vector2 position, Vector2 origin, Vector2 scale, float rotation = 0)
         {
             Parent = null;
@@ -94,10 +120,8 @@ namespace GMRTSClient
             updateTransform();
         }
 
-        public void UpdateTransform(Vector2 position, Vector2 origin, Vector2 scale, float rotation)
+        public void UpdateTransform(Vector2 position, float rotation)
         {
-            this.origin = origin;
-            this.scale = scale;
             this.rotation = rotation;
             this.position = position;
             updateTransform();

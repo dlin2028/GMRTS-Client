@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using GMRTSClasses.Units;
+using GMRTSClient.UI;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -10,7 +11,11 @@ namespace GMRTSClient.Units
 {
     class Unit : GMRTSClasses.Units.Unit
     {
-        public bool Enabled { get; set; }
+        private Texture2D texture;
+
+        /// <summary>
+        /// The texture used for drawing
+        /// </summary>
         public Texture2D Texture
         {
             get { return texture; }
@@ -19,16 +24,32 @@ namespace GMRTSClient.Units
                 Rect = new TransformRect(Transform, new Vector2(texture.Width, texture.Height));
             }
         }
-
+        /// <summary>
+        /// The texture drawn on top when selected
+        /// </summary>
         public Texture2D SelectionTexture { get; set; }
+        /// <summary>
+        /// The position, rotation and scale of an object.
+        /// </summary>
         public Transform Transform { get; set; }
         public TransformRect Rect { get; set; }
+        /// <summary>
+        /// The UnitActions relevant to this unit
+        /// </summary>
         public LinkedList<UnitAction> Orders { get; set; }
+        /// <summary>
+        /// Whether or not the unit can be selected
+        /// </summary>
         public bool Selectable { get; set; }
+        /// <summary>
+        /// Whether or not the unit is currently selected
+        /// </summary>
         public bool Selected { get; set; }
+        /// <summary>
+        /// Whether to draw and update
+        /// </summary>
+        public bool Enabled { get; set; }
 
-
-        private Texture2D texture;
 
         public float CurrentRotation
         {
@@ -47,6 +68,7 @@ namespace GMRTSClient.Units
             Selected = false;
 
             Transform = new Transform(CurrentPosition);
+            Transform.LocalOrigin = new Vector2(texture.Width / 2, texture.Height / 2);
             Orders = new LinkedList<UnitAction>();
 
             //this also initializes the rect
@@ -56,9 +78,8 @@ namespace GMRTSClient.Units
 
         public override void Update(ulong currentMilliseconds)
         {
-            Transform.UpdateTransform(CurrentPosition, Vector2.Zero, Vector2.One, CurrentRotation);
-
             base.Update(currentMilliseconds);
+            Transform.UpdateTransform(CurrentPosition, CurrentRotation);
         }
 
         public void Draw(SpriteBatch sb)
@@ -75,10 +96,7 @@ namespace GMRTSClient.Units
         }
         protected virtual void drawSelection(SpriteBatch sb, Texture2D texture)
         {
-            Vector2 worldPosition = Transform.WorldPosition;
-            Vector2 worldScale = Transform.WorldScale;
-            //sb.Draw(texture, new Rectangle((int)worldPosition.X, (int)worldPosition.Y, (int)(worldScale.X * Texture.Width), (int)(Transform.LocalScale.Y * Texture.Height)), null, Color.White, 0f, Vector2.Zero, SpriteEffects.None, 0);
-            sb.Draw(texture, new Rectangle((int)worldPosition.X, (int)worldPosition.Y, (int)(worldScale.X * Texture.Width), (int)(Transform.LocalScale.Y * Texture.Height)), null, Color.White, Transform.WorldRotation, Transform.WorldOrigin, SpriteEffects.None, 0);
+            sb.Draw(texture, new Rectangle((int)Transform.WorldPosition.X, (int)Transform.WorldPosition.Y, (int)(Transform.WorldScale.X * Texture.Width), (int)(Transform.WorldScale.Y * Texture.Height)), null, Color.White, Transform.WorldRotation, new Vector2(SelectionTexture.Width/2, SelectionTexture.Height/2), SpriteEffects.None, 0);
         }
         protected virtual void draw(SpriteBatch sb, Texture2D texture)
         {

@@ -6,7 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace GMRTSClient
+namespace GMRTSClient.UI.Display
 {
     class BuildPreviewElement : UIElement
     {

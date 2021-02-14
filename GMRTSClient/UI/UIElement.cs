@@ -4,15 +4,15 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace GMRTSClient
+namespace GMRTSClient.UI
 {
     abstract class UIElement : Sprite
     {
         protected Rectangle rect;
 
-        public Rectangle Rect
+        public new Rectangle Rect
         {
-            get { return rect; }
+            get { return Enabled ? rect : new Rectangle(); }
             set { rect = value; }
         }
 

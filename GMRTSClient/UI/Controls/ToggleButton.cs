@@ -2,12 +2,21 @@
 using Microsoft.Xna.Framework.Graphics;
 using System;
 
-namespace GMRTSClient
+namespace GMRTSClient.UI.Controls
 {
     class ToggleButton : Button
     {
+        /// <summary>
+        /// Whether or not the button is currently toggled
+        /// </summary>
         public bool Toggled = false;
+        /// <summary>
+        /// fired when the button is toggled
+        /// </summary>
         public event ButtonEventHandler OnToggleOn;
+        /// <summary>
+        /// fired when the button is un-toggled
+        /// </summary>
         public event ButtonEventHandler OnToggleOff;
 
         public ToggleButton(Texture2D pixel, Rectangle rect, Color color) : base(pixel, rect, color)

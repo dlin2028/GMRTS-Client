@@ -1,5 +1,6 @@
 ﻿using GMRTSClasses.CTSTransferData;
-
+using GMRTSClient.UI.Controls;
+using GMRTSClient.UI.Display;
 using GMRTSClient.Units;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
@@ -9,8 +10,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Xml.Linq;
 
-namespace GMRTSClient
+namespace GMRTSClient.UI
 {
     class GameUI
     {
@@ -256,8 +258,7 @@ namespace GMRTSClient
                             pendingActions.Add(newAction);
                             break;
                         case ActionType.Build:
-                            newAction = new BuildAction(selectionRect.SelectedUnits.Where(x => x == x /* uncomment this later ------------------------------------------
-                                                                                                   is Builder */).ToList(), pixel, mouseWorldPos, currentBuilding, circle, content);
+                            newAction = new BuildAction(selectionRect.SelectedUnits.Where(x => x is Builder).ToList(), pixel, mouseWorldPos, currentBuilding, circle, content);
                             Actions.Add(newAction);
                             pendingActions.Add(newAction);
                             break;

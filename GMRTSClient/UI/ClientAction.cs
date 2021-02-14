@@ -1,6 +1,6 @@
 ﻿using GMRTSClasses.CTSTransferData;
 using GMRTSClasses.CTSTransferData.MetaActions;
-
+using GMRTSClient.UI.Display;
 using GMRTSClient.Units;
 
 using Microsoft.Xna.Framework;
@@ -13,7 +13,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace GMRTSClient
+namespace GMRTSClient.UI
 {
     public enum ActionType
     {

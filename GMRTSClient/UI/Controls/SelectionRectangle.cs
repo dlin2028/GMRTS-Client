@@ -6,10 +6,16 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace GMRTSClient
+namespace GMRTSClient.UI.Controls
 {
+    /// <summary>
+    /// The rectangle to select units when click+dragging
+    /// </summary>
     class SelectionRectangle
     {
+        /// <summary>
+        /// The currently selected selectable units
+        /// </summary>
         public List<Unit> SelectedUnits;
 
         private Point selectionBegin;
@@ -24,6 +30,12 @@ namespace GMRTSClient
             this.pixel = pixel;
         }
 
+        /// <summary>
+        /// Create rectangle given two points
+        /// </summary>
+        /// <param name="a">First point</param>
+        /// <param name="b">Second point</param>
+        /// <returns></returns>
         private Rectangle createRectangle(Point a, Point b)
         {
             return new Rectangle(Math.Min(a.X, b.X),
@@ -39,14 +51,14 @@ namespace GMRTSClient
                 if(InputManager.LastMouseState.LeftButton == ButtonState.Released)
                     selectionBegin = camera.ScreenToWorldSpace(InputManager.MouseState.Position.ToVector2()).ToPoint();
 
-                //foreach (var element in elements)
-                //{
-                //    if (element.Rect.Contains(camera.WorldToScreenSpace(selectionBegin.ToVector2())))
-                //    {
-                //        selectionRect = new Rectangle(0, 0, 0, 0);
-                //        return;
-                //    }
-                //}
+                foreach (var element in elements)
+                {
+                    if (element.Rect.Contains(camera.WorldToScreenSpace(selectionBegin.ToVector2())))
+                    {
+                        selectionRect = new Rectangle(0, 0, 0, 0);
+                        return;
+                    }
+                }
 
                 selectionRect = createRectangle(selectionBegin, camera.ScreenToWorldSpace(InputManager.MouseState.Position.ToVector2()).ToPoint());
             }

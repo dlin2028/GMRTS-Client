@@ -1,4 +1,5 @@
 ﻿using GMRTSClasses;
+using GMRTSClient.UI;
 using GMRTSClient.Units;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -23,7 +24,6 @@ namespace GMRTSClient
         private Dictionary<Guid, ClientAction> actionDic;
 
         private GameUI gameUI;
-        private FrameCounter frameCounter = new FrameCounter();
         private SpriteFont smallFont;
 
         private SignalRClient client;
@@ -37,7 +37,7 @@ namespace GMRTSClient
 
         private void Client_SpawnUnit(GMRTSClasses.STCTransferData.UnitSpawnData obj)
         {
-            Unit unit = null;
+            Unit unit;
             switch (obj.Type)
             {
                 case "Tank":
@@ -69,6 +69,7 @@ namespace GMRTSClient
             actionDic = new Dictionary<Guid, ClientAction>();
 
             stopwatch = new Stopwatch();
+            stopwatch.Start();
         }
         
         protected override void Initialize()
@@ -170,7 +171,6 @@ namespace GMRTSClient
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
-            frameCounter.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
 
 
             spriteBatch.Begin(SpriteSortMode.BackToFront, BlendState.AlphaBlend, null, null, null, null, mainCamera.Transform(viewport));
@@ -184,8 +184,6 @@ namespace GMRTSClient
 
             spriteBatch.Begin(SpriteSortMode.BackToFront);
             gameUI.Draw(spriteBatch);
-            //this should be moved to ui later
-            spriteBatch.DrawString(smallFont, string.Format("FPS: {0} \n Money {1} \n Minerals {2}", frameCounter.AverageFramesPerSecond, 5, 5), new Vector2(1, 1), Color.Black);
             spriteBatch.End();
 
             base.Draw(gameTime);
