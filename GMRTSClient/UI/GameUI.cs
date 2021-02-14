@@ -16,9 +16,6 @@ namespace GMRTSClient.UI
 {
     class GameUI
     {
-        public GMRTSClasses.Changing<float> Money { get; set; }
-        public GMRTSClasses.Changing<float> Minerals { get; set; }
-
         public List<UnitAction> Actions { get; set; }
 
         private Camera camera;
@@ -65,6 +62,8 @@ namespace GMRTSClient.UI
             this.camera = camera;
             selectionRect = new SelectionRectangle(camera, pixel);
 
+
+            //button land
             buildPreview = new BuildPreviewElement(content.Load<Texture2D>("Factory"), content.Load<Texture2D>("Mine"), content.Load<Texture2D>("Market"), 0.25f);
             buildPreview.Enabled = false;
 
@@ -138,6 +137,7 @@ namespace GMRTSClient.UI
             {
                 var mouseWorldPos = camera.ScreenToWorldSpace(InputManager.MouseState.Position.ToVector2());
 
+                //if the user presses shift+right click
                 if (InputManager.Keys.IsKeyDown(Keys.LeftShift) && InputManager.Keys.IsKeyDown(Keys.LeftControl))
                 {
                     for (int i = 0; i < Actions.Count; i++)
@@ -150,7 +150,7 @@ namespace GMRTSClient.UI
                                 unit.Orders.Remove(Actions[i]);
                             }
                             Actions.RemoveAt(i);
-                        }
+                        }  
                     }
                 }
                 else if (selectionRect.SelectedUnits.Count > 0)
@@ -187,7 +187,7 @@ namespace GMRTSClient.UI
                     switch (currentAction)
                     {
                         case ActionType.None:
-                            var target = units.FirstOrDefault(x => x.Rect.Intersecting(mouseWorldPos));
+                            var target = units.FirstOrDefault(x => x.Rect.Contains(mouseWorldPos));
                             if (target != null) //&& unit is enemy
                             {
                                 newAction = new AttackAction(selectionRect.SelectedUnits, pixel, target, circle);
@@ -212,7 +212,7 @@ namespace GMRTSClient.UI
                             pendingActions.Add(newAction);
                             break;
                         case ActionType.Attack:
-                            var attackTarget = units.FirstOrDefault(x => x.Rect.Intersecting(mouseWorldPos));
+                            var attackTarget = units.FirstOrDefault(x => x.Rect.Contains(mouseWorldPos));
                             if (attackTarget != null) //&& unit is enemy
                             {
                                 newAction = new AttackAction(selectionRect.SelectedUnits, pixel, attackTarget, circle);
@@ -221,7 +221,7 @@ namespace GMRTSClient.UI
                             }
                             break;
                         case ActionType.Assist:
-                            var assistTarget = units.FirstOrDefault(x => x.Rect.Intersecting(mouseWorldPos));
+                            var assistTarget = units.FirstOrDefault(x => x.Rect.Contains(mouseWorldPos));
                             if (assistTarget != null) //&&unit is friendly
                             {
                                 newAction = new AssistAction(selectionRect.SelectedUnits, pixel, assistTarget, circle);

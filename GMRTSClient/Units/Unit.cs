@@ -50,16 +50,27 @@ namespace GMRTSClient.Units
         /// </summary>
         public bool Enabled { get; set; }
 
-
+        /// <summary>
+        /// The rotation of the unit currently used for drawing
+        /// </summary>
         public float CurrentRotation
         {
             get { return Rotation.Value; }
         }
+        /// <summary>
+        /// The position of the unit currently used for drawing
+        /// </summary>
         public Vector2 CurrentPosition
         {
             get { return new Vector2(Position.Value.X, Position.Value.Y); }
         }
-         
+        
+        /// <summary>
+        /// The base class for all units
+        /// </summary>
+        /// <param name="id">The GUID used for updating with server data</param>
+        /// <param name="texture">The main texture for drawing the unit</param>
+        /// <param name="selectionTexture">The texture used for drawing the selection markers</param>
         public Unit(Guid id, Texture2D texture, Texture2D selectionTexture)
             :base(id)
         {
@@ -75,13 +86,19 @@ namespace GMRTSClient.Units
             Texture = texture;
             SelectionTexture = selectionTexture;
         }
-
+        /// <summary>
+        /// Updates the unit transform
+        /// </summary>
+        /// <param name="currentMilliseconds"></param>
         public override void Update(ulong currentMilliseconds)
         {
             base.Update(currentMilliseconds);
             Transform.UpdateTransform(CurrentPosition, CurrentRotation);
         }
-
+        /// <summary>
+        /// The public draw function which calls the protected draw and drawselection when applicable
+        /// </summary>
+        /// <param name="sb"></param>
         public void Draw(SpriteBatch sb)
         {
             if (Enabled)
@@ -94,10 +111,20 @@ namespace GMRTSClient.Units
                 }
             }
         }
+        /// <summary>
+        /// Draws the selection marker
+        /// </summary>
+        /// <param name="sb">spritebatch</param>
+        /// <param name="texture">the selection texture</param>
         protected virtual void drawSelection(SpriteBatch sb, Texture2D texture)
         {
             sb.Draw(texture, new Rectangle((int)Transform.WorldPosition.X, (int)Transform.WorldPosition.Y, (int)(Transform.WorldScale.X * Texture.Width), (int)(Transform.WorldScale.Y * Texture.Height)), null, Color.White, Transform.WorldRotation, new Vector2(SelectionTexture.Width/2, SelectionTexture.Height/2), SpriteEffects.None, 0);
         }
+        /// <summary>
+        /// draws the main texture
+        /// </summary>
+        /// <param name="sb">spritebatch</param>
+        /// <param name="texture">the main texture</param>
         protected virtual void draw(SpriteBatch sb, Texture2D texture)
         {
             sb.Draw(texture, Transform.WorldPosition, null, Color.White, Transform.WorldRotation, Transform.WorldOrigin, Transform.WorldScale, SpriteEffects.None, 0);

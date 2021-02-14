@@ -24,17 +24,22 @@ namespace GMRTSClient
         private Dictionary<Guid, ClientAction> actionDic;
 
         private GameUI gameUI;
-        private SpriteFont smallFont;
 
         private SignalRClient client;
         private Stopwatch stopwatch = new Stopwatch();
 
+        /// <summary>
+        /// Called when the server starts a game
+        /// </summary>
+        /// <param name="obj">The time the game starts i think</param>
         private void Client_OnGameStart(DateTime obj)
         {
-            ;
             stopwatch.Restart();
         }
-
+        /// <summary>
+        /// Called when the server spawns a unit
+        /// </summary>
+        /// <param name="obj">The unit spawn data</param>
         private void Client_SpawnUnit(GMRTSClasses.STCTransferData.UnitSpawnData obj)
         {
             Unit unit;
@@ -61,6 +66,7 @@ namespace GMRTSClient
             IsMouseVisible = true; 
             Window.AllowUserResizing = true;
             //uncomment for 3000 FPS ultimate gamer mode
+            //also works as PC toaster mode
             //IsFixedTimeStep = false;
             //graphics.SynchronizeWithVerticalRetrace = false;
 
@@ -80,7 +86,7 @@ namespace GMRTSClient
             Window.ClientSizeChanged += (s, e) => { gameUI = new GameUI(mainCamera, GraphicsDevice, Content) { Actions = gameUI.Actions}; };
 
             
-            client = new SignalRClient("http://localhost:53694/server", a => unitDic[a], TimeSpan.FromMilliseconds(400));
+            client = new SignalRClient("http://localhost:53694/server", a => unitDic[a] /* this is beautiful, thanks peter */, TimeSpan.FromMilliseconds(400));
             client.OnGameStart += Client_OnGameStart;
             client.SpawnUnit += Client_SpawnUnit;
             client.OnActionFinish += Client_OnActionFinish;
@@ -95,9 +101,11 @@ namespace GMRTSClient
 
             if (!startConnectionTask.Result)
             {
+                //add some units for debugging
                 Random rng = new Random();
                 for (int i = 0; i < 10; i++)
                 {
+                    //this could be in loadcontent?
                     units.Add(new ClientOnlyUnit(Content.Load<Texture2D>("Builder"), Content.Load<Texture2D>("SelectionMarker"), new Vector2(rng.Next(-5000, 5000), rng.Next(-5000, 5000)), (float)rng.NextDouble()));
                 }
             }
@@ -116,8 +124,9 @@ namespace GMRTSClient
         protected override void LoadContent()
         {
             spriteBatch = new SpriteBatch(GraphicsDevice);
-
-            smallFont = Content.Load<SpriteFont>("smallfont");
+            //im loading lots of content here...
+            #region loading content
+            #endregion
         }
 
         protected override void Update(GameTime gameTime)
@@ -143,6 +152,7 @@ namespace GMRTSClient
             InputManager.Update();
             gameUI.Update(units.ToArray(), gameTime);
 
+            //Sending (ui) actions to server
             foreach (var newAction in gameUI.GetPendingActions())
             {
                 actionDic.Add(newAction.ID, newAction);

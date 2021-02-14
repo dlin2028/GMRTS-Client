@@ -8,17 +8,35 @@ namespace GMRTSClient
 {
     public class TransformRect
     {
+        /// <summary>
+        /// The transform the rect is bound to
+        /// </summary>
         public Transform Transform { get; set; }
+        /// <summary>
+        /// The width and height of the rect
+        /// </summary>
         public Vector2 Size;
+        /// <summary>
+        /// If false, intersection/collision always return false
+        /// </summary>
         public bool Enabled { get; set; }
 
+        /// <summary>
+        /// A rectangle which supports transforms
+        /// </summary>
+        /// <param name="transform">The transform the rect is bound to</param>
+        /// <param name="size">The width and height of the rect</param>
         public TransformRect(Transform transform, Vector2 size)
         {
             Transform = transform;
             Size = size;
             Enabled = true;
         }
-
+        /// <summary>
+        /// Returns whether or not a normal rect is intersecting
+        /// </summary>
+        /// <param name="rect">The other rect</param>
+        /// <returns>whether or not a normal rect is intersecting</returns>
         public bool Intersecting(Rectangle rect)
         {
             if (!Enabled) return false;
@@ -50,8 +68,12 @@ namespace GMRTSClient
 
             return true;
         }
-
-        public bool Intersecting(Vector2 vector)
+        /// <summary>
+        /// Returns whether or not a point is contained inside the box
+        /// </summary>
+        /// <param name="vector">The vector to check</param>
+        /// <returns>whether or not a point is contained inside the box</returns>
+        public bool Contains(Vector2 vector)
         {
             if (!Enabled) return false;
 

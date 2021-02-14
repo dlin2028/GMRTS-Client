@@ -14,16 +14,25 @@ namespace GMRTSClient
         private float zoom;
         private Viewport viewport;
 
+        /// <summary>
+        /// The position of the camera
+        /// </summary>
         public Vector2 Position
         {
             get { return position; }
             set { position = value; }
         }
+        /// <summary>
+        /// The rotation of the camera
+        /// </summary>
         public float Rotation
         {
             get { return rotation; }
             set { rotation = value; }
         }
+        /// <summary>
+        /// The camera zoom
+        /// </summary>
         public float Zoom
         {
             get { return zoom; }
@@ -82,7 +91,5 @@ namespace GMRTSClient
                 Matrix.CreateScale(new Vector3(Zoom, Zoom, 1)) * // Scale Matrix
                 Matrix.CreateTranslation(new Vector3(viewportWidth / 2, viewportHeight / 2, 0)); // Origin/Offset Matrix
         }
-
-
     }
 }

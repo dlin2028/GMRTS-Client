@@ -95,7 +95,7 @@ namespace GMRTSClient
                 return children;
             }
         }
-
+        //Sets the parent when the children collection is changed
         private void Children_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
             foreach (var newItem in e.NewItems)
@@ -107,7 +107,11 @@ namespace GMRTSClient
                 ((Transform)oldItem).Parent = null;
             }
         }
-
+        /// <summary>
+        /// Holds the position, rotation, origin, and scale of an object
+        /// </summary>
+        /// <param name="position">The position</param>
+        /// <param name="rotation">The rotation in radians</param>
         public Transform(Vector2 position, float rotation = 0)
             : this(position, Vector2.Zero, Vector2.One, rotation) { }
         public Transform(Vector2 position, Vector2 origin, Vector2 scale, float rotation = 0)
@@ -119,7 +123,11 @@ namespace GMRTSClient
             this.scale = scale;
             updateTransform();
         }
-
+        /// <summary>
+        /// Updates the position and rotation to the specified values
+        /// </summary>
+        /// <param name="position">The new position</param>
+        /// <param name="rotation">The new rotation</param>
         public void UpdateTransform(Vector2 position, float rotation)
         {
             this.rotation = rotation;

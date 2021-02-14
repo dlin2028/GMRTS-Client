@@ -8,7 +8,6 @@ namespace GMRTSClient
     public static class InputManager
     {
         //Approval By Kevin ✔
-        //remember kevin k? (i think it was kevin k)
         public static MouseState MouseState { get; set; }
         public static MouseState LastMouseState { get; private set; }
         public static KeyboardState Keys { get; private set; }
