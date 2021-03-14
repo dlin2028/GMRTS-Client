@@ -7,7 +7,6 @@ namespace GMRTSClient
         [STAThread]
         static void Main()
         {
-            //comment
             using (var game = new Game1())
                 game.Run();
         }
