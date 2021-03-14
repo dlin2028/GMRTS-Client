@@ -5,24 +5,28 @@ using MonoGame.Extended;
 using MonoGame.Extended.Entities;
 using MonoGame.Extended.Entities.Systems;
 using MonoGame.Extended.Sprites;
+using MonoGame.Extended.TextureAtlases;
+using System;
+using System.Collections.Generic;
+using System.Text;
 
 namespace GMRTSClient.Systems
 {
-    internal class RenderSystem : EntityDrawSystem
+    internal class UnitRenderSystem : EntityDrawSystem
     {
         private readonly SpriteBatch spriteBatch;
 
         private ComponentMapper<Transform2> transformMapper;
-        private ComponentMapper<Sprite> spriteMapper;
+        private ComponentMapper<Unit> spriteMapper;
 
         public override void Initialize(IComponentMapperService mapperService)
         {
             transformMapper = mapperService.GetMapper<Transform2>();
-            spriteMapper = mapperService.GetMapper<Sprite>();
+            spriteMapper = mapperService.GetMapper<Unit>();
         }
 
-        public RenderSystem(GraphicsDevice graphics)
-            :base(Aspect.All(typeof(Unit), typeof(Transform2)))
+        public UnitRenderSystem(GraphicsDevice graphics)
+            : base(Aspect.All(typeof(Unit), typeof(Transform2)))
         {
             spriteBatch = new SpriteBatch(graphics);
         }
@@ -33,9 +37,10 @@ namespace GMRTSClient.Systems
 
             foreach (var entity in ActiveEntities)
             {
-                var sprite = spriteMapper.Get(entity);
+                var unit = spriteMapper.Get(entity);
                 var transform = transformMapper.Get(entity);
-                spriteBatch.Draw(sprite, transform);
+                spriteBatch.Draw(unit.Sprite, transform);
+                
             }
 
             spriteBatch.End();
