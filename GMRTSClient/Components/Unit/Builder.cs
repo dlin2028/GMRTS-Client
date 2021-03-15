@@ -13,7 +13,7 @@ namespace GMRTSClient.Components.Unit
     class Builder : Unit
     {
         public Builder(Guid id, ContentManager content)
-            :base(id, new Sprite(content.Load<Texture2D>("Builder")), new Sprite(content.Load<Texture2D>("SelectMarker")))
+            :base(id, new Sprite(content.Load<Texture2D>("Builder")))
         {
             UnitType = UnitType.Builder;
         }

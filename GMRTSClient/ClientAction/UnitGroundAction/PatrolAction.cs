@@ -1,6 +1,6 @@
 ﻿using GMRTSClasses.CTSTransferData;
 using GMRTSClasses.CTSTransferData.MetaActions;
-using GMRTSClient.Units;
+using GMRTSClient.Components.Unit;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -15,9 +15,10 @@ namespace GMRTSClient.UI.ClientActions
     {
         List<LinkedListNode<UnitAction>> lastPatrols;
 
-        public PatrolAction(List<Unit> units, Texture2D pixel, Vector2 target, Texture2D circle)
-            : base(units, pixel, target, circle)
+        public PatrolAction(List<Unit> units, Vector2 target)
+            : base(units, target)
         {
+            RenderColor = Color.Green;
             ActionType = ActionType.Patrol;
             lastPatrols = new List<LinkedListNode<UnitAction>>();
         }

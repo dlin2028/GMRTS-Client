@@ -19,24 +19,18 @@ namespace GMRTSClient.Components.Unit
     abstract class Unit : GMRTSClasses.Units.Unit
     {
         public Sprite Sprite { get; set; }
-        public Sprite SelectSprite { get; set; }
         public UnitType UnitType { get; set; }
 
         /// <summary>
         /// The UnitActions relevant to this unit
         /// </summary>
         public LinkedList<UnitAction> Orders { get; set; }
-        /// <summary>
-        /// Whether or not the unit is currently selected
-        /// </summary>
-        public bool Selected { get; set; }
 
 
-        public Unit(Guid id, Sprite sprite, Sprite selectSprite)
+        public Unit(Guid id, Sprite sprite)
             :base(id)
         {
             Sprite = sprite;
-            SelectSprite = selectSprite;
         }
     }
 }

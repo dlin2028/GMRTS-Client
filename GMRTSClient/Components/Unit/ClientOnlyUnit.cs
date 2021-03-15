@@ -13,7 +13,7 @@ namespace GMRTSClient.Components.Unit
     class ClientOnlyUnit : Unit
     {
         public ClientOnlyUnit(ContentManager content)
-            : base(Guid.Empty, new Sprite(content.Load<Texture2D>("Builder")), new Sprite(content.Load<Texture2D>("SelectMarker")))
+            : base(Guid.Empty, new Sprite(content.Load<Texture2D>("Builder")))
         {
 
         }

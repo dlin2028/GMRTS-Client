@@ -1,4 +1,4 @@
-﻿using GMRTSClient.Units;
+﻿using GMRTSClient.Components.Unit;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
@@ -11,8 +11,8 @@ namespace GMRTSClient.UI.ClientActions
     {
         public Vector2 Target;
 
-        public UnitGroundAction(List<Unit> units, Texture2D pixel, Vector2 target, Texture2D circle)
-            : base(units, pixel, circle)
+        public UnitGroundAction(List<Unit> units, Vector2 target)
+            : base(units)
         {
             Position = target;
             Target = target;

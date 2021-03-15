@@ -13,7 +13,7 @@ namespace GMRTSClient.Components.Unit
     class Tank : Unit
     {
         public Tank(Guid id, ContentManager content)
-            : base(id, new Sprite(content.Load<Texture2D>("Tank")), new Sprite(content.Load<Texture2D>("SelectMarker")))
+            : base(id, new Sprite(content.Load<Texture2D>("Tank")))
         {
             UnitType = UnitType.Tank;
         }

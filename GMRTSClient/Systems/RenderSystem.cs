@@ -21,10 +21,10 @@ namespace GMRTSClient.Systems
             spriteMapper = mapperService.GetMapper<Sprite>();
         }
 
-        public RenderSystem(GraphicsDevice graphics)
+        public RenderSystem(SpriteBatch spriteBatch)
             :base(Aspect.All(typeof(Unit), typeof(Transform2)))
         {
-            spriteBatch = new SpriteBatch(graphics);
+            this.spriteBatch = spriteBatch;
         }
 
         public override void Draw(GameTime gameTime)

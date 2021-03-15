@@ -29,12 +29,14 @@ namespace GMRTSClient.Systems
         private ContentManager content;
 
         private ComponentMapper<Unit> unitMapper;
+        private ComponentMapper<DTOActionData> actionMapper;
 
 
         public ServerUpdateSystem(ContentManager content)
-            :base(Aspect.All(typeof(Unit)))
+            : base(Aspect.One(typeof(Unit), typeof(DTOActionData)))
         {
             this.content = content;
+            units = new List<Unit>();
 
             client = new SignalRClient("http://localhost:53694/server", a => unitDic[a] /* this is beautiful, thanks peter */, TimeSpan.FromMilliseconds(400));
             client.OnGameStart += Client_OnGameStart;
@@ -66,14 +68,35 @@ namespace GMRTSClient.Systems
         public override void Initialize(IComponentMapperService mapperService)
         {
             unitMapper = mapperService.GetMapper<Unit>();
+            actionMapper = mapperService.GetMapper<DTOActionData>();
         }
 
         public override void Update(GameTime gameTime)
         {
             foreach (var entityId in ActiveEntities)
             {
-                var unit = unitMapper.Get(entityId);
-                unit.Update((ulong)stopwatch.ElapsedMilliseconds);
+                if (unitMapper.Has(entityId))
+                {
+                    var unit = unitMapper.Get(entityId);
+                    unit.Update((ulong)stopwatch.ElapsedMilliseconds);
+                }
+                else
+                {
+                    var actionData = actionMapper.Get(entityId);
+
+                    var nonmeta = actionData.DTONonmetaAction;
+                    var meta = actionData.DTOMetaAction;
+
+                    if (meta == null)
+                    {
+                        client.ArbitraryNonmeta(nonmeta);
+                    }
+                    else
+                    {
+                        client.ArbitraryMeta(meta);
+                    }
+                    actionMapper.Delete(entityId);
+                }
             }
         }
 

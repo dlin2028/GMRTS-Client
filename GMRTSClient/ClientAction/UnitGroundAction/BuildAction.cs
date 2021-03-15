@@ -1,6 +1,6 @@
 ﻿using GMRTSClasses.CTSTransferData;
 using GMRTSClasses.CTSTransferData.MetaActions;
-using GMRTSClient.Units;
+using GMRTSClient.Components.Unit;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -15,8 +15,9 @@ namespace GMRTSClient.UI.ClientActions
     class BuildAction : UnitGroundAction
     {
         public BuildingType BuildingType;
-        public BuildAction(List<Unit> units, Texture2D pixel, Vector2 target, BuildingType buildingType, Texture2D circle, ContentManager content) : base(units, pixel, target, circle)
+        public BuildAction(List<Unit> units, Vector2 target, BuildingType buildingType, ContentManager content) : base(units, target)
         {
+            RenderColor = Color.DarkGoldenrod;
             ActionType = ActionType.Build;
             BuildingType = buildingType;
         }

@@ -16,19 +16,21 @@ namespace GMRTSClient.UI.ClientActions
 {
     abstract class UnitAction : PlayerAction
     {
-        public List<Unit> Units;
-        public Vector2 Position;
+        public List<Unit> Units { get; set; }
+        public Vector2 Position { get; set; }
+        public Color RenderColor { get; protected set; }
 
-        private HashSet<UnitAction> prevOrders;
+        public HashSet<UnitAction> PrevOrders { get; private set; }
+
         private HashSet<Unit> currentUnits;
 
         private TimeSpan animationTime;
 
         private float scale = 0.01f;
 
-        public UnitAction(List<Unit> units, Texture2D pixel, Texture2D circle)
-            : this(Guid.NewGuid(), units, pixel, circle) { }
-        public UnitAction(Guid id, List<Unit> units, Texture2D pixel, Texture2D circle)
+        public UnitAction(List<Unit> units)
+            : this(Guid.NewGuid(), units) { }
+        public UnitAction(Guid id, List<Unit> units)
         {
             animationTime = new TimeSpan(0, 0, 0, 0, 500);
             ID = id;
@@ -38,6 +40,20 @@ namespace GMRTSClient.UI.ClientActions
             foreach (var unit in units)
             {
                 unit.Orders.AddLast(this);
+            }
+        }
+
+        public void Update()
+        {
+            PrevOrders.Clear();
+            currentUnits.Clear();
+            foreach (var unit in Units)
+            {
+                var prevOrder = unit.Orders.Find(this).Previous;
+                if (prevOrder != null)
+                    PrevOrders.Add(prevOrder.Value);
+                else
+                    currentUnits.Add(unit);
             }
         }
     }

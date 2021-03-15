@@ -1,5 +1,5 @@
 ﻿using GMRTSClasses.CTSTransferData.MetaActions;
-using GMRTSClient.Units;
+using GMRTSClient.Components.Unit;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -12,8 +12,9 @@ namespace GMRTSClient.UI.ClientActions
 {
     class MoveAction : UnitGroundAction
     {
-        public MoveAction(List<Unit> units, Texture2D pixel, Vector2 target, Texture2D circle) : base(units, pixel, target, circle)
+        public MoveAction(List<Unit> units, Vector2 target) : base(units, target)
         {
+            RenderColor = Color.Blue;
             ActionType = ActionType.Move;
         }
 

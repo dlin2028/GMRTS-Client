@@ -1,5 +1,5 @@
 ﻿using GMRTSClasses.CTSTransferData.MetaActions;
-using GMRTSClient.Units;
+using GMRTSClient.Components.Unit;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -13,8 +13,10 @@ namespace GMRTSClient.UI.ClientActions
 {
     class AssistAction : UnitUnitAction
     {
-        public AssistAction(List<Unit> units, Texture2D pixel, Unit target, Texture2D circle) : base(units, pixel, target, circle)
+
+        public AssistAction(List<Unit> units, Unit target) : base(units, target)
         {
+            RenderColor = Color.Yellow;
             ActionType = ActionType.Assist;
         }
 

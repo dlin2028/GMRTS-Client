@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using MonoGame.Extended;
 using MonoGame.Extended.Entities;
 
 namespace GMRTSClient
@@ -10,7 +11,8 @@ namespace GMRTSClient
     {
         private GraphicsDeviceManager graphics;
         private SpriteBatch spriteBatch;
-        World world;
+        private World world;
+        private OrthographicCamera camera;
 
         public Game1()
         {
@@ -21,9 +23,15 @@ namespace GMRTSClient
 
         protected override void Initialize()
         {
-            // TODO: Add your initialization logic here
+            spriteBatch = new SpriteBatch(GraphicsDevice);
+
             world = new WorldBuilder()
-                .AddSystem(new RenderSystem(GraphicsDevice))
+                .AddSystem(new ServerUpdateSystem(Content))
+                .AddSystem(new RenderSystem(spriteBatch))
+                .AddSystem(new ActionRenderSystem(Content, GraphicsDevice, spriteBatch))
+                .AddSystem(new SelectionSystem(Content, GraphicsDevice, camera))
+                .AddSystem(new UnitRenderSystem(spriteBatch))
+                .AddSystem(new UnitUpdateSystem())
                 .Build();
 
             Components.Add(world);
@@ -33,9 +41,7 @@ namespace GMRTSClient
 
         protected override void LoadContent()
         {
-            spriteBatch = new SpriteBatch(GraphicsDevice);
 
-            // TODO: use this.Content to load your game content here
         }
 
         protected override void Update(GameTime gameTime)
