@@ -6,13 +6,16 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace GMRTSClient.Units
+namespace GMRTSClient.Components.Unit
 {
     enum UnitType
     {
         Tank,
         Builder
     }
+    /// <summary>
+    /// The base class for all units
+    /// </summary>
     abstract class Unit : GMRTSClasses.Units.Unit
     {
         public Sprite Sprite { get; set; }
@@ -29,7 +32,8 @@ namespace GMRTSClient.Units
         public bool Selected { get; set; }
 
 
-        public Unit(Sprite sprite, Sprite selectSprite)
+        public Unit(Guid id, Sprite sprite, Sprite selectSprite)
+            :base(id)
         {
             Sprite = sprite;
             SelectSprite = selectSprite;

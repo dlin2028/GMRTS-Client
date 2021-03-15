@@ -23,9 +23,10 @@ namespace GMRTSClient
         {
             // TODO: Add your initialization logic here
             world = new WorldBuilder()
-                .AddSystem(new PlayerSystem())
                 .AddSystem(new RenderSystem(GraphicsDevice))
                 .Build();
+
+            Components.Add(world);
 
             base.Initialize();
         }

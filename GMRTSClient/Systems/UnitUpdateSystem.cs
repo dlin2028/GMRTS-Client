@@ -1,4 +1,4 @@
-﻿using GMRTSClient.Units;
+﻿using GMRTSClient.Components.Unit;
 using Microsoft.Xna.Framework;
 using MonoGame.Extended;
 using MonoGame.Extended.Entities;
@@ -9,17 +9,15 @@ using System.Text;
 
 namespace GMRTSClient.Systems
 {
-    class UnitSystem : EntityUpdateSystem
+    class UnitUpdateSystem : EntityUpdateSystem
     {
-        public ulong CurrentMilliseconds { get; set; }
-
         private ComponentMapper<Transform2> transformMapper;
         private ComponentMapper<Unit> unitMapper;
 
-        public UnitSystem()
+        public UnitUpdateSystem()
            : base(Aspect.All(typeof(Transform2), typeof(Unit)))
         {
-            CurrentMilliseconds = 0;
+
         }
 
         public override void Initialize(IComponentMapperService mapperService)
@@ -30,13 +28,11 @@ namespace GMRTSClient.Systems
 
         public override void Update(GameTime gameTime)
         {
-            CurrentMilliseconds += (ulong)gameTime.ElapsedGameTime.TotalMilliseconds;
             foreach (var entityId in ActiveEntities)
             {
                 var transform = transformMapper.Get(entityId);
                 var unit = unitMapper.Get(entityId);
 
-                unit.Update(CurrentMilliseconds);
                 transform.Position = new Vector2(unit.Position.Value.X, unit.Position.Value.Y);
             }
         }

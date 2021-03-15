@@ -5,12 +5,15 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace GMRTSClient.Units
+namespace GMRTSClient.Components.Unit
 {
+    /// <summary>
+    /// Goes pew pew!
+    /// </summary>
     class Tank : Unit
     {
-        public Tank(ContentManager content)
-            : base(new Sprite(content.Load<Texture2D>("Tank")), new Sprite(content.Load<Texture2D>("SelectMarker")))
+        public Tank(Guid id, ContentManager content)
+            : base(id, new Sprite(content.Load<Texture2D>("Tank")), new Sprite(content.Load<Texture2D>("SelectMarker")))
         {
             UnitType = UnitType.Tank;
         }

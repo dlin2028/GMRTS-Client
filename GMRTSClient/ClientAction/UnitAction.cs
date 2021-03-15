@@ -1,6 +1,6 @@
 ﻿using GMRTSClasses.CTSTransferData;
 using GMRTSClasses.CTSTransferData.MetaActions;
-using GMRTSClient.Units;
+using GMRTSClient.Components.Unit;
 
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
