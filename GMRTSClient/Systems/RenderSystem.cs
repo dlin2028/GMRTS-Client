@@ -29,16 +29,12 @@ namespace GMRTSClient.Systems
 
         public override void Draw(GameTime gameTime)
         {
-            spriteBatch.Begin();
-
             foreach (var entity in ActiveEntities)
             {
                 var sprite = spriteMapper.Get(entity);
                 var transform = transformMapper.Get(entity);
                 spriteBatch.Draw(sprite, transform);
             }
-
-            spriteBatch.End();
         }
     }
 }

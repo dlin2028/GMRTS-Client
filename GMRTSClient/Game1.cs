@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using MonoGame.Extended;
 using MonoGame.Extended.Entities;
+using MonoGame.Extended.ViewportAdapters;
 
 namespace GMRTSClient
 {
@@ -23,25 +24,27 @@ namespace GMRTSClient
 
         protected override void Initialize()
         {
-            spriteBatch = new SpriteBatch(GraphicsDevice);
 
-            world = new WorldBuilder()
-                .AddSystem(new ServerUpdateSystem(Content))
-                .AddSystem(new RenderSystem(spriteBatch))
-                .AddSystem(new ActionRenderSystem(Content, GraphicsDevice, spriteBatch))
-                .AddSystem(new SelectionSystem(Content, GraphicsDevice, camera))
-                .AddSystem(new UnitRenderSystem(spriteBatch))
-                .AddSystem(new UnitUpdateSystem())
-                .Build();
+            var viewportAdapter = new BoxingViewportAdapter(Window, GraphicsDevice, 800, 480);
+            camera = new OrthographicCamera(viewportAdapter);
 
-            Components.Add(world);
 
             base.Initialize();
         }
 
         protected override void LoadContent()
         {
+            spriteBatch = new SpriteBatch(GraphicsDevice);
 
+            world = new WorldBuilder()
+                   .AddSystem(new ServerUpdateSystem(Content))
+                   .AddSystem(new RenderSystem(spriteBatch))
+                   .AddSystem(new ActionRenderSystem(Content, GraphicsDevice, spriteBatch))
+                   .AddSystem(new SelectionSystem(Content, GraphicsDevice, camera))
+                   .AddSystem(new UnitRenderSystem(spriteBatch))
+                   .AddSystem(new UnitUpdateSystem())
+                   .Build();
+            Components.Add(world);
         }
 
         protected override void Update(GameTime gameTime)
@@ -49,7 +52,7 @@ namespace GMRTSClient
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
-            // TODO: Add your update logic here
+            world.Update(gameTime);
 
             base.Update(gameTime);
         }
@@ -58,8 +61,12 @@ namespace GMRTSClient
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
-            // TODO: Add your drawing code here
+            var transformMatrix = camera.GetViewMatrix();
+            spriteBatch.Begin(transformMatrix: transformMatrix);
 
+            world.Draw(gameTime);
+
+            spriteBatch.End();
             base.Draw(gameTime);
         }
     }

@@ -33,17 +33,12 @@ namespace GMRTSClient.Systems
 
         public override void Draw(GameTime gameTime)
         {
-            spriteBatch.Begin();
-
             foreach (var entity in ActiveEntities)
             {
                 var unit = spriteMapper.Get(entity);
                 var transform = transformMapper.Get(entity);
                 spriteBatch.Draw(unit.Sprite, transform);
-                
             }
-
-            spriteBatch.End();
         }
     }
 }
