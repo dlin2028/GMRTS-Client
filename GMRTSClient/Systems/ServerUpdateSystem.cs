@@ -31,6 +31,7 @@ namespace GMRTSClient.Systems
         private ComponentMapper<Component.Unit.Unit> unitMapper;
         private ComponentMapper<DTOActionData> actionMapper;
 
+        private bool spawnedClientUnits = false;
 
         public ServerUpdateSystem(ContentManager content)
             : base(Aspect.One(typeof(Unit), typeof(DTOActionData)))
@@ -52,28 +53,6 @@ namespace GMRTSClient.Systems
             {
                 await client.JoinGameByNameAndCreateIfNeeded("aaaaa", Guid.NewGuid().ToString());
                 await client.RequestGameStart();
-            });
-
-            Task.Run(() =>
-            {
-                Task.Delay(5000);
-
-                if (!startConnectionTask.Result)
-                {
-                    //add some units for debugging
-                    Random rng = new Random();
-                    for (int i = 0; i < 10; i++)
-                    {
-                        Unit unit = new ClientOnlyUnit(content);
-                        var entity = CreateEntity();
-                        entity.Attach(unit);
-                        entity.Attach(unit.Sprite);
-                        entity.Attach(new Transform2());
-
-                        units.Add(unit);
-                        unitDic.Add(unit.ID, unit);
-                    }
-                }
             });
         }
         public override void Initialize(IComponentMapperService mapperService)
@@ -108,6 +87,24 @@ namespace GMRTSClient.Systems
                     }
                     actionMapper.Delete(entityId);
                 }
+            }
+
+            if (gameTime.TotalGameTime.TotalSeconds >= 5 && spawnedClientUnits)
+            {
+                //add some units for debugging
+                Random rng = new Random();
+                for (int i = 0; i < 10; i++)
+                {
+                    Unit unit = new ClientOnlyUnit(content);
+                    var entity = CreateEntity();
+                    entity.Attach(new Transform2(rng.Next(-500, 500), rng.Next(-500, 500)));
+                    entity.Attach(unit);
+                    entity.Attach(unit.Sprite);
+
+                    units.Add(unit);
+                    unitDic.Add(unit.ID, unit);
+                }
+                spawnedClientUnits = true;
             }
         }
 
