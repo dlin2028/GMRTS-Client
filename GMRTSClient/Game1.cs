@@ -40,7 +40,7 @@ namespace GMRTSClient
                    .AddSystem(new ServerUpdateSystem(Content))
                    .AddSystem(new RenderSystem(spriteBatch))
                    .AddSystem(new ActionRenderSystem(Content, GraphicsDevice, spriteBatch))
-                   .AddSystem(new SelectionSystem(Content, GraphicsDevice, camera))
+                   .AddSystem(new SelectionSystem(Content, GraphicsDevice, spriteBatch, camera))
                    .AddSystem(new UnitRenderSystem(spriteBatch))
                    .AddSystem(new UnitUpdateSystem())
                    .Build();
@@ -66,8 +66,8 @@ namespace GMRTSClient
 
             world.Draw(gameTime);
 
-            spriteBatch.End();
             base.Draw(gameTime);
+            spriteBatch.End();
         }
     }
 }

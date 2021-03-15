@@ -1,6 +1,6 @@
 ﻿using GMRTSClasses;
 using GMRTSClasses.CTSTransferData;
-using GMRTSClasses.Units;
+using GMRTSClient.Component.Unit;
 using GMRTSClient.UI.ClientActions;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
@@ -21,14 +21,14 @@ namespace GMRTSClient.Systems
 
         private Stopwatch stopwatch = new Stopwatch();
 
-        private List<Unit> units;
+        private List<Component.Unit.Unit> units;
 
-        private Dictionary<Guid, GMRTSClient.Components.Unit.Unit> unitDic;
+        private Dictionary<Guid, Unit> unitDic;
         private Dictionary<Guid, PlayerAction> actionDic;
 
         private ContentManager content;
 
-        private ComponentMapper<Unit> unitMapper;
+        private ComponentMapper<Component.Unit.Unit> unitMapper;
         private ComponentMapper<DTOActionData> actionMapper;
 
 
@@ -37,6 +37,8 @@ namespace GMRTSClient.Systems
         {
             this.content = content;
             units = new List<Unit>();
+            unitDic = new Dictionary<Guid, Unit>();
+            actionDic = new Dictionary<Guid, PlayerAction>();
 
             client = new SignalRClient("http://localhost:53694/server", a => unitDic[a] /* this is beautiful, thanks peter */, TimeSpan.FromMilliseconds(400));
             client.OnGameStart += Client_OnGameStart;
@@ -52,18 +54,27 @@ namespace GMRTSClient.Systems
                 await client.RequestGameStart();
             });
 
-
-            if (!startConnectionTask.Result)
+            Task.Run(() =>
             {
-                //add some units for debugging
-                Random rng = new Random();
-                for (int i = 0; i < 10; i++)
-                {
-                    //this could be in loadcontent?
-                    units.Add(new GMRTSClient.Components.Unit.ClientOnlyUnit(content));
-                }
-            }
+                Task.Delay(5000);
 
+                if (!startConnectionTask.Result)
+                {
+                    //add some units for debugging
+                    Random rng = new Random();
+                    for (int i = 0; i < 10; i++)
+                    {
+                        Unit unit = new ClientOnlyUnit(content);
+                        var entity = CreateEntity();
+                        entity.Attach(unit);
+                        entity.Attach(unit.Sprite);
+                        entity.Attach(new Transform2());
+
+                        units.Add(unit);
+                        unitDic.Add(unit.ID, unit);
+                    }
+                }
+            });
         }
         public override void Initialize(IComponentMapperService mapperService)
         {
@@ -115,21 +126,15 @@ namespace GMRTSClient.Systems
         /// <param name="obj">The unit spawn data</param>
         private void Client_SpawnUnit(GMRTSClasses.STCTransferData.UnitSpawnData obj)
         {
-            GMRTSClient.Components.Unit.Unit unit;
-            switch (obj.Type)
+            Unit unit = obj.Type switch
             {
-                case "Tank":
-                    unit = new GMRTSClient.Components.Unit.Tank(obj.ID, content);
-                    break;
-                case "Builder":
-                    unit = new GMRTSClient.Components.Unit.Builder(obj.ID, content);
-                    break;
-                default:
-                    throw new Exception();
-            }
-
+                "Tank" => new Tank(obj.ID, content),
+                "Builder" => new Builder(obj.ID, content),
+                _ => throw new Exception(),
+            };
             var entity = CreateEntity();
             entity.Attach(unit);
+            entity.Attach(unit.Sprite);
             entity.Attach(new Transform2());
 
             units.Add(unit);

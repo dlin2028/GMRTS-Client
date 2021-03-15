@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace GMRTSClient.Components.Unit
+namespace GMRTSClient.Component.Unit
 {
     /// <summary>
     /// Goes pew pew!

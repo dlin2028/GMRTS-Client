@@ -1,4 +1,4 @@
-﻿using GMRTSClient.Components.Unit;
+﻿using GMRTSClient.Component.Unit;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended;

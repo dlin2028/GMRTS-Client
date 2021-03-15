@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace GMRTSClient.Components
+namespace GMRTSClient.Component
 {
     class FancyRect
     {

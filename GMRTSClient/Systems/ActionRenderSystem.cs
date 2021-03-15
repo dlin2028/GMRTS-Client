@@ -22,6 +22,7 @@ namespace GMRTSClient.Systems
         public ActionRenderSystem(ContentManager content, GraphicsDevice graphics, SpriteBatch spriteBatch)
             : base(Aspect.All(typeof(PlayerAction)))
         {
+            this.spriteBatch = spriteBatch;
             circle = content.Load<Texture2D>("Circle");
             pixel = new Texture2D(graphics, 1, 1);
             pixel.SetData(new[] { Color.White });

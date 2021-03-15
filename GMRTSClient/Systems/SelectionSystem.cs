@@ -1,7 +1,8 @@
-﻿using GMRTSClient.Components;
+﻿using GMRTSClient.Component;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using MonoGame.Extended;
 using MonoGame.Extended.Entities;
 using MonoGame.Extended.Entities.Systems;
@@ -29,10 +30,10 @@ namespace GMRTSClient.Systems
         private Rectangle selectionRect;
 
 
-        public SelectionSystem(ContentManager content, GraphicsDevice graphics, OrthographicCamera camera)
+        public SelectionSystem(ContentManager content, GraphicsDevice graphics, SpriteBatch spriteBatch, OrthographicCamera camera)
             : base(Aspect.All(typeof(Selectable), typeof(FancyRect)))
         {
-            this.spriteBatch = new SpriteBatch(graphics);
+            this.spriteBatch = spriteBatch;
             this.camera = camera;
             pixel = new Texture2D(graphics, 1, 1);
             pixel.SetData(new[] { Color.White });
@@ -58,12 +59,22 @@ namespace GMRTSClient.Systems
 
         private void MouseListener_MouseDragStart(object sender, MouseEventArgs e)
         {
+            if(e.CurrentState.LeftButton != ButtonState.Pressed)
+                return;
+
+            selectionRect = new Rectangle();
             selectionBegin = e.Position;
             dragging = true;
         }
 
         private void MouseListener_MouseDrag(object sender, MouseEventArgs e)
         {
+            if (e.CurrentState.LeftButton != ButtonState.Pressed)
+            {
+                MouseListener_MouseDragEnd(sender, e);
+                return;
+            }
+
             selectionRect = createRectangle(selectionBegin, camera.ScreenToWorld(e.Position.ToVector2()).ToPoint());
         }
 
@@ -101,6 +112,7 @@ namespace GMRTSClient.Systems
 
         public override void Draw(GameTime gameTime)
         {
+            mouseListener.Update(gameTime);
             if (dragging)
             {
                 spriteBatch.Draw(pixel, selectionRect, Color.Green);

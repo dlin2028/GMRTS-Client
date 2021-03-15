@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace GMRTSClient.Components.Unit
+namespace GMRTSClient.Component.Unit
 {
     /// <summary>
     /// Units which don't rely on the server for transform data
@@ -13,7 +13,7 @@ namespace GMRTSClient.Components.Unit
     class ClientOnlyUnit : Unit
     {
         public ClientOnlyUnit(ContentManager content)
-            : base(Guid.Empty, new Sprite(content.Load<Texture2D>("Builder")))
+            : base(Guid.NewGuid(), new Sprite(content.Load<Texture2D>("Builder")))
         {
 
         }
