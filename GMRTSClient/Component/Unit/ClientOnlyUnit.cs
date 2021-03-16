@@ -17,5 +17,10 @@ namespace GMRTSClient.Component.Unit
         {
 
         }
+
+        public override void Update(ulong currentMilliseconds)
+        {
+            //base.Update(currentMilliseconds);
+        }
     }
 }

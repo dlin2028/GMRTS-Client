@@ -33,7 +33,8 @@ namespace GMRTSClient.Systems
                 var transform = transformMapper.Get(entityId);
                 var unit = unitMapper.Get(entityId);
 
-                transform.Position = new Vector2(unit.Position.Value.X, unit.Position.Value.Y);
+                if (unit.UnitType != UnitType.ClientOnly)
+                    transform.Position = new Vector2(unit.Position.Value.X, unit.Position.Value.Y);
             }
         }
     }

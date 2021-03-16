@@ -10,6 +10,7 @@ namespace GMRTSClient.Component.Unit
 {
     enum UnitType
     {
+        ClientOnly,
         Tank,
         Builder
     }

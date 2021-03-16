@@ -27,6 +27,8 @@ namespace GMRTSClient
 
             var viewportAdapter = new BoxingViewportAdapter(Window, GraphicsDevice, 800, 480);
             camera = new OrthographicCamera(viewportAdapter);
+            camera.MinimumZoom = 0.005f;
+            camera.MaximumZoom = 0.65f;
 
 
             base.Initialize();
@@ -38,6 +40,7 @@ namespace GMRTSClient
 
             world = new WorldBuilder()
                    .AddSystem(new ServerUpdateSystem(Content))
+                   .AddSystem(new CameraSystem(camera))
                    .AddSystem(new RenderSystem(spriteBatch))
                    .AddSystem(new ActionRenderSystem(Content, GraphicsDevice, spriteBatch))
                    .AddSystem(new SelectionSystem(Content, GraphicsDevice, spriteBatch, camera))
