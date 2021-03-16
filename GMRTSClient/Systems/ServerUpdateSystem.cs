@@ -1,5 +1,6 @@
 ﻿using GMRTSClasses;
 using GMRTSClasses.CTSTransferData;
+using GMRTSClient.Component;
 using GMRTSClient.Component.Unit;
 using GMRTSClient.UI.ClientActions;
 using Microsoft.Xna.Framework;
@@ -66,9 +67,13 @@ namespace GMRTSClient.Systems
                     {
                         Unit unit = new ClientOnlyUnit(content);
                         var entity = CreateEntity();
+                        var transform = new Transform2(rng.Next(-500, 500), rng.Next(-500, 500));
+
                         entity.Attach(unit);
                         entity.Attach(unit.Sprite);
-                        entity.Attach(new Transform2(rng.Next(-500, 500), rng.Next(-500, 500)));
+                        entity.Attach(transform);
+                        entity.Attach(new FancyRect(transform, unit.Sprite.TextureRegion.Size));
+                        entity.Attach(new Selectable());
 
                         units.Add(unit);
                         unitDic.Add(unit.ID, unit);
@@ -133,10 +138,14 @@ namespace GMRTSClient.Systems
                 "Builder" => new Builder(obj.ID, content),
                 _ => throw new Exception(),
             };
+
             var entity = CreateEntity();
+            var transform = new Transform2();
+
             entity.Attach(unit);
             entity.Attach(unit.Sprite);
-            entity.Attach(new Transform2());
+            entity.Attach(transform);
+            entity.Attach(new FancyRect(transform, unit.Sprite.TextureRegion.Size));
 
             units.Add(unit);
             unitDic.Add(unit.ID, unit);

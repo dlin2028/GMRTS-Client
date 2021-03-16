@@ -8,6 +8,7 @@ using MonoGame.Extended.Entities;
 using MonoGame.Extended.Entities.Systems;
 using MonoGame.Extended.Input;
 using MonoGame.Extended.Input.InputListeners;
+using MonoGame.Extended.Sprites;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -20,7 +21,10 @@ namespace GMRTSClient.Systems
         private readonly OrthographicCamera camera;
         private ComponentMapper<Selectable> selectableMapper;
         private ComponentMapper<FancyRect> rectMapper;
+        private ComponentMapper<Transform2> transMapper;
+        private ComponentMapper<Sprite> spriteMapper;
 
+        private Texture2D selectionTexture;
         private Texture2D pixel;
         private bool dragging;
 
@@ -31,12 +35,14 @@ namespace GMRTSClient.Systems
 
 
         public SelectionSystem(ContentManager content, GraphicsDevice graphics, SpriteBatch spriteBatch, OrthographicCamera camera)
-            : base(Aspect.All(typeof(Selectable), typeof(FancyRect)))
+            : base(Aspect.All(typeof(Selectable), typeof(FancyRect), typeof(Transform2), typeof(Sprite)))
         {
             this.spriteBatch = spriteBatch;
             this.camera = camera;
+
             pixel = new Texture2D(graphics, 1, 1);
             pixel.SetData(new[] { Color.White });
+            selectionTexture = content.Load<Texture2D>("SelectionMarker");
 
             mouseListener = new MouseListener();
 
@@ -48,6 +54,8 @@ namespace GMRTSClient.Systems
         {
             selectableMapper = mapperService.GetMapper<Selectable>();
             rectMapper = mapperService.GetMapper<FancyRect>();
+            transMapper = mapperService.GetMapper<Transform2>();
+            spriteMapper = mapperService.GetMapper<Sprite>();
         }
         private Rectangle createRectangle(Point a, Point b)
         {
@@ -63,7 +71,7 @@ namespace GMRTSClient.Systems
                 return;
 
             selectionRect = new Rectangle();
-            selectionBegin = e.Position;
+            selectionBegin = camera.ScreenToWorld(e.Position.ToVector2()).ToPoint();
             dragging = true;
         }
 
@@ -116,6 +124,19 @@ namespace GMRTSClient.Systems
             if (dragging)
             {
                 spriteBatch.Draw(pixel, selectionRect, Color.Green);
+            }
+
+            foreach (var entityId in ActiveEntities)
+            {
+                var selectable = selectableMapper.Get(entityId);
+                var transform = transMapper.Get(entityId);
+                var rect = rectMapper.Get(entityId);
+                var sprite = spriteMapper.Get(entityId);
+
+                if (selectable.Selected)
+                {
+                    spriteBatch.Draw(selectionTexture, new Rectangle((int)transform.WorldPosition.X, (int)transform.WorldPosition.Y, (int)(transform.WorldScale.X * sprite.TextureRegion.Width), (int)(transform.WorldScale.Y * sprite.TextureRegion.Height)), null, Color.White, -transform.WorldRotation, new Vector2(selectionTexture.Width / 2, selectionTexture.Height / 2), SpriteEffects.None, 0);
+                }
             }
         }
 

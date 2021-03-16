@@ -39,13 +39,13 @@ namespace GMRTSClient
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
             world = new WorldBuilder()
-                   .AddSystem(new ServerUpdateSystem(Content))
                    .AddSystem(new CameraSystem(camera))
+                   .AddSystem(new ServerUpdateSystem(Content))
+                   .AddSystem(new UnitUpdateSystem())
+                   .AddSystem(new UnitRenderSystem(spriteBatch))
                    .AddSystem(new RenderSystem(spriteBatch))
                    .AddSystem(new ActionRenderSystem(Content, GraphicsDevice, spriteBatch))
                    .AddSystem(new SelectionSystem(Content, GraphicsDevice, spriteBatch, camera))
-                   .AddSystem(new UnitRenderSystem(spriteBatch))
-                   .AddSystem(new UnitUpdateSystem())
                    .Build();
             Components.Add(world);
         }

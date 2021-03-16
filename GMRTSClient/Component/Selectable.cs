@@ -11,9 +11,5 @@ namespace GMRTSClient.Component
         /// Whether or not the unit is currently selected
         /// </summary>
         public bool Selected { get; set; }
-
-        public Selectable()
-        {
-        }
     }
 }

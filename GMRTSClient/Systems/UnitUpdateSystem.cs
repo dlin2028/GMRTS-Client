@@ -35,6 +35,8 @@ namespace GMRTSClient.Systems
 
                 if (unit.UnitType != UnitType.ClientOnly)
                     transform.Position = new Vector2(unit.Position.Value.X, unit.Position.Value.Y);
+                else
+                    transform.Rotation += 0.001f;
             }
         }
     }

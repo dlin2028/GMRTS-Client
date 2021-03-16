@@ -13,10 +13,11 @@ namespace GMRTSClient.Component
 
         private Transform2 transform;
         private Vector2 Size;
-        public FancyRect(Transform2 transform, Vector2 size)
+        public FancyRect(Transform2 transform, Size2 size)
         {
             this.transform = transform;
             this.Size = size;
+            Enabled = true;
         }
         /// <summary>
         /// Returns whether or not a normal rect is intersecting
@@ -32,10 +33,11 @@ namespace GMRTSClient.Component
             var size = new Vector2(Size.X, Size.Y) * transform.WorldScale;
             var rotationMatrix = Matrix.CreateRotationZ(transform.WorldRotation);
 
-            Vector2 topLeft = Vector2.Transform(Vector2.Zero, transform.WorldMatrix);
-            Vector2 topRight = Vector2.Transform(new Vector2(Size.X, 0), transform.WorldMatrix);
-            Vector2 bottomLeft = Vector2.Transform(new Vector2(0, Size.Y), transform.WorldMatrix);
-            Vector2 bottomRight = Vector2.Transform(new Vector2(Size.X, Size.Y), transform.WorldMatrix);
+            var center = Size / 2;
+            Vector2 topLeft = Vector2.Transform(-center, transform.WorldMatrix);
+            Vector2 topRight = Vector2.Transform(-center + new Vector2(Size.X, 0), transform.WorldMatrix);
+            Vector2 bottomLeft = Vector2.Transform(-center + new Vector2(0, Size.Y), transform.WorldMatrix);
+            Vector2 bottomRight = Vector2.Transform(-center + new Vector2(Size.X, Size.Y), transform.WorldMatrix);
 
             Vector2[] verticies = { topLeft, topRight, bottomLeft, bottomRight };
             Vector2[] rectVerticies = { new Vector2(rect.X, rect.Y), new Vector2(rect.X + rect.Width, rect.Y), new Vector2(rect.X, rect.Y + rect.Height), new Vector2(rect.X + rect.Width, rect.Y + rect.Height) };
