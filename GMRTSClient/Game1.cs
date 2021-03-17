@@ -1,10 +1,13 @@
 ﻿using GMRTSClient.Systems;
+using GMRTSClient.UI;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using MonoGame.Extended;
 using MonoGame.Extended.Entities;
 using MonoGame.Extended.ViewportAdapters;
+using Myra;
+using Myra.Graphics2D.UI;
 
 namespace GMRTSClient
 {
@@ -14,6 +17,7 @@ namespace GMRTSClient
         private SpriteBatch spriteBatch;
         private World world;
         private OrthographicCamera camera;
+        private Desktop desktop;
 
         public Game1()
         {
@@ -50,6 +54,11 @@ namespace GMRTSClient
                    .Build();
 
             Components.Add(world);
+
+            MyraEnvironment.Game = this;
+            GameUI gameUI = new GameUI();
+            desktop = new Desktop();
+            desktop.Root = gameUI;
         }
 
         protected override void Update(GameTime gameTime)
@@ -69,6 +78,7 @@ namespace GMRTSClient
             var transformMatrix = camera.GetViewMatrix();
             spriteBatch.Begin(transformMatrix: transformMatrix);
 
+            desktop.Render();
             world.Draw(gameTime);
 
             base.Draw(gameTime);

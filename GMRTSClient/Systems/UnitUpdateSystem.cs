@@ -33,6 +33,8 @@ namespace GMRTSClient.Systems
                 var transform = transformMapper.Get(entityId);
                 var unit = unitMapper.Get(entityId);
 
+                unit.Update((ulong)gameTime.TotalGameTime.TotalMilliseconds);
+
                 transform.Position = new Vector2(unit.Position.Value.X, unit.Position.Value.Y);
                 transform.Rotation = unit.Rotation.Value;
             }

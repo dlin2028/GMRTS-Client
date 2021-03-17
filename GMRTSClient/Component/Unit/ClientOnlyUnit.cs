@@ -18,7 +18,7 @@ namespace GMRTSClient.Component.Unit
             : base(Guid.NewGuid(), new Sprite(content.Load<Texture2D>("Builder")))
         {
             Position = new GMRTSClasses.Changing<System.Numerics.Vector2>(new System.Numerics.Vector2(transform.Position.X, transform.Position.Y), System.Numerics.Vector2.Zero, Vector2Changer.VectorChanger, 0);
-            Rotation = new GMRTSClasses.Changing<float>(transform.Rotation, 5, FloatChanger.FChanger, 0);
+            Rotation = new GMRTSClasses.Changing<float>(transform.Rotation, 0.05f, FloatChanger.FChanger, 0);
         }
     }
 }
