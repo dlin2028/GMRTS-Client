@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Text;
 
-namespace GMRTSClient.UI.ClientActions
+namespace GMRTSClient.UI.ClientAction
 {
     public enum ActionType
     {

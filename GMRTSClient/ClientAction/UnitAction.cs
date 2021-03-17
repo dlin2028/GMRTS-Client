@@ -6,23 +6,23 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-
+using MonoGame.Extended.Collections;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace GMRTSClient.UI.ClientActions
+namespace GMRTSClient.UI.ClientAction
 {
     abstract class UnitAction : PlayerAction
     {
-        public List<Unit> Units { get; set; }
+        public ObservableCollection<Unit> Units { get; set; }
         public Vector2 Position { get; set; }
         public Color RenderColor { get; protected set; }
 
         public HashSet<UnitAction> PrevOrders { get; private set; }
 
-        private HashSet<Unit> currentUnits;
+        public HashSet<Unit> CurrentUnits { get; private set; }
 
         private TimeSpan animationTime;
 
@@ -34,26 +34,32 @@ namespace GMRTSClient.UI.ClientActions
         {
             animationTime = new TimeSpan(0, 0, 0, 0, 500);
             ID = id;
-            Units = new List<Unit>(units.ToArray());
-            currentUnits = new HashSet<Unit>();
+            Units = new ObservableCollection<Unit>(units);
+            PrevOrders = new HashSet<UnitAction>();
+            CurrentUnits = new HashSet<Unit>();
+
+            Units.Clearing += updateCollections;
+            Units.ItemAdded += updateCollections;
+            Units.ItemRemoved += updateCollections;
 
             foreach (var unit in units)
             {
                 unit.Orders.AddLast(this);
             }
+            updateCollections(null, null);
         }
 
-        public void Update()
+        private void updateCollections(object sender, EventArgs e)
         {
             PrevOrders.Clear();
-            currentUnits.Clear();
+            CurrentUnits.Clear();
             foreach (var unit in Units)
             {
                 var prevOrder = unit.Orders.Find(this).Previous;
                 if (prevOrder != null)
                     PrevOrders.Add(prevOrder.Value);
                 else
-                    currentUnits.Add(unit);
+                    CurrentUnits.Add(unit);
             }
         }
     }

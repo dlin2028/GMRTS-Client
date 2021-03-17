@@ -1,4 +1,4 @@
-﻿using GMRTSClient.UI.ClientActions;
+﻿using GMRTSClient.UI.ClientAction;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended.Sprites;
@@ -31,6 +31,7 @@ namespace GMRTSClient.Component.Unit
         public Unit(Guid id, Sprite sprite)
             :base(id)
         {
+            Orders = new LinkedList<UnitAction>();
             Sprite = sprite;
         }
     }

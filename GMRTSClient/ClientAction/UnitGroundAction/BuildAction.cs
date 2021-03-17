@@ -10,7 +10,7 @@ using System.Linq;
 using System.Text;
 
 
-namespace GMRTSClient.UI.ClientActions
+namespace GMRTSClient.UI.ClientAction
 {
     class BuildAction : UnitGroundAction
     {

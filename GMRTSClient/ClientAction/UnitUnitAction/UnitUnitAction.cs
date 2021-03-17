@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace GMRTSClient.UI.ClientActions
+namespace GMRTSClient.UI.ClientAction
 {
     abstract class UnitUnitAction : UnitAction
     {

@@ -2,7 +2,7 @@
 using GMRTSClasses.CTSTransferData;
 using GMRTSClient.Component;
 using GMRTSClient.Component.Unit;
-using GMRTSClient.UI.ClientActions;
+using GMRTSClient.UI.ClientAction;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using MonoGame.Extended;
@@ -55,9 +55,9 @@ namespace GMRTSClient.Systems
                 await client.RequestGameStart();
             });
 
-            Task.Run(() =>
+            Task.Run(async () =>
             {
-                Task.Delay(5000);
+                await Task.Delay(500);
 
                 if (!startConnectionTask.Result)
                 {
@@ -65,9 +65,9 @@ namespace GMRTSClient.Systems
                     Random rng = new Random();
                     for (int i = 0; i < 10; i++)
                     {
-                        Unit unit = new ClientOnlyUnit(content);
                         var entity = CreateEntity();
                         var transform = new Transform2(rng.Next(-500, 500), rng.Next(-500, 500));
+                        Unit unit = new ClientOnlyUnit(content, transform);
 
                         entity.Attach(unit);
                         entity.Attach(unit.Sprite);
@@ -113,6 +113,8 @@ namespace GMRTSClient.Systems
                         client.ArbitraryMeta(meta);
                     }
                     actionMapper.Delete(entityId);
+
+                    //maybe destroy empty entities here
                 }
             }
         }

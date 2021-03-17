@@ -1,4 +1,4 @@
-﻿using GMRTSClient.UI.ClientActions;
+﻿using GMRTSClient.UI.ClientAction;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -51,6 +51,11 @@ namespace GMRTSClient.Systems
             {
                 spriteBatch.Draw(circle, unitAction.Position, null, unitAction.RenderColor * (float)(unitAction.AnimationTime.TotalMilliseconds / 500.0), 0f, new Vector2(circle.Width, circle.Height) / 2, 0.01f, SpriteEffects.None, 0f);
                 unitAction.AnimationTime -= gameTime.ElapsedGameTime;
+            }
+            if (unitAction.CurrentUnits.Count != 0)
+            {
+                var avgPosition = new Vector2(unitAction.CurrentUnits.Average(x => x.Position.Value.X), unitAction.CurrentUnits.Average(x => x.Position.Value.Y));
+                spriteBatch.Draw(pixel, avgPosition, null, unitAction.RenderColor, (float)Math.Atan2(unitAction.Position.Y - avgPosition.Y, unitAction.Position.X - avgPosition.X), new Vector2(0, (float)pixel.Height / 2f), new Vector2((avgPosition - unitAction.Position).Length(), (float)unitAction.CurrentUnits.Count / 2), SpriteEffects.None, 0f);
             }
             foreach (var order in unitAction.PrevOrders)
             {

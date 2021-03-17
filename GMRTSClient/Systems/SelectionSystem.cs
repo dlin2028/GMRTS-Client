@@ -46,10 +46,23 @@ namespace GMRTSClient.Systems
 
             mouseListener = new MouseListener();
 
+            mouseListener.MouseClicked += MouseListener_MouseClicked;
             mouseListener.MouseDragStart += MouseListener_MouseDragStart;
             mouseListener.MouseDrag += MouseListener_MouseDrag;
             mouseListener.MouseDragEnd += MouseListener_MouseDragEnd;
         }
+
+        private void MouseListener_MouseClicked(object sender, MouseEventArgs e)
+        {
+            if(!KeyboardExtended.GetState().IsShiftDown())
+            {
+                foreach (var entityId in ActiveEntities)
+                {
+                    selectableMapper.Get(entityId).Selected = false;
+                }
+            }
+        }
+
         public override void Initialize(IComponentMapperService mapperService)
         {
             selectableMapper = mapperService.GetMapper<Selectable>();
@@ -67,7 +80,7 @@ namespace GMRTSClient.Systems
 
         private void MouseListener_MouseDragStart(object sender, MouseEventArgs e)
         {
-            if(e.CurrentState.LeftButton != ButtonState.Pressed)
+            if(e.Button != MouseButton.Left)
                 return;
 
             selectionRect = new Rectangle();
@@ -77,17 +90,17 @@ namespace GMRTSClient.Systems
 
         private void MouseListener_MouseDrag(object sender, MouseEventArgs e)
         {
-            if (e.CurrentState.LeftButton != ButtonState.Pressed)
-            {
-                MouseListener_MouseDragEnd(sender, e);
+            if (e.Button != MouseButton.Left)
                 return;
-            }
 
             selectionRect = createRectangle(selectionBegin, camera.ScreenToWorld(e.Position.ToVector2()).ToPoint());
         }
 
         private void MouseListener_MouseDragEnd(object sender, MouseEventArgs e)
         {
+            if (e.Button != MouseButton.Left)
+                return;
+
             dragging = false;
 
             KeyboardStateExtended keyboardState = KeyboardExtended.GetState();

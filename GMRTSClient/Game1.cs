@@ -44,9 +44,11 @@ namespace GMRTSClient
                    .AddSystem(new UnitUpdateSystem())
                    .AddSystem(new UnitRenderSystem(spriteBatch))
                    .AddSystem(new RenderSystem(spriteBatch))
+                   .AddSystem(new UnitActionSystem(0, camera))
                    .AddSystem(new ActionRenderSystem(Content, GraphicsDevice, spriteBatch))
                    .AddSystem(new SelectionSystem(Content, GraphicsDevice, spriteBatch, camera))
                    .Build();
+
             Components.Add(world);
         }
 
