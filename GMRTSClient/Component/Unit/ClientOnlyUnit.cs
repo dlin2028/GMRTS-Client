@@ -20,10 +20,5 @@ namespace GMRTSClient.Component.Unit
             Position = new GMRTSClasses.Changing<System.Numerics.Vector2>(new System.Numerics.Vector2(transform.Position.X, transform.Position.Y), System.Numerics.Vector2.Zero, Vector2Changer.VectorChanger, 0);
             Rotation = new GMRTSClasses.Changing<float>(transform.Rotation, 5, FloatChanger.FChanger, 0);
         }
-
-        public override void Update(ulong currentMilliseconds)
-        {
-            //base.Update(currentMilliseconds);
-        }
     }
 }

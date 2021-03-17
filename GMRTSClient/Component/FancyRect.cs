@@ -65,9 +65,11 @@ namespace GMRTSClient.Component
         {
             if (!Enabled) return false;
 
-            Vector2 topLeft = Vector2.Transform(Vector2.Zero, transform.WorldMatrix);
-            Vector2 topRight = Vector2.Transform(new Vector2(Size.X, 0), transform.WorldMatrix);
-            Vector2 bottomRight = Vector2.Transform(new Vector2(Size.X, Size.Y), transform.WorldMatrix);
+            var size = new Vector2(Size.X, Size.Y) * transform.WorldScale;
+            var center = Size / 2;
+            Vector2 topLeft = Vector2.Transform(-center, transform.WorldMatrix);
+            Vector2 topRight = Vector2.Transform(-center + new Vector2(Size.X, 0), transform.WorldMatrix);
+            Vector2 bottomRight = Vector2.Transform(-center + new Vector2(Size.X, Size.Y), transform.WorldMatrix);
 
             #region good code no need for inspection
             var x = vector.X;

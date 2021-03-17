@@ -15,6 +15,7 @@ namespace GMRTSClient.UI.ClientAction
             : base(units)
         {
             Target = target;
+            Position = new Vector2(target.Position.Value.X, target.Position.Value.Y);
         }
     }
 }
