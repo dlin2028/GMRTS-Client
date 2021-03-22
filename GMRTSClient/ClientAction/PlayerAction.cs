@@ -12,10 +12,10 @@ namespace GMRTSClient.UI.ClientAction
         Attack,
         Assist,
         Patrol,
+        Build,
         //non drawable actions
         Delete,
-        Replace,
-        Build
+        Replace
     }
 
     class DTOActionData
@@ -36,7 +36,7 @@ namespace GMRTSClient.UI.ClientAction
         public ActionType ActionType;
         public Guid ID;
         public TimeSpan AnimationTime { get; set; }
-        public bool IsUnitAction => ActionType <= ActionType.Patrol && ActionType != ActionType.None;
+        public bool IsUnitAction => ActionType <= ActionType.Build && ActionType != ActionType.None;
 
         public PlayerAction()
         {

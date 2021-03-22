@@ -1,7 +1,10 @@
-﻿using GMRTSClient.Component;
+﻿using GMRTSClasses.CTSTransferData;
+using GMRTSClient.Component;
 using GMRTSClient.Component.Unit;
+using GMRTSClient.UI;
 using GMRTSClient.UI.ClientAction;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
 using MonoGame.Extended;
 using MonoGame.Extended.Entities;
 using MonoGame.Extended.Entities.Systems;
@@ -16,42 +19,52 @@ namespace GMRTSClient.Systems
 {
     class UnitActionSystem : EntityUpdateSystem
     {
+        private readonly OrthographicCamera camera;
+        private readonly ContentManager content;
+
         private ComponentMapper<Unit> unitMapper;
         private ComponentMapper<Selectable> selectMapper;
         private ComponentMapper<FancyRect> rectMapper;
         private MouseListener mouseListener;
 
-        private readonly ActionType currentAction;
-        private readonly OrthographicCamera camera;
+        private UIStatus uiStatus;
+        private ActionType currentAction => uiStatus.CurrentAction;
+        private BuildingType currentBuilding => uiStatus.CurrentBuilding;
 
-        public UnitActionSystem(int currentAction, OrthographicCamera camera)
-            :base(Aspect.All(typeof(Unit)))
+        public UnitActionSystem(UIStatus uiStatus, OrthographicCamera camera, ContentManager content)
+            : base(Aspect.All(typeof(Unit)))
         {
-            this.currentAction = (ActionType)currentAction;
+            this.uiStatus = uiStatus;
+            this.camera = camera;
+            this.content = content;
+
             mouseListener = new MouseListener();
             mouseListener.MouseClicked += MouseListener_MouseClicked;
             mouseListener.MouseDoubleClicked += MouseListener_MouseClicked;
-            this.camera = camera;
         }
 
-        private ComponentMapper<PlayerAction> pam;
+
         public override void Initialize(IComponentMapperService mapperService)
         {
-            pam = mapperService.GetMapper<PlayerAction>();
             unitMapper = mapperService.GetMapper<Unit>();
             selectMapper = mapperService.GetMapper<Selectable>();
             rectMapper = mapperService.GetMapper<FancyRect>();
         }
 
+        private IEnumerable<int> GetIntersectingUnits(Vector2 position)
+        {
+            return ActiveEntities.Where(x => rectMapper.Get(x).Contains(camera.ScreenToWorld(position)));
+        }
+
         private void MouseListener_MouseClicked(object sender, MouseEventArgs e)
         {
-            if (e.Button != MouseButton.Right) return;
+            if (e.Button != MouseButton.Right || uiStatus.MouseHovering) return;
 
             List<int> selectedEntities = new List<int>();
             List<Unit> selectedUnits = new List<Unit>();
             foreach (var entityId in ActiveEntities)
             {
-                if(selectMapper.Get(entityId).Selected)
+                if (selectMapper.Get(entityId).Selected)
                 {
                     selectedEntities.Add(entityId);
                     selectedUnits.Add(unitMapper.Get(entityId));
@@ -99,7 +112,7 @@ namespace GMRTSClient.Systems
             {
                 case ActionType.None:
                     Unit target = null;
-                    var clickedUnits = ActiveEntities.Where(x => rectMapper.Get(x).Contains(camera.ScreenToWorld(e.Position.ToVector2())));
+                    var clickedUnits = GetIntersectingUnits(camera.ScreenToWorld(e.Position.ToVector2()));
                     if (clickedUnits.Count() > 0)
                         target = unitMapper.Get(clickedUnits.First());
 
@@ -124,7 +137,11 @@ namespace GMRTSClient.Systems
                     newEntity.Attach(new DTOActionData(newAction));
                     break;
                 case ActionType.Attack:
-                    var attackTarget = unitMapper.Get(ActiveEntities.FirstOrDefault(x => rectMapper.Get(x).Contains(camera.ScreenToWorld(e.Position.ToVector2()))));
+                    Unit attackTarget = null;
+                    var unitsToAttack = GetIntersectingUnits(camera.ScreenToWorld(e.Position.ToVector2()));
+                    if (unitsToAttack.Count() > 0)
+                        attackTarget = unitMapper.Get(unitsToAttack.First());
+
                     if (attackTarget != null) //&& unit is enemy
                     {
                         newAction = new AttackAction(selectedUnits, attackTarget);
@@ -133,7 +150,11 @@ namespace GMRTSClient.Systems
                     }
                     break;
                 case ActionType.Assist:
-                    var assistTarget = unitMapper.Get(ActiveEntities.FirstOrDefault(x => rectMapper.Get(x).Contains(camera.ScreenToWorld(e.Position.ToVector2()))));
+                    Unit assistTarget = null;
+                    var unitsToAssist = GetIntersectingUnits(camera.ScreenToWorld(e.Position.ToVector2()));
+                    if (unitsToAssist.Count() > 0)
+                        assistTarget = unitMapper.Get(unitsToAssist.First());
+
                     if (assistTarget != null) //&&unit is friendly
                     {
                         newAction = new AssistAction(selectedUnits, assistTarget);
@@ -149,18 +170,21 @@ namespace GMRTSClient.Systems
                     }
                     foreach (var prevAction in prevActions)
                     {
+                        var extraEntity = CreateEntity();
                         if (prevAction.Item1 == null)
                         {
                             var posList = prevAction.Item2.Select(x => x.Position.Value);
                             var avgpos = new Vector2(posList.Average(x => x.X), posList.Average(x => x.Y));
                             newAction = new PatrolAction(prevAction.Item2.ToList(), avgpos);
+                            extraEntity.Attach(newAction);
+                            extraEntity.Attach(new DTOActionData(newAction));
                         }
-                        else
+                        else if(prevAction.Item1.ActionType != ActionType.Patrol)
                         {
                             newAction = new PatrolAction(prevAction.Item2.ToList(), prevAction.Item1.Position);
+                            extraEntity.Attach(newAction);
+                            extraEntity.Attach(new DTOActionData(newAction));
                         }
-                        newEntity.Attach(newAction);
-                        newEntity.Attach(new DTOActionData(newAction));
                     }
 
                     newAction = new PatrolAction(selectedUnits, mouseWorldPos);
@@ -168,9 +192,9 @@ namespace GMRTSClient.Systems
                     newEntity.Attach(new DTOActionData(newAction));
                     break;
                 case ActionType.Build:
-                    //newAction = new BuildAction(selectionRect.SelectedUnits.Where(x => x is Builder).ToList(), pixel, mouseWorldPos, currentBuilding, circle, content);
-                    //Actions.Add(newAction);
-                    //pendingActions.Add(newAction);
+                    newAction = new BuildAction(selectedUnits.Where(x => x == x /*is Builder*/).ToList(), mouseWorldPos, currentBuilding, content);
+                    newEntity.Attach(newAction);
+                    newEntity.Attach(new DTOActionData(newAction));
                     break;
                 default:
                     break;

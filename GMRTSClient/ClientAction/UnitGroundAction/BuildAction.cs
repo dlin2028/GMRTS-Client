@@ -4,6 +4,7 @@ using GMRTSClient.Component.Unit;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using MonoGame.Extended.Sprites;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,9 +15,44 @@ namespace GMRTSClient.UI.ClientAction
 {
     class BuildAction : UnitGroundAction
     {
-        public BuildingType BuildingType;
+        public BuildingType BuildingType { get; set; }
+
+        public Sprite Sprite {
+            get {
+                switch (BuildingType)
+                {
+                    case BuildingType.Factory:
+                        if (factorySprite == null)
+                            factorySprite = new Sprite(content.Load<Texture2D>("Factory"));
+
+                        return factorySprite;
+
+                    case BuildingType.Supermarket:
+                        if (supermarketSprite == null)
+                            supermarketSprite = new Sprite(content.Load<Texture2D>("Market"));
+
+                        return supermarketSprite;
+
+                    case BuildingType.Mine:
+                        if (mineSprite == null)
+                            mineSprite = new Sprite(content.Load<Texture2D>("Mine"));
+
+                        return mineSprite;
+                }
+                throw new Exception("BuildingType was invalid");
+            }
+        }
+
+        private static Sprite factorySprite;
+        private static Sprite mineSprite;
+        private static Sprite supermarketSprite;
+
+        private ContentManager content;
+
         public BuildAction(List<Unit> units, Vector2 target, BuildingType buildingType, ContentManager content) : base(units, target)
         {
+            this.content = content;
+
             RenderColor = Color.DarkGoldenrod;
             ActionType = ActionType.Build;
             BuildingType = buildingType;

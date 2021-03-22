@@ -18,17 +18,22 @@ namespace GMRTSClient
         private World world;
         private OrthographicCamera camera;
         private Desktop desktop;
+        GameUI gameUI;
+        private UIStatus uiStatus;
 
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
+            //uncomment for 3000 FPS ultimate gamer mode
+            //also works as PC toaster mode
+            //IsFixedTimeStep = false;
+            //graphics.SynchronizeWithVerticalRetrace = false;
         }
 
         protected override void Initialize()
         {
-
             var viewportAdapter = new BoxingViewportAdapter(Window, GraphicsDevice, 800, 480);
             camera = new OrthographicCamera(viewportAdapter);
             camera.MinimumZoom = 0.005f;
@@ -42,23 +47,25 @@ namespace GMRTSClient
         {
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
+            MyraEnvironment.Game = this;
+            gameUI = new GameUI();
+            desktop = new Desktop();
+            desktop.Root = gameUI;
+
+            uiStatus = new UIStatus(gameUI.CurrentAction, gameUI.CurrentBuilding, desktop.IsMouseOverGUI);
+
             world = new WorldBuilder()
                    .AddSystem(new CameraSystem(camera))
                    .AddSystem(new ServerUpdateSystem(Content))
                    .AddSystem(new UnitUpdateSystem())
                    .AddSystem(new UnitRenderSystem(spriteBatch))
                    .AddSystem(new RenderSystem(spriteBatch))
-                   .AddSystem(new UnitActionSystem(0, camera))
+                   .AddSystem(new UnitActionSystem(uiStatus, camera, Content))
                    .AddSystem(new ActionRenderSystem(Content, GraphicsDevice, spriteBatch))
-                   .AddSystem(new SelectionSystem(Content, GraphicsDevice, spriteBatch, camera))
+                   .AddSystem(new SelectionSystem(Content, GraphicsDevice, spriteBatch, camera, uiStatus))
                    .Build();
 
             Components.Add(world);
-
-            MyraEnvironment.Game = this;
-            GameUI gameUI = new GameUI();
-            desktop = new Desktop();
-            desktop.Root = gameUI;
         }
 
         protected override void Update(GameTime gameTime)
@@ -66,6 +73,7 @@ namespace GMRTSClient
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
+            uiStatus.Update(gameUI.CurrentAction, gameUI.CurrentBuilding, desktop.IsMouseOverGUI);
             world.Update(gameTime);
 
             base.Update(gameTime);
@@ -78,11 +86,12 @@ namespace GMRTSClient
             var transformMatrix = camera.GetViewMatrix();
             spriteBatch.Begin(transformMatrix: transformMatrix);
 
-            desktop.Render();
             world.Draw(gameTime);
 
             base.Draw(gameTime);
             spriteBatch.End();
+
+            desktop.Render();
         }
     }
 }

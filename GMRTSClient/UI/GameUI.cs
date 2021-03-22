@@ -6,31 +6,68 @@ using System;
 
 namespace GMRTSClient.UI
 {
+	public class UIStatus
+	{
+		public ActionType CurrentAction { get; set; }
+		public BuildingType CurrentBuilding { get; set; }
+		public bool MouseHovering { get; set; }
+        public UIStatus(ActionType currentAction, BuildingType currentBuilding, bool mouseHovering)
+        {
+			CurrentAction = currentAction;
+			CurrentBuilding = currentBuilding;
+			MouseHovering = mouseHovering;
+        }
+
+		public void Update(ActionType currentAction, BuildingType currentBuilding, bool mouseHovering)
+		{
+			CurrentAction = currentAction;
+			CurrentBuilding = currentBuilding;
+			MouseHovering = mouseHovering;
+		}
+	}
+
 	public partial class GameUI
 	{
-        public ActionType CurrentAction { get; private set; }
+		public ActionType CurrentAction { get; private set; }
 		public BuildingType CurrentBuilding { get; private set; }
 
-        public GameUI()
+		public GameUI()
 		{
 			BuildUI();
 
-			moveButton.Selected += resetButtonColors;
+			moveButton.Selected += resetActionButtons;
 			moveButton.Selected += (s,a) => { moveButton.Color = Color.DarkBlue; CurrentAction = ActionType.Move; };
 
-			assistButton.Selected += resetButtonColors;
+			assistButton.Selected += resetActionButtons;
 			assistButton.Selected += (s, a) => { assistButton.Color = Color.DarkBlue; CurrentAction = ActionType.Assist; };
 
-			attackButton.Selected += resetButtonColors;
+			attackButton.Selected += resetActionButtons;
 			attackButton.Selected += (s, a) => { attackButton.Color = Color.DarkBlue; CurrentAction = ActionType.Attack; };
 
-			patrolButton.Selected += resetButtonColors;
+			patrolButton.Selected += resetActionButtons;
 			patrolButton.Selected += (s, a) => { patrolButton.Color = Color.DarkBlue; CurrentAction = ActionType.Patrol; };
 
+			buildButton.Selected += resetBuildButtons;
 			buildButton.Selected += (s, a) => { buildMenu.Visible = !buildMenu.Visible; };
+
+			factoryButton.Selected += resetBuildButtons;
+			factoryButton.Selected += (s, a) => { factoryButton.Color = Color.DarkBlue; CurrentBuilding = BuildingType.Factory; CurrentAction = ActionType.Build; };
+
+			mineButton.Selected += resetBuildButtons;
+			mineButton.Selected += (s, a) => { mineButton.Color = Color.DarkBlue; CurrentBuilding = BuildingType.Mine; CurrentAction = ActionType.Build; };
+
+			supermarketButton.Selected += resetBuildButtons;
+			supermarketButton.Selected += (s, a) => { supermarketButton.Color = Color.DarkBlue; CurrentBuilding = BuildingType.Supermarket; CurrentAction = ActionType.Build; };
 		}
 
-		private void resetButtonColors(object sender, EventArgs a)
+		private void resetBuildButtons(object sender, EventArgs e)
+        {
+			factoryButton.Color = Color.White;
+			mineButton.Color = Color.White;
+			supermarketButton.Color = Color.White;
+		}
+
+		private void resetActionButtons(object sender, EventArgs a)
         {
 			moveButton.Color = Color.White;
 			assistButton.Color = Color.White;

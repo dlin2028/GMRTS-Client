@@ -1,4 +1,5 @@
 ﻿using GMRTSClient.Component;
+using GMRTSClient.UI;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -33,12 +34,15 @@ namespace GMRTSClient.Systems
         private Point selectionBegin;
         private Rectangle selectionRect;
 
+        private UIStatus uiStatus;
 
-        public SelectionSystem(ContentManager content, GraphicsDevice graphics, SpriteBatch spriteBatch, OrthographicCamera camera)
+
+        public SelectionSystem(ContentManager content, GraphicsDevice graphics, SpriteBatch spriteBatch, OrthographicCamera camera, UIStatus uiStatus)
             : base(Aspect.All(typeof(Selectable), typeof(FancyRect), typeof(Transform2), typeof(Sprite)))
         {
             this.spriteBatch = spriteBatch;
             this.camera = camera;
+            this.uiStatus = uiStatus;
 
             pixel = new Texture2D(graphics, 1, 1);
             pixel.SetData(new[] { Color.White });
@@ -54,6 +58,8 @@ namespace GMRTSClient.Systems
 
         private void MouseListener_MouseClicked(object sender, MouseEventArgs e)
         {
+            if (uiStatus.MouseHovering) return;
+
             if(!KeyboardExtended.GetState().IsShiftDown())
             {
                 foreach (var entityId in ActiveEntities)
@@ -80,7 +86,7 @@ namespace GMRTSClient.Systems
 
         private void MouseListener_MouseDragStart(object sender, MouseEventArgs e)
         {
-            if(e.Button != MouseButton.Left)
+            if(e.Button != MouseButton.Left || uiStatus.MouseHovering)
                 return;
 
             selectionRect = new Rectangle();
@@ -90,7 +96,7 @@ namespace GMRTSClient.Systems
 
         private void MouseListener_MouseDrag(object sender, MouseEventArgs e)
         {
-            if (e.Button != MouseButton.Left)
+            if (e.Button != MouseButton.Left || uiStatus.MouseHovering)
                 return;
 
             selectionRect = createRectangle(selectionBegin, camera.ScreenToWorld(e.Position.ToVector2()).ToPoint());
@@ -98,7 +104,7 @@ namespace GMRTSClient.Systems
 
         private void MouseListener_MouseDragEnd(object sender, MouseEventArgs e)
         {
-            if (e.Button != MouseButton.Left)
+            if (e.Button != MouseButton.Left || uiStatus.MouseHovering)
                 return;
 
             dragging = false;
