@@ -23,19 +23,28 @@ namespace GMRTSClient.UI.ClientAction
                 {
                     case BuildingType.Factory:
                         if (factorySprite == null)
+                        {
                             factorySprite = new Sprite(content.Load<Texture2D>("Factory"));
+                            factorySprite.Alpha = 0.5f;
+                        }
 
                         return factorySprite;
 
                     case BuildingType.Supermarket:
                         if (supermarketSprite == null)
+                        {
                             supermarketSprite = new Sprite(content.Load<Texture2D>("Market"));
+                            supermarketSprite.Alpha = 0.5f;
+                        }
 
                         return supermarketSprite;
 
                     case BuildingType.Mine:
                         if (mineSprite == null)
+                        {
                             mineSprite = new Sprite(content.Load<Texture2D>("Mine"));
+                            mineSprite.Alpha = 0.5f;
+                        }
 
                         return mineSprite;
                 }

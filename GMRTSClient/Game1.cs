@@ -39,6 +39,9 @@ namespace GMRTSClient
             camera.MinimumZoom = 0.005f;
             camera.MaximumZoom = 0.65f;
 
+            graphics.PreferredBackBufferWidth = 1280;
+            graphics.PreferredBackBufferHeight = 720;
+            graphics.ApplyChanges();
 
             base.Initialize();
         }

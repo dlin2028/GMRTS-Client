@@ -26,53 +26,108 @@ namespace GMRTSClient.UI
 		}
 	}
 
+
 	public partial class GameUI
 	{
 		public ActionType CurrentAction { get; private set; }
 		public BuildingType CurrentBuilding { get; private set; }
 
+		private enum CurrentMenu
+		{
+			none,
+			buildBuilding,
+			buildUnit
+		}
+
+		private CurrentMenu currentMenu;
+
 		public GameUI()
 		{
 			BuildUI();
 
-			moveButton.Selected += resetActionButtons;
-			moveButton.Selected += (s,a) => { moveButton.Color = Color.DarkBlue; CurrentAction = ActionType.Move; };
+			MoveButton.Click += (s, a) => { CurrentAction = MoveButton.IsPressed ? ActionType.Move : ActionType.None; };
+			MoveButton.Click += resetActionButtons;
 
-			assistButton.Selected += resetActionButtons;
-			assistButton.Selected += (s, a) => { assistButton.Color = Color.DarkBlue; CurrentAction = ActionType.Assist; };
+			AssistButton.Click += (s, a) => { CurrentAction = AssistButton.IsPressed ? ActionType.Assist : ActionType.None; };
+			AssistButton.Click += resetActionButtons;
 
-			attackButton.Selected += resetActionButtons;
-			attackButton.Selected += (s, a) => { attackButton.Color = Color.DarkBlue; CurrentAction = ActionType.Attack; };
+			AttackButton.Click += (s, a) => { CurrentAction = AttackButton.IsPressed ? ActionType.Attack : ActionType.None; };
+			AttackButton.Click += resetActionButtons;
 
-			patrolButton.Selected += resetActionButtons;
-			patrolButton.Selected += (s, a) => { patrolButton.Color = Color.DarkBlue; CurrentAction = ActionType.Patrol; };
+			PatrolButton.Click += (s, a) => { CurrentAction = PatrolButton.IsPressed ? ActionType.Patrol : ActionType.None; };
+			PatrolButton.Click += resetActionButtons;
+			
+			//buildButton.Selected += resetBuildButtons;
+			//buildButton.Selected += (s, a) => { currentMenu = CurrentMenu.buildBuilding; };
+			//buildButton.Selected += closeOtherMenus;
 
-			buildButton.Selected += resetBuildButtons;
-			buildButton.Selected += (s, a) => { buildMenu.Visible = !buildMenu.Visible; };
+			//buildUnitsButton.Selected += resetBuildButtons;
+			//buildUnitsButton.Selected += (s, a) => { currentMenu = CurrentMenu.buildUnit; };
+			//buildUnitsButton.Selected += closeOtherMenus;
 
-			factoryButton.Selected += resetBuildButtons;
-			factoryButton.Selected += (s, a) => { factoryButton.Color = Color.DarkBlue; CurrentBuilding = BuildingType.Factory; CurrentAction = ActionType.Build; };
+			//factoryButton.Selected += resetBuildButtons;
+			//factoryButton.Selected += (s, a) => { factoryButton.Color = Color.DarkBlue; CurrentBuilding = BuildingType.Factory; CurrentAction = ActionType.Build; };
 
-			mineButton.Selected += resetBuildButtons;
-			mineButton.Selected += (s, a) => { mineButton.Color = Color.DarkBlue; CurrentBuilding = BuildingType.Mine; CurrentAction = ActionType.Build; };
+			//mineButton.Selected += resetBuildButtons;
+			//mineButton.Selected += (s, a) => { mineButton.Color = Color.DarkBlue; CurrentBuilding = BuildingType.Mine; CurrentAction = ActionType.Build; };
 
-			supermarketButton.Selected += resetBuildButtons;
-			supermarketButton.Selected += (s, a) => { supermarketButton.Color = Color.DarkBlue; CurrentBuilding = BuildingType.Supermarket; CurrentAction = ActionType.Build; };
+			//supermarketButton.Selected += resetBuildButtons;
+			//supermarketButton.Selected += (s, a) => { supermarketButton.Color = Color.DarkBlue; CurrentBuilding = BuildingType.Supermarket; CurrentAction = ActionType.Build; };
 		}
+		//private void closeOtherMenus(object sender, EventArgs e)
+  //      {
+  //          switch (currentMenu)
+  //          {
+  //              case CurrentMenu.buildBuilding:
+		//			unitbuildMenu.Visible = false;
+		//			buildMenu.Visible = !buildMenu.Visible;
+		//			break;
+  //              case CurrentMenu.buildUnit:
+		//			buildMenu.Visible = false;
+		//			unitbuildMenu.Visible = !unitbuildMenu.Visible;
+		//			break;
+  //              default:
+  //                  break;
+  //          }
+  //      }
 
-		private void resetBuildButtons(object sender, EventArgs e)
-        {
-			factoryButton.Color = Color.White;
-			mineButton.Color = Color.White;
-			supermarketButton.Color = Color.White;
-		}
+		//private void resetBuildUnitButtons(object sender, EventArgs e)
+		//{
+		//	tankButton.Color = Color.White;
+		//	builderButton.Color = Color.White;
+		//}
+
+		//private void resetBuildButtons(object sender, EventArgs e)
+        //{
+		//	factoryButton.Color = Color.White;
+		//	mineButton.Color = Color.White;
+		//	supermarketButton.Color = Color.White;
+		//}
 
 		private void resetActionButtons(object sender, EventArgs a)
         {
-			moveButton.Color = Color.White;
-			assistButton.Color = Color.White;
-			attackButton.Color = Color.White;
-			patrolButton.Color = Color.White;
+			MoveButton.IsPressed = false;
+			AssistButton.IsPressed = false;
+			AttackButton.IsPressed = false;
+			PatrolButton.IsPressed = false;
+
+			switch (CurrentAction)
+			{
+				case ActionType.Move:
+					MoveButton.IsPressed = !MoveButton.IsPressed;
+					break;
+				case ActionType.Attack:
+					AttackButton.IsPressed = !AttackButton.IsPressed;
+					break;
+				case ActionType.Assist:
+					AssistButton.IsPressed = !AssistButton.IsPressed;
+					break;
+				case ActionType.Patrol:
+					PatrolButton.IsPressed = !PatrolButton.IsPressed;
+					break;
+				default:
+					break;
+			}
 		}
 	}
 }
