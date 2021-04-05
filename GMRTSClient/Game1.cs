@@ -34,7 +34,7 @@ namespace GMRTSClient
 
         protected override void Initialize()
         {
-            var viewportAdapter = new BoxingViewportAdapter(Window, GraphicsDevice, 800, 480);
+            var viewportAdapter = new BoxingViewportAdapter(Window, GraphicsDevice, 1280, 720);
             camera = new OrthographicCamera(viewportAdapter);
             camera.MinimumZoom = 0.005f;
             camera.MaximumZoom = 0.65f;
@@ -63,7 +63,7 @@ namespace GMRTSClient
                    .AddSystem(new UnitUpdateSystem())
                    .AddSystem(new UnitRenderSystem(spriteBatch))
                    .AddSystem(new RenderSystem(spriteBatch))
-                   .AddSystem(new UnitActionSystem(uiStatus, camera, Content))
+                   .AddSystem(new UnitActionSystem(uiStatus, gameUI, camera, Content))
                    .AddSystem(new ActionRenderSystem(Content, GraphicsDevice, spriteBatch))
                    .AddSystem(new SelectionSystem(Content, GraphicsDevice, spriteBatch, camera, uiStatus))
                    .Build();

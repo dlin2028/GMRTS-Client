@@ -10,12 +10,12 @@ namespace GMRTSClient.Component.Unit
     /// <summary>
     /// Goes pew pew!
     /// </summary>
-    class Tank : Unit
+    class Tank : UnitComponent
     {
-        public Tank(Guid id, ContentManager content)
-            : base(id, new Sprite(content.Load<Texture2D>("Tank")))
+        public Tank(Unit unit, ContentManager content)
+            :base(unit, new Sprite(content.Load<Texture2D>("Tank")))
         {
-            UnitType = UnitType.Tank;
+
         }
     }
 }

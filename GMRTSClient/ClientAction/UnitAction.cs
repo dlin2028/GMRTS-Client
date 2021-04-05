@@ -26,8 +26,6 @@ namespace GMRTSClient.UI.ClientAction
 
         private TimeSpan animationTime;
 
-        private float scale = 0.01f;
-
         public UnitAction(List<Unit> units)
             : this(Guid.NewGuid(), units) { }
         public UnitAction(Guid id, List<Unit> units)

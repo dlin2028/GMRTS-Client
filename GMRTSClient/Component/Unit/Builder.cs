@@ -10,12 +10,12 @@ namespace GMRTSClient.Component.Unit
     /// <summary>
     /// Builds factories and more?
     /// </summary>
-    class Builder : Unit
+    class Builder : UnitComponent
     {
-        public Builder(Guid id, ContentManager content)
-            :base(id, new Sprite(content.Load<Texture2D>("Builder")))
+        public Builder(Unit unit, ContentManager content)
+            :base(unit, new Sprite(content.Load<Texture2D>("Builder")))
         {
-            UnitType = UnitType.Builder;
+
         }
     }
 }

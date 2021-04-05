@@ -27,22 +27,23 @@ namespace GMRTSClient.Systems
         private ComponentMapper<FancyRect> rectMapper;
         private MouseListener mouseListener;
 
+        private GameUI gameui;
         private UIStatus uiStatus;
         private ActionType currentAction => uiStatus.CurrentAction;
         private BuildingType currentBuilding => uiStatus.CurrentBuilding;
 
-        public UnitActionSystem(UIStatus uiStatus, OrthographicCamera camera, ContentManager content)
+        public UnitActionSystem(UIStatus uiStatus, GameUI gameui, OrthographicCamera camera, ContentManager content)
             : base(Aspect.All(typeof(Unit)))
         {
             this.uiStatus = uiStatus;
             this.camera = camera;
             this.content = content;
+            this.gameui = gameui;
 
             mouseListener = new MouseListener();
             mouseListener.MouseClicked += MouseListener_MouseClicked;
             mouseListener.MouseDoubleClicked += MouseListener_MouseClicked;
         }
-
 
         public override void Initialize(IComponentMapperService mapperService)
         {
@@ -51,13 +52,18 @@ namespace GMRTSClient.Systems
             rectMapper = mapperService.GetMapper<FancyRect>();
         }
 
-        private IEnumerable<int> GetIntersectingUnits(Vector2 position)
+        private IEnumerable<int> GetIntersectingUnits(Point position)
         {
-            return ActiveEntities.Where(x => rectMapper.Get(x).Contains(camera.ScreenToWorld(position)));
+            return ActiveEntities.Where(x => rectMapper.Get(x).Contains(camera.ScreenToWorld(position.ToVector2())));
         }
 
         private void MouseListener_MouseClicked(object sender, MouseEventArgs e)
         {
+            if(e.Button == MouseButton.Left && !uiStatus.MouseHovering)
+            {
+                gameui.CurrentAction = ActionType.None;
+            }
+
             if (e.Button != MouseButton.Right || uiStatus.MouseHovering) return;
 
             List<int> selectedEntities = new List<int>();
@@ -112,7 +118,7 @@ namespace GMRTSClient.Systems
             {
                 case ActionType.None:
                     Unit target = null;
-                    var clickedUnits = GetIntersectingUnits(camera.ScreenToWorld(e.Position.ToVector2()));
+                    var clickedUnits = GetIntersectingUnits(e.Position);
                     if (clickedUnits.Count() > 0)
                         target = unitMapper.Get(clickedUnits.First());
 
@@ -138,7 +144,7 @@ namespace GMRTSClient.Systems
                     break;
                 case ActionType.Attack:
                     Unit attackTarget = null;
-                    var unitsToAttack = GetIntersectingUnits(camera.ScreenToWorld(e.Position.ToVector2()));
+                    var unitsToAttack = GetIntersectingUnits(e.Position);
                     if (unitsToAttack.Count() > 0)
                         attackTarget = unitMapper.Get(unitsToAttack.First());
 
@@ -151,7 +157,7 @@ namespace GMRTSClient.Systems
                     break;
                 case ActionType.Assist:
                     Unit assistTarget = null;
-                    var unitsToAssist = GetIntersectingUnits(camera.ScreenToWorld(e.Position.ToVector2()));
+                    var unitsToAssist = GetIntersectingUnits(e.Position);
                     if (unitsToAssist.Count() > 0)
                         assistTarget = unitMapper.Get(unitsToAssist.First());
 
@@ -206,6 +212,7 @@ namespace GMRTSClient.Systems
                 {
                     selectMapper.Get(entityId).Selected = false;
                 }
+                gameui.CurrentAction = ActionType.None;
             }
         }
 

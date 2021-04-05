@@ -67,9 +67,13 @@ namespace GMRTSClient.Systems
                     {
                         var entity = CreateEntity();
                         var transform = new Transform2(rng.Next(-500, 500), rng.Next(-500, 500));
-                        Unit unit = new ClientOnlyUnit(content, transform);
+                        Unit unit = new Unit(Guid.NewGuid());
+                        UnitComponent unitComponent = new Tank(unit, content);
+
 
                         entity.Attach(unit);
+                        entity.Attach(unitComponent);
+                        entity.Attach(new ClientOnlyUnit(unit, transform, unitComponent));
                         entity.Attach(unit.Sprite);
                         entity.Attach(transform);
                         entity.Attach(new FancyRect(transform, unit.Sprite.TextureRegion.Size));
@@ -134,10 +138,11 @@ namespace GMRTSClient.Systems
         /// <param name="obj">The unit spawn data</param>
         private void Client_SpawnUnit(GMRTSClasses.STCTransferData.UnitSpawnData obj)
         {
-            Unit unit = obj.Type switch
+            Unit unit = new Unit(obj.ID);
+            UnitComponent unitComponent = obj.Type switch
             {
-                "Tank" => new Tank(obj.ID, content),
-                "Builder" => new Builder(obj.ID, content),
+                "Tank" => new Tank(unit, content),
+                "Builder" => new Builder(unit, content),
                 _ => throw new Exception(),
             };
 
@@ -145,9 +150,10 @@ namespace GMRTSClient.Systems
             var transform = new Transform2();
 
             entity.Attach(unit);
-            entity.Attach(unit.Sprite);
+            entity.Attach(unitComponent);
+            entity.Attach(unitComponent.Sprite);
             entity.Attach(transform);
-            entity.Attach(new FancyRect(transform, unit.Sprite.TextureRegion.Size));
+            entity.Attach(new FancyRect(transform, unitComponent.Sprite.TextureRegion.Size));
 
             units.Add(unit);
             unitDic.Add(unit.ID, unit);

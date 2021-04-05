@@ -18,6 +18,8 @@ namespace GMRTSClient.Systems
 {
     class SelectionSystem : EntityDrawSystem
     {
+        public static List<int> SelectedEntities = new List<int>();
+
         private readonly SpriteBatch spriteBatch;
         private readonly OrthographicCamera camera;
         private ComponentMapper<Selectable> selectableMapper;
@@ -133,6 +135,14 @@ namespace GMRTSClient.Systems
                     {
                         selectable.Selected = false;
                     }
+                }
+                if(selectable.Selected)
+                {
+                    SelectedEntities.Add(entityId);
+                }
+                else
+                {
+                    SelectedEntities.Remove(entityId);
                 }
             }
         }

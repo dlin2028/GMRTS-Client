@@ -8,19 +8,9 @@ using System.Text;
 
 namespace GMRTSClient.Component.Unit
 {
-    enum UnitType
-    {
-        ClientOnly,
-        Tank,
-        Builder
-    }
-    /// <summary>
-    /// The base class for all units
-    /// </summary>
-    abstract class Unit : GMRTSClasses.Units.Unit
+    class Unit : GMRTSClasses.Units.Unit
     {
         public Sprite Sprite { get; set; }
-        public UnitType UnitType { get; set; }
 
         /// <summary>
         /// The UnitActions relevant to this unit
@@ -28,11 +18,10 @@ namespace GMRTSClient.Component.Unit
         public LinkedList<UnitAction> Orders { get; set; }
 
 
-        public Unit(Guid id, Sprite sprite)
+        public Unit(Guid id)
             :base(id)
         {
             Orders = new LinkedList<UnitAction>();
-            Sprite = sprite;
         }
     }
 }
