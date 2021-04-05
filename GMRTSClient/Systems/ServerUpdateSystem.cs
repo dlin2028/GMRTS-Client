@@ -1,5 +1,6 @@
 ﻿using GMRTSClasses;
 using GMRTSClasses.CTSTransferData;
+using GMRTSClient.ClientAction;
 using GMRTSClient.Component;
 using GMRTSClient.Component.Unit;
 using GMRTSClient.UI.ClientAction;
@@ -26,6 +27,7 @@ namespace GMRTSClient.Systems
 
         private Dictionary<Guid, Unit> unitDic;
         private Dictionary<Guid, PlayerAction> actionDic;
+        private Dictionary<Guid, FactoryOrder> factoryActionDic;
 
         private ContentManager content;
 
@@ -68,7 +70,7 @@ namespace GMRTSClient.Systems
                         var entity = CreateEntity();
                         var transform = new Transform2(rng.Next(-500, 500), rng.Next(-500, 500));
                         Unit unit = new Unit(Guid.NewGuid());
-                        UnitComponent unitComponent = new Tank(unit, content);
+                        Builder unitComponent = new Builder(unit, content);
 
 
                         entity.Attach(unit);
@@ -107,12 +109,17 @@ namespace GMRTSClient.Systems
 
                     var nonmeta = actionData.DTONonmetaAction;
                     var meta = actionData.DTOMetaAction;
+                    var factory = actionData.DTOFactoryOrder;
 
-                    if (meta == null)
+                    if (nonmeta != null)
                     {
                         client.ArbitraryNonmeta(nonmeta);
                     }
-                    else
+                    if(factory != null)
+                    {
+                        client.FactoryAct(factory);
+                    }
+                    if(meta != null)
                     {
                         client.ArbitraryMeta(meta);
                     }
@@ -139,18 +146,30 @@ namespace GMRTSClient.Systems
         private void Client_SpawnUnit(GMRTSClasses.STCTransferData.UnitSpawnData obj)
         {
             Unit unit = new Unit(obj.ID);
-            UnitComponent unitComponent = obj.Type switch
-            {
-                "Tank" => new Tank(unit, content),
-                "Builder" => new Builder(unit, content),
-                _ => throw new Exception(),
-            };
 
             var entity = CreateEntity();
             var transform = new Transform2();
 
             entity.Attach(unit);
+
+            UnitComponent unitComponent;
+
+            switch (obj.Type)
+            {
+                case "Tank":
+                    unitComponent = new Tank(unit, content);
+                    entity.Attach((Tank)unitComponent);
+                    break;
+                case "Builder":
+                    unitComponent = new Builder(unit, content);
+                    entity.Attach((Builder)unitComponent);
+                    break;
+                default:
+                    throw new Exception("Invalid Unit Type");
+            }
             entity.Attach(unitComponent);
+
+
             entity.Attach(unitComponent.Sprite);
             entity.Attach(transform);
             entity.Attach(new FancyRect(transform, unitComponent.Sprite.TextureRegion.Size));

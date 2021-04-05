@@ -28,18 +28,18 @@ namespace GMRTSClient.UI
 			MouseHovering = mouseHovering;
 		}
 	}
-	[Flags] public enum MenuFlags
+	[Flags] public enum BuildFlags
 	{
-		none,
-		BuildBuilding = 1,
-		BuildUnit = 2
+		None,
+		Building,
+		Unit
 	} 
 
 	public partial class GameUI
 	{
 		private ActionType currentAction;
 
-		private MenuFlags buildMenuFlags;
+		private BuildFlags buildMenuFlags;
 
 		public ActionType CurrentAction
         {
@@ -50,31 +50,44 @@ namespace GMRTSClient.UI
 			}
         }
 
-		public MenuFlags BuildMenuFlags
+		public BuildFlags BuildMenuFlags
 		{
 			get { return buildMenuFlags; }
-			set {
+			set
+			{
 				buildMenuFlags = value;
 				updateBuildableUnits();
 			}
 		}
+        private BuildingType currentBuilding;
 
-		public BuildingType CurrentBuilding { get; set; }
+        public BuildingType CurrentBuilding
+        {
+            get { return currentBuilding; }
+            set {
+				CurrentAction = ActionType.Build;
+				currentBuilding = value;
+			}
+        }
 
-		List<ImageButton> activeBuildButtons;
+
+        List<ImageButton> activeBuildButtons;
 		List<ImageButton> buildButtons;
 
-        public GameUI()
+		public GameUI()
 		{
 			BuildUI();
 
 			MoveButton.Click += (s, a) => { CurrentAction = MoveButton.IsPressed ? ActionType.Move : ActionType.None; };
-
 			AssistButton.Click += (s, a) => { CurrentAction = AssistButton.IsPressed ? ActionType.Assist : ActionType.None; };
-
 			AttackButton.Click += (s, a) => { CurrentAction = AttackButton.IsPressed ? ActionType.Attack : ActionType.None; };
-
 			PatrolButton.Click += (s, a) => { CurrentAction = PatrolButton.IsPressed ? ActionType.Patrol : ActionType.None; };
+
+			BuildFactoryButton.Click += (s, a) => { CurrentBuilding = BuildingType.Factory; };
+			BuildMineButton.Click += (s, a) => { CurrentBuilding = BuildingType.Mine; };
+			BuildMarketButton.Click += (s, a) => { };
+			BuildTankButton.Click += (s, a) => { };
+			BuildBuilderButton.Click += (s, a) => { };
 
 			buildButtons = new List<ImageButton>();
 			buildButtons.Add(BuildFactoryButton);
@@ -82,6 +95,8 @@ namespace GMRTSClient.UI
 			buildButtons.Add(BuildMarketButton);
 			buildButtons.Add(BuildTankButton);
 			buildButtons.Add(BuildBuilderButton);
+
+			BuildMenuFlags = BuildFlags.None;
 		}
 
 		private void resetActionButtons()
@@ -117,13 +132,13 @@ namespace GMRTSClient.UI
 				button.Visible = false;
             }
 			activeBuildButtons = new List<ImageButton>();
-			if(buildMenuFlags.HasFlag(MenuFlags.BuildBuilding))
+			if(buildMenuFlags.HasFlag(BuildFlags.Building))
             {
 				activeBuildButtons.Add(BuildFactoryButton);
 				activeBuildButtons.Add(BuildMineButton);
 				activeBuildButtons.Add(BuildMarketButton);
             }
-			if(buildMenuFlags.HasFlag(MenuFlags.BuildUnit))
+			if(buildMenuFlags.HasFlag(BuildFlags.Unit))
             {
 				activeBuildButtons.Add(BuildTankButton);
 				activeBuildButtons.Add(BuildBuilderButton);

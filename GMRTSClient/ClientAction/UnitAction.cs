@@ -19,10 +19,14 @@ namespace GMRTSClient.UI.ClientAction
         public ObservableCollection<Unit> Units { get; set; }
         public Vector2 Position { get; set; }
         public Color RenderColor { get; protected set; }
-
         public HashSet<UnitAction> PrevOrders { get; private set; }
-
         public HashSet<Unit> CurrentUnits { get; private set; }
+
+        public TimeSpan AnimationTime
+        {
+            get { return animationTime; }
+            set { animationTime = value; }
+        }
 
         private TimeSpan animationTime;
 

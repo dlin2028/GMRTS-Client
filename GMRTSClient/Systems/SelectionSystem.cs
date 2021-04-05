@@ -16,7 +16,7 @@ using System.Text;
 
 namespace GMRTSClient.Systems
 {
-    class SelectionSystem : EntityDrawSystem
+    class SelectionSystem : EntityDrawSystem, IUpdateSystem
     {
         public static List<int> SelectedEntities = new List<int>();
 
@@ -149,7 +149,6 @@ namespace GMRTSClient.Systems
 
         public override void Draw(GameTime gameTime)
         {
-            mouseListener.Update(gameTime);
             if (dragging)
             {
                 spriteBatch.Draw(pixel, selectionRect, Color.Green);
@@ -169,5 +168,9 @@ namespace GMRTSClient.Systems
             }
         }
 
+        public void Update(GameTime gameTime)
+        {
+            mouseListener.Update(gameTime);
+        }
     }
 }

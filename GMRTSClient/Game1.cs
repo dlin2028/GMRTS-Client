@@ -66,6 +66,7 @@ namespace GMRTSClient
                    .AddSystem(new UnitActionSystem(uiStatus, gameUI, camera, Content))
                    .AddSystem(new ActionRenderSystem(Content, GraphicsDevice, spriteBatch))
                    .AddSystem(new SelectionSystem(Content, GraphicsDevice, spriteBatch, camera, uiStatus))
+                   .AddSystem(new UIUpdateSystem(gameUI, uiStatus))
                    .Build();
 
             Components.Add(world);

@@ -15,17 +15,42 @@ namespace GMRTSClient.Systems
     class UIUpdateSystem : EntityUpdateSystem
     {
         private ComponentMapper<Selectable> selectionMapper;
+        private ComponentMapper<Builder> builderMapper;
+        private ComponentMapper<Factory> factoryMapper;
         private readonly GameUI gameUI;
         private readonly UIStatus uiStatus;
         private MouseListener mouseListener;
+        private BuildFlags currBuildFlags;
 
         public UIUpdateSystem(GameUI gameUI, UIStatus uiStatus)
-            :base(Aspect.All(typeof(Unit), typeof(Selectable)))
+            :base(Aspect.All(typeof(Selectable)))
         {
             this.gameUI = gameUI;
             this.uiStatus = uiStatus;
             mouseListener = new MouseListener();
             mouseListener.MouseClicked += MouseListener_MouseClicked;
+            mouseListener.MouseDragEnd += MouseListener_MouseDragEnd;
+        }
+
+        private void MouseListener_MouseDragEnd(object sender, MouseEventArgs e)
+        {
+            currBuildFlags = BuildFlags.None;
+            foreach (var entityID in ActiveEntities)
+            {
+                if (selectionMapper.Get(entityID).Selected)
+                {
+                    if (builderMapper.Has(entityID))
+                    {
+                        currBuildFlags |= builderMapper.Get(entityID).BuildFlags;
+                    }
+                    if (factoryMapper.Has(entityID))
+                    {
+                        currBuildFlags |= factoryMapper.Get(entityID).BuildFlags;
+                    }
+                }
+            }
+
+            gameUI.BuildMenuFlags = currBuildFlags;
         }
 
         private void MouseListener_MouseClicked(object sender, MouseEventArgs e)
@@ -39,6 +64,8 @@ namespace GMRTSClient.Systems
         public override void Initialize(IComponentMapperService mapperService)
         {
             selectionMapper = mapperService.GetMapper<Selectable>();
+            builderMapper = mapperService.GetMapper<Builder>();
+            factoryMapper = mapperService.GetMapper<Factory>();
         }
 
         public override void Update(GameTime gameTime)

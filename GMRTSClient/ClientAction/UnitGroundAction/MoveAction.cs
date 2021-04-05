@@ -27,5 +27,10 @@ namespace GMRTSClient.UI.ClientAction
         {
             return new GMRTSClasses.CTSTransferData.UnitGround.MoveAction() { ActionID = ID, Position = new System.Numerics.Vector2(Position.X, Position.Y), UnitIDs = Units.Select(x => x.ID).ToList(), RequeueOnCompletion = false };
         }
+
+        public override GMRTSClasses.CTSTransferData.FactoryActions.FactoryAction ToDTOFactoryAction()
+        {
+            return null;
+        }
     }
 }

@@ -18,7 +18,7 @@ namespace GMRTSClient.Component.Unit
             :base(unit, unitComponent.Sprite)
         {
             unit.Position = new GMRTSClasses.Changing<System.Numerics.Vector2>(new System.Numerics.Vector2(transform.Position.X, transform.Position.Y), System.Numerics.Vector2.Zero, Vector2Changer.VectorChanger, 0);
-            unit.Rotation = new GMRTSClasses.Changing<float>(transform.Rotation, 0.05f, FloatChanger.FChanger, 0);
+            unit.Rotation = new GMRTSClasses.Changing<float>(transform.Rotation, 0.0f, FloatChanger.FChanger, 0);
         }
     }
 }

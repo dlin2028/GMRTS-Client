@@ -76,5 +76,9 @@ namespace GMRTSClient.UI.ClientAction
         {
             return new GMRTSClasses.CTSTransferData.UnitGround.BuildBuildingAction() { ActionID = ID, BuildingType = BuildingType, Position = new System.Numerics.Vector2(Position.X, Position.Y), UnitIDs = new List<Guid>() { Units.First().ID } };
         }
+        public override GMRTSClasses.CTSTransferData.FactoryActions.FactoryAction ToDTOFactoryAction()
+        {
+            return null;
+        }
     }
 }

@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework.Content;
+﻿using GMRTSClient.UI;
+using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended.Sprites;
 using System;
@@ -12,6 +13,7 @@ namespace GMRTSClient.Component.Unit
     /// </summary>
     class Builder : UnitComponent
     {
+        public BuildFlags BuildFlags = BuildFlags.Building;
         public Builder(Unit unit, ContentManager content)
             :base(unit, new Sprite(content.Load<Texture2D>("Builder")))
         {

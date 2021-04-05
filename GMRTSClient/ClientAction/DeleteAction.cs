@@ -28,5 +28,9 @@ namespace GMRTSClient.UI.ClientAction
         {
             return null;
         }
+        public override GMRTSClasses.CTSTransferData.FactoryActions.FactoryAction ToDTOFactoryAction()
+        {
+            return null;
+        }
     }
 }

@@ -27,5 +27,10 @@ namespace GMRTSClient.UI.ClientAction
         {
             return new GMRTSClasses.CTSTransferData.UnitUnit.AttackAction() { ActionID = ID, Target = Target.ID, UnitIDs = Units.Select(x => x.ID).ToList() };
         }
+
+        public override GMRTSClasses.CTSTransferData.FactoryActions.FactoryAction ToDTOFactoryAction()
+        {
+            return null;
+        }
     }
 }

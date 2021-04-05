@@ -1,4 +1,5 @@
 ﻿using GMRTSClasses.CTSTransferData;
+using GMRTSClasses.CTSTransferData.FactoryActions;
 using GMRTSClasses.CTSTransferData.MetaActions;
 using GMRTSClient.Component.Unit;
 using Microsoft.Xna.Framework;
@@ -29,6 +30,11 @@ namespace GMRTSClient.UI.ClientAction
         }
 
         public override MetaAction ToDTOMetaAction()
+        {
+            return null;
+        }
+
+        public override FactoryAction ToDTOFactoryAction()
         {
             return null;
         }
