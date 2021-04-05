@@ -85,9 +85,6 @@ namespace GMRTSClient.UI
 
 			BuildFactoryButton.Click += (s, a) => { CurrentBuilding = BuildingType.Factory; };
 			BuildMineButton.Click += (s, a) => { CurrentBuilding = BuildingType.Mine; };
-			BuildMarketButton.Click += (s, a) => { };
-			BuildTankButton.Click += (s, a) => { };
-			BuildBuilderButton.Click += (s, a) => { };
 
 			buildButtons = new List<ImageButton>();
 			buildButtons.Add(BuildFactoryButton);

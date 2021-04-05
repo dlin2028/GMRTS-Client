@@ -3,6 +3,7 @@ using GMRTSClasses.CTSTransferData;
 using GMRTSClient.ClientAction;
 using GMRTSClient.Component;
 using GMRTSClient.Component.Unit;
+using GMRTSClient.UI;
 using GMRTSClient.UI.ClientAction;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
@@ -34,20 +35,26 @@ namespace GMRTSClient.Systems
         private ComponentMapper<Component.Unit.Unit> unitMapper;
         private ComponentMapper<DTOActionData> actionMapper;
 
+        private readonly GameUI gameui;
 
-        public ServerUpdateSystem(ContentManager content)
+        public ServerUpdateSystem(GameUI gameui, ContentManager content)
             : base(Aspect.One(typeof(Unit), typeof(DTOActionData)))
         {
+            this.gameui = gameui;
             this.content = content;
             units = new List<Unit>();
             unitDic = new Dictionary<Guid, Unit>();
             actionDic = new Dictionary<Guid, PlayerAction>();
+            factoryActionDic = new Dictionary<Guid, FactoryOrder>();
 
             client = new SignalRClient("http://localhost:53694/server", a => unitDic[a] /* this is beautiful, thanks peter */, TimeSpan.FromMilliseconds(400));
             client.OnGameStart += Client_OnGameStart;
             client.SpawnUnit += Client_SpawnUnit;
             client.OnActionFinish += Client_OnActionFinish;
 
+            //gameui.BuildMarketButton.Click += (s, a) => { EnqueueFactoryOrder(new FactoryEnqueueOrder( };
+            gameui.BuildTankButton.Click += (s, a) => { };
+            gameui.BuildBuilderButton.Click += (s, a) => { };
 
             Task<bool> startConnectionTask = client.TryStart();
             startConnectionTask.Wait();
@@ -75,9 +82,27 @@ namespace GMRTSClient.Systems
 
                         entity.Attach(unit);
                         entity.Attach(unitComponent);
+                        entity.Attach(transform);
                         entity.Attach(new ClientOnlyUnit(unit, transform, unitComponent));
                         entity.Attach(unit.Sprite);
+                        entity.Attach(new FancyRect(transform, unit.Sprite.TextureRegion.Size));
+                        entity.Attach(new Selectable());
+
+                        units.Add(unit);
+                        unitDic.Add(unit.ID, unit);
+                    }
+
+                    { //this is c o o l (i hope)
+                        var entity = CreateEntity();
+                        var transform = new Transform2(0, 0);
+                        Unit unit = new Unit(Guid.NewGuid());
+                        Factory unitComponent = new Factory(unit, content);
+
+                        entity.Attach(unit);
+                        entity.Attach(unitComponent);
                         entity.Attach(transform);
+                        entity.Attach(new ClientOnlyUnit(unit, transform, unitComponent));
+                        entity.Attach(unit.Sprite);
                         entity.Attach(new FancyRect(transform, unit.Sprite.TextureRegion.Size));
                         entity.Attach(new Selectable());
 
@@ -87,6 +112,13 @@ namespace GMRTSClient.Systems
                 }
             });
         }
+
+        private void EnqueueFactoryOrder(PlayerAction action)
+        {
+            var entity = CreateEntity();
+            entity.Attach(new DTOActionData(action));
+        }
+
         public override void Initialize(IComponentMapperService mapperService)
         {
             unitMapper = mapperService.GetMapper<Unit>();
