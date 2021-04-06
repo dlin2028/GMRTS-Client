@@ -7,7 +7,7 @@ namespace GMRTSClient.Component
 {
     class DTOActionData
     {
-        private PlayerAction action;
+        public PlayerAction Action;
 
         public GMRTSClasses.CTSTransferData.ClientAction DTONonmetaAction => action.ToDTONonmetaAction();
         public GMRTSClasses.CTSTransferData.MetaActions.MetaAction DTOMetaAction => action.ToDTOMetaAction();
@@ -15,7 +15,7 @@ namespace GMRTSClient.Component
 
         public DTOActionData(PlayerAction action)
         {
-            this.action = action;
+            Action = action;
         }
     }
 }

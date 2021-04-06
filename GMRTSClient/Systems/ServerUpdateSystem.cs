@@ -155,6 +155,7 @@ namespace GMRTSClient.Systems
 
                     if (nonmeta != null)
                     {
+                        actionDic.Add(actionData.Action.ID, actionData.Action);
                         client.ArbitraryNonmeta(nonmeta);
                     }
                     if(factory != null)
