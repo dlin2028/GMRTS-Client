@@ -232,7 +232,7 @@ namespace GMRTSClient.Systems
         {
             foreach (var id in obj.Units)
             {
-                unitDic[id].Orders.Remove((UnitAction)actionDic[id]);
+                unitDic[id].Orders.Remove((UnitAction)actionDic[obj.ActionID]);
                 ((UnitAction)actionDic[obj.ActionID]).Units.Remove(unitDic[id]);
             }
         }
