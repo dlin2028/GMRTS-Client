@@ -9,9 +9,9 @@ namespace GMRTSClient.Component
     {
         public PlayerAction Action;
 
-        public GMRTSClasses.CTSTransferData.ClientAction DTONonmetaAction => action.ToDTONonmetaAction();
-        public GMRTSClasses.CTSTransferData.MetaActions.MetaAction DTOMetaAction => action.ToDTOMetaAction();
-        public GMRTSClasses.CTSTransferData.FactoryActions.FactoryAction DTOFactoryOrder => action.ToDTOFactoryAction();
+        public GMRTSClasses.CTSTransferData.ClientAction DTONonmetaAction => Action.ToDTONonmetaAction();
+        public GMRTSClasses.CTSTransferData.MetaActions.MetaAction DTOMetaAction => Action.ToDTOMetaAction();
+        public GMRTSClasses.CTSTransferData.FactoryActions.FactoryAction DTOFactoryOrder => Action.ToDTOFactoryAction();
 
         public DTOActionData(PlayerAction action)
         {
