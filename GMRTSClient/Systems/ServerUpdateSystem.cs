@@ -210,6 +210,14 @@ namespace GMRTSClient.Systems
                     unitComponent = new Factory(unit, content);
                     entity.Attach((Factory)unitComponent);
                     break;
+                case "Mine":
+                    unitComponent = new Mine(unit, content);
+                    entity.Attach((Mine)unitComponent);
+                    break;
+                case "Supermarket":
+                    unitComponent = new Supermarket(unit, content);
+                    entity.Attach((Supermarket)unitComponent);
+                    break;
                 default:
                     throw new Exception("Invalid Unit Type");
             }

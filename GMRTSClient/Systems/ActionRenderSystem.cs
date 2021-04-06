@@ -2,6 +2,8 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+
+using MonoGame.Extended;
 using MonoGame.Extended.Entities;
 using MonoGame.Extended.Entities.Systems;
 using MonoGame.Extended.Sprites;
@@ -78,7 +80,7 @@ namespace GMRTSClient.Systems
             else if(unitAction.ActionType == ActionType.Build)
             {
                 var action = (BuildAction)unitAction;
-                spriteBatch.Draw(action.Sprite, action.Target);
+                spriteBatch.Draw(action.Sprite, new Transform2(action.Target, 0, Vector2.One * 0.1f));
             }
         }
     }
