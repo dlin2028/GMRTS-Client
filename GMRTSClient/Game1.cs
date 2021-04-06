@@ -59,7 +59,7 @@ namespace GMRTSClient
 
             world = new WorldBuilder()
                    .AddSystem(new CameraSystem(camera))
-                   .AddSystem(new ServerUpdateSystem(Content))
+                   .AddSystem(new ServerUpdateSystem(gameUI, Content))
                    .AddSystem(new UnitUpdateSystem())
                    .AddSystem(new UnitRenderSystem(spriteBatch))
                    .AddSystem(new RenderSystem(spriteBatch))

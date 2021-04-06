@@ -34,6 +34,7 @@ namespace GMRTSClient.Systems
 
         private ComponentMapper<Component.Unit.Unit> unitMapper;
         private ComponentMapper<DTOActionData> actionMapper;
+        private ComponentMapper<Factory> factoryMapper;
 
         private readonly GameUI gameui;
 
@@ -52,9 +53,8 @@ namespace GMRTSClient.Systems
             client.SpawnUnit += Client_SpawnUnit;
             client.OnActionFinish += Client_OnActionFinish;
 
-            //gameui.BuildMarketButton.Click += (s, a) => { EnqueueFactoryOrder(new FactoryEnqueueOrder( };
-            gameui.BuildTankButton.Click += (s, a) => { };
-            gameui.BuildBuilderButton.Click += (s, a) => { };
+            gameui.BuildTankButton.Click += (s, a) =>  { EnqueueFactoryOrder(GMRTSClasses.Units.MobileUnitType.Tank); };
+            gameui.BuildBuilderButton.Click += (s, a) =>  { EnqueueFactoryOrder(GMRTSClasses.Units.MobileUnitType.Builder); };
 
             Task<bool> startConnectionTask = client.TryStart();
             startConnectionTask.Wait();
@@ -113,16 +113,26 @@ namespace GMRTSClient.Systems
             });
         }
 
-        private void EnqueueFactoryOrder(PlayerAction action)
+        private void EnqueueFactoryOrder(GMRTSClasses.Units.MobileUnitType unitType)
         {
-            var entity = CreateEntity();
-            entity.Attach(new DTOActionData(action));
+            foreach (var entityID in SelectionSystem.SelectedEntities)
+            {
+                if(factoryMapper.Has(entityID))
+                {
+                    var factory = factoryMapper.Get(entityID);
+                    var entity = CreateEntity();
+                    var order = new FactoryEnqueueOrder(factory.Unit.ID, unitType);
+                    entity.Attach(order);
+                    entity.Attach(new DTOActionData(order));
+                }
+            }
         }
 
         public override void Initialize(IComponentMapperService mapperService)
         {
             unitMapper = mapperService.GetMapper<Unit>();
             actionMapper = mapperService.GetMapper<DTOActionData>();
+            factoryMapper = mapperService.GetMapper<Factory>();
         }
 
         public override void Update(GameTime gameTime)
