@@ -181,6 +181,7 @@ namespace GMRTSClient.Systems
         private void Client_OnGameStart(DateTime obj)
         {
             stopwatch.Restart();
+            UnitUpdateSystem.TimerWatchThingy.Restart();
         }
         /// <summary>
         /// Called when the server spawns a unit

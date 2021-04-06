@@ -5,6 +5,7 @@ using MonoGame.Extended.Entities;
 using MonoGame.Extended.Entities.Systems;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 
 namespace GMRTSClient.Systems
@@ -13,6 +14,10 @@ namespace GMRTSClient.Systems
     {
         private ComponentMapper<Transform2> transformMapper;
         private ComponentMapper<Unit> unitMapper;
+        /// <summary>
+        /// PLEASE DELETE ME
+        /// </summary>
+        public static Stopwatch TimerWatchThingy = new Stopwatch();
 
         public UnitUpdateSystem()
            : base(Aspect.All(typeof(Transform2), typeof(Unit)))
@@ -33,7 +38,7 @@ namespace GMRTSClient.Systems
                 var transform = transformMapper.Get(entityId);
                 var unit = unitMapper.Get(entityId);
 
-                unit.Update((ulong)gameTime.TotalGameTime.TotalMilliseconds);
+                unit.Update((ulong)TimerWatchThingy.ElapsedMilliseconds);
 
                 transform.Position = new Vector2(unit.Position.Value.X, unit.Position.Value.Y);
                 transform.Rotation = unit.Rotation.Value;
