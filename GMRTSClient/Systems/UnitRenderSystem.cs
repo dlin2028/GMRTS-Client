@@ -37,6 +37,7 @@ namespace GMRTSClient.Systems
             {
                 var unit = spriteMapper.Get(entity);
                 var transform = transformMapper.Get(entity);
+                transform.Scale = Vector2.One * 0.01f;
                 spriteBatch.Draw(unit.Sprite, transform);
             }
         }
