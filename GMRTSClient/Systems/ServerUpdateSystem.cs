@@ -217,6 +217,8 @@ namespace GMRTSClient.Systems
             entity.Attach(transform);
             entity.Attach(new FancyRect(transform, unitComponent.Sprite.TextureRegion.Size));
 
+            entity.Attach(new Selectable());
+
             units.Add(unit);
             unitDic.Add(unit.ID, unit);
         }
