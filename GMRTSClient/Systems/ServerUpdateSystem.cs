@@ -192,8 +192,6 @@ namespace GMRTSClient.Systems
             var entity = CreateEntity();
             var transform = new Transform2();
 
-            entity.Attach(unit);
-
             UnitComponent unitComponent;
 
             switch (obj.Type)
@@ -206,12 +204,15 @@ namespace GMRTSClient.Systems
                     unitComponent = new Builder(unit, content);
                     entity.Attach((Builder)unitComponent);
                     break;
+                case "Factory":
+                    unitComponent = new Factory(unit, content);
+                    entity.Attach((Factory)unitComponent);
+                    break;
                 default:
                     throw new Exception("Invalid Unit Type");
             }
-            entity.Attach(unitComponent);
 
-
+            entity.Attach(unit);
             entity.Attach(unitComponent.Sprite);
             entity.Attach(transform);
             entity.Attach(new FancyRect(transform, unitComponent.Sprite.TextureRegion.Size));
