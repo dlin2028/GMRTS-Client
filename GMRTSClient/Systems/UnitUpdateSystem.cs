@@ -14,15 +14,12 @@ namespace GMRTSClient.Systems
     {
         private ComponentMapper<Transform2> transformMapper;
         private ComponentMapper<Unit> unitMapper;
-        /// <summary>
-        /// PLEASE DELETE ME
-        /// </summary>
-        public static Stopwatch TimerWatchThingy = new Stopwatch();
+        private Stopwatch stopwatch;
 
-        public UnitUpdateSystem()
+        public UnitUpdateSystem(Stopwatch stopwatch)
            : base(Aspect.All(typeof(Transform2), typeof(Unit)))
         {
-
+            this.stopwatch = stopwatch;
         }
 
         public override void Initialize(IComponentMapperService mapperService)
@@ -38,7 +35,7 @@ namespace GMRTSClient.Systems
                 var transform = transformMapper.Get(entityId);
                 var unit = unitMapper.Get(entityId);
 
-                unit.Update((ulong)TimerWatchThingy.ElapsedMilliseconds);
+                unit.Update((ulong)stopwatch.ElapsedMilliseconds);
 
                 transform.Position = new Vector2(unit.Position.Value.X, unit.Position.Value.Y);
                 transform.Rotation = unit.Rotation.Value;

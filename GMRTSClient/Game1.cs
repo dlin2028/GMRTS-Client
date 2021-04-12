@@ -1,4 +1,5 @@
-﻿using GMRTSClient.Systems;
+﻿using System.Diagnostics;
+using GMRTSClient.Systems;
 using GMRTSClient.UI;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -54,13 +55,14 @@ namespace GMRTSClient
             gameUI = new GameUI();
             desktop = new Desktop();
             desktop.Root = gameUI;
+            var stopwatch = new Stopwatch();
 
             uiStatus = new UIStatus(gameUI.CurrentAction, gameUI.CurrentBuilding, desktop.IsMouseOverGUI);
 
             world = new WorldBuilder()
                    .AddSystem(new CameraSystem(camera))
-                   .AddSystem(new ServerUpdateSystem(gameUI, Content))
-                   .AddSystem(new UnitUpdateSystem())
+                   .AddSystem(new ServerUpdateSystem(gameUI,Content, stopwatch))
+                   .AddSystem(new UnitUpdateSystem(stopwatch))
                    .AddSystem(new UnitRenderSystem(spriteBatch))
                    .AddSystem(new RenderSystem(spriteBatch))
                    .AddSystem(new UnitActionSystem(uiStatus, gameUI, camera, Content))

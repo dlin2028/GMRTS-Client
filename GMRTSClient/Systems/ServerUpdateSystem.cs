@@ -22,7 +22,7 @@ namespace GMRTSClient.Systems
     {
         private SignalRClient client;
 
-        private Stopwatch stopwatch = new Stopwatch();
+        private Stopwatch stopwatch;
 
         private List<Component.Unit.Unit> units;
 
@@ -39,9 +39,10 @@ namespace GMRTSClient.Systems
 
         private readonly GameUI gameui;
 
-        public ServerUpdateSystem(GameUI gameui, ContentManager content)
+        public ServerUpdateSystem(GameUI gameui, ContentManager content, Stopwatch stopwatch)
             : base(Aspect.One(typeof(Unit), typeof(DTOActionData)))
         {
+            this.stopwatch = stopwatch;
             this.gameui = gameui;
             this.content = content;
             units = new List<Unit>();
@@ -189,7 +190,6 @@ namespace GMRTSClient.Systems
         private void Client_OnGameStart(DateTime obj)
         {
             stopwatch.Restart();
-            UnitUpdateSystem.TimerWatchThingy.Restart();
         }
         /// <summary>
         /// Called when the server spawns a unit
