@@ -12,16 +12,30 @@ using MonoGame.Extended.Input.InputListeners;
 using MonoGame.Extended.Sprites;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace GMRTSClient.Systems
 {
-    internal class Unsubscriber<Selectable> : IDisposable
-    {
-        private List<IObserver<Selectable>> _observers;
-        private IObserver<Selectable> _observer;
 
-        internal Unsubscriber(List<IObserver<Selectable>> observers, IObserver<Selectable> observer)
+    public class SelectableData
+    {
+        public List<int> SelectedEntityIds {get; private set; }
+        public List<int> EntityIds {get; private set; }
+
+        public SelectableData(List<int> entityIds, List<int> selectedEntityIds)
+        {
+            EntityIds = entityIds;
+            SelectedEntityIds = selectedEntityIds;
+        }
+    }
+
+    internal class Unsubscriber<SelectableData> : IDisposable
+    {
+        private List<IObserver<SelectableData>> _observers;
+        private IObserver<SelectableData> _observer;
+
+        internal Unsubscriber(List<IObserver<SelectableData>> observers, IObserver<SelectableData> observer)
         {
             this._observers = observers;
             this._observer = observer;
@@ -33,7 +47,7 @@ namespace GMRTSClient.Systems
                 _observers.Remove(_observer);
         }
     }
-    class SelectionSystem : EntityDrawSystem, IUpdateSystem, IObservable<Selectable>
+    class SelectionSystem : EntityDrawSystem, IUpdateSystem, IObservable<SelectableData>
     {
         private static SelectionSystem instance;
         public static SelectionSystem Instance
@@ -63,7 +77,7 @@ namespace GMRTSClient.Systems
 
         private UIStatus uiStatus;
 
-        private List<IObserver<Selectable>> observers;
+        private List<IObserver<SelectableData>> observers;
 
         public List<int> SelectedEntities;
 
@@ -75,7 +89,7 @@ namespace GMRTSClient.Systems
                 instance = this;
             }
 
-            observers = new List<IObserver<Selectable>>();
+            observers = new List<IObserver<SelectableData>>();
             this.spriteBatch = spriteBatch;
             this.camera = camera;
             this.uiStatus = uiStatus;
@@ -182,18 +196,19 @@ namespace GMRTSClient.Systems
                     SelectedEntities.Remove(entityId);
                 }
             }
+            foreach (var observer in observers)
+            {
+                observer.OnNext(new SelectableData(ActiveEntities.Select(x => x).ToList(), SelectedEntities));
+            }
         }
-        public IDisposable Subscribe(IObserver<Selectable> observer)
+        public IDisposable Subscribe(IObserver<SelectableData> observer)
         {
             // Check whether observer is already registered. If not, add it
             if (!observers.Contains(observer))
             {
                 observers.Add(observer);
-                // Provide observer with existing data.
-                foreach (var item in ActiveEntities)
-                    observer.OnNext(selectableMapper.Get(item));
             }
-            return new Unsubscriber<Selectable>(observers, observer);
+            return new Unsubscriber<SelectableData>(observers, observer);
         }
 
         public override void Draw(GameTime gameTime)

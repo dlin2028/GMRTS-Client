@@ -12,30 +12,55 @@ using System.Text;
 
 namespace GMRTSClient.Systems
 {
-    class UIUpdateSystem : EntityUpdateSystem
+    class UIUpdateSystem : EntityUpdateSystem, IObserver<SelectableData>
     {
         private ComponentMapper<Selectable> selectionMapper;
         private ComponentMapper<Builder> builderMapper;
         private ComponentMapper<Factory> factoryMapper;
         private readonly GameUI gameUI;
         private readonly UIStatus uiStatus;
-        private MouseListener mouseListener;
-        private BuildFlags currBuildFlags;
+        private IDisposable unsubscriber;
 
         public UIUpdateSystem(GameUI gameUI, UIStatus uiStatus)
             :base(Aspect.All(typeof(Selectable)))
         {
             this.gameUI = gameUI;
             this.uiStatus = uiStatus;
-            mouseListener = new MouseListener();
-            mouseListener.MouseClicked += MouseListener_MouseClicked;
-            mouseListener.MouseDragEnd += MouseListener_MouseDragEnd;
+            unsubscriber = SelectionSystem.Instance.Subscribe(this);
         }
 
-        private void MouseListener_MouseDragEnd(object sender, MouseEventArgs e)
+        public override void Initialize(IComponentMapperService mapperService)
         {
-            currBuildFlags = BuildFlags.None;
-            foreach (var entityID in ActiveEntities)
+            selectionMapper = mapperService.GetMapper<Selectable>();
+            builderMapper = mapperService.GetMapper<Builder>();
+            factoryMapper = mapperService.GetMapper<Factory>();
+        }
+
+        public override void Update(GameTime gameTime)
+        {
+
+        }
+
+        public void OnCompleted()
+        {
+            unsubscriber.Dispose();
+        }
+
+        public void OnError(Exception error)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void OnNext(SelectableData value)
+        {
+            if(value.SelectedEntityIds.Count == 0 && uiStatus.MouseHovering == false)
+            {
+                gameUI.CurrentAction = ActionType.None;
+                return;
+            }
+
+            var currBuildFlags = BuildFlags.None;
+            foreach (var entityID in value.SelectedEntityIds)
             {
                 if (selectionMapper.Get(entityID).Selected)
                 {
@@ -49,28 +74,7 @@ namespace GMRTSClient.Systems
                     }
                 }
             }
-
             gameUI.BuildMenuFlags = currBuildFlags;
-        }
-
-        private void MouseListener_MouseClicked(object sender, MouseEventArgs e)
-        {
-            if (ActiveEntities.Count == 0 && uiStatus.MouseHovering == false)
-            {
-                gameUI.CurrentAction = ActionType.None;
-            }
-        }
-
-        public override void Initialize(IComponentMapperService mapperService)
-        {
-            selectionMapper = mapperService.GetMapper<Selectable>();
-            builderMapper = mapperService.GetMapper<Builder>();
-            factoryMapper = mapperService.GetMapper<Factory>();
-        }
-
-        public override void Update(GameTime gameTime)
-        {
-            mouseListener.Update(gameTime);
         }
     }
 }
