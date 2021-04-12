@@ -33,8 +33,9 @@ namespace GMRTSClient.Systems
         private ContentManager content;
 
         private ComponentMapper<Component.Unit.Unit> unitMapper;
-        private ComponentMapper<DTOActionData> actionMapper;
+        private ComponentMapper<DTOActionData> actionDataMapper;
         private ComponentMapper<Factory> factoryMapper;
+        private ComponentMapper<PlayerAction> actionMapper;
 
         private readonly GameUI gameui;
 
@@ -115,7 +116,7 @@ namespace GMRTSClient.Systems
 
         private void EnqueueFactoryOrder(GMRTSClasses.Units.MobileUnitType unitType)
         {
-            foreach (var entityID in SelectionSystem.SelectedEntities)
+            foreach (var entityID in SelectionSystem.Instance.SelectedEntities)
             {
                 if(factoryMapper.Has(entityID))
                 {
@@ -131,8 +132,9 @@ namespace GMRTSClient.Systems
         public override void Initialize(IComponentMapperService mapperService)
         {
             unitMapper = mapperService.GetMapper<Unit>();
-            actionMapper = mapperService.GetMapper<DTOActionData>();
+            actionDataMapper = mapperService.GetMapper<DTOActionData>();
             factoryMapper = mapperService.GetMapper<Factory>();
+            actionMapper = mapperService.GetMapper<PlayerAction>();
         }
 
         public override void Update(GameTime gameTime)
@@ -147,7 +149,7 @@ namespace GMRTSClient.Systems
                 }
                 else
                 {
-                    var actionData = actionMapper.Get(entityId);
+                    var actionData = actionDataMapper.Get(entityId);
 
                     var nonmeta = actionData.DTONonmetaAction;
                     var meta = actionData.DTOMetaAction;
@@ -166,9 +168,13 @@ namespace GMRTSClient.Systems
                     {
                         client.ArbitraryMeta(meta);
                     }
-                    actionMapper.Delete(entityId);
+                    actionDataMapper.Delete(entityId);
 
                     //maybe destroy empty entities here
+                    if(!actionMapper.Has(entityId))
+                    {
+                        DestroyEntity(entityId);
+                    }
                 }
             }
         }
@@ -226,9 +232,8 @@ namespace GMRTSClient.Systems
             entity.Attach(unitComponent.Sprite);
             entity.Attach(transform);
             entity.Attach(new FancyRect(transform, unitComponent.Sprite.TextureRegion.Size));
-
             entity.Attach(new Selectable());
-
+             
             units.Add(unit);
             unitDic.Add(unit.ID, unit);
         }

@@ -36,8 +36,8 @@ namespace GMRTSClient
         {
             var viewportAdapter = new BoxingViewportAdapter(Window, GraphicsDevice, 1280, 720);
             camera = new OrthographicCamera(viewportAdapter);
-            camera.MinimumZoom = 0.005f;
-            camera.MaximumZoom = 0.65f;
+            camera.MinimumZoom = 0.05f;
+            camera.MaximumZoom = 2.00f;
 
             graphics.PreferredBackBufferWidth = 1280;
             graphics.PreferredBackBufferHeight = 720;

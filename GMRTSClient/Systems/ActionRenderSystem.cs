@@ -58,11 +58,11 @@ namespace GMRTSClient.Systems
             if (unitAction.CurrentUnits.Count != 0)
             {
                 var avgPosition = new Vector2(unitAction.CurrentUnits.Average(x => x.Position.Value.X), unitAction.CurrentUnits.Average(x => x.Position.Value.Y));
-                spriteBatch.Draw(pixel, avgPosition, null, unitAction.RenderColor, (float)Math.Atan2(unitAction.Position.Y - avgPosition.Y, unitAction.Position.X - avgPosition.X), new Vector2(0, (float)pixel.Height / 2f), new Vector2((avgPosition - unitAction.Position).Length(), (float)unitAction.CurrentUnits.Count * 10), SpriteEffects.None, 0f);
+                spriteBatch.Draw(pixel, avgPosition, null, unitAction.RenderColor, (float)Math.Atan2(unitAction.Position.Y - avgPosition.Y, unitAction.Position.X - avgPosition.X), new Vector2(0, (float)pixel.Height / 2f), new Vector2((avgPosition - unitAction.Position).Length(), (float)unitAction.CurrentUnits.Count * .5f), SpriteEffects.None, 0f);
             }
             foreach (var order in unitAction.PrevOrders)
             {
-                spriteBatch.Draw(pixel, order.Position, null, unitAction.RenderColor, (float)Math.Atan2(unitAction.Position.Y - order.Position.Y, unitAction.Position.X - order.Position.X), new Vector2(0, (float)pixel.Height / 2f), new Vector2((order.Position - unitAction.Position).Length(), (float)order.Units.Where(x => { var y = x.Orders.Find(order).Next; return y != null && y.Value == unitAction; }).Count() * 10), SpriteEffects.None, 0f);
+                spriteBatch.Draw(pixel, order.Position, null, unitAction.RenderColor, (float)Math.Atan2(unitAction.Position.Y - order.Position.Y, unitAction.Position.X - order.Position.X), new Vector2(0, (float)pixel.Height / 2f), new Vector2((order.Position - unitAction.Position).Length(), (float)order.Units.Where(x => { var y = x.Orders.Find(order).Next; return y != null && y.Value == unitAction; }).Count() * .5f), SpriteEffects.None, 0f);
             }
 
             if (unitAction.ActionType == ActionType.Patrol)
@@ -73,7 +73,7 @@ namespace GMRTSClient.Systems
                     if (lastOrderNode.List.First(x => x.ActionType == ActionType.Patrol).ID == unitAction.ID)
                     {
                         var lastOrder = lastOrderNode.Value;
-                        spriteBatch.Draw(pixel, lastOrder.Position, null, Color.Green, (float)Math.Atan2(unitAction.Position.Y - lastOrder.Position.Y, unitAction.Position.X - lastOrder.Position.X), new Vector2(0, (float)pixel.Height / 2f), new Vector2((lastOrder.Position - unitAction.Position).Length(), (float)lastOrderNodes.Where(x => x.Value == lastOrder).Count() * 10), SpriteEffects.None, 0f);
+                        spriteBatch.Draw(pixel, lastOrder.Position, null, Color.Green, (float)Math.Atan2(unitAction.Position.Y - lastOrder.Position.Y, unitAction.Position.X - lastOrder.Position.X), new Vector2(0, (float)pixel.Height / 2f), new Vector2((lastOrder.Position - unitAction.Position).Length(), (float)lastOrderNodes.Where(x => x.Value == lastOrder).Count() * .5f), SpriteEffects.None, 0f);
                     }
                 }
             }

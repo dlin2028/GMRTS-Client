@@ -169,6 +169,7 @@ namespace GMRTSClient.Systems
                     }
                     break;
                 case ActionType.Patrol:
+                    DestroyEntity(newEntity.Id); //so that the extraEntities are sent before the newEntity
                     List<(UnitAction?, IEnumerable<Unit>)> prevActions = new List<(UnitAction?, IEnumerable<Unit>)>();
                     foreach (var uniqueAction in selectedUnits.Select(x => x.Orders).Select(x => x.LastOrDefault()).Distinct())
                     {
@@ -192,7 +193,7 @@ namespace GMRTSClient.Systems
                             extraEntity.Attach(new DTOActionData(newAction));
                         }
                     }
-
+                    newEntity = CreateEntity();
                     newAction = new PatrolAction(selectedUnits, mouseWorldPos);
                     newEntity.Attach(newAction);
                     newEntity.Attach(new DTOActionData(newAction));

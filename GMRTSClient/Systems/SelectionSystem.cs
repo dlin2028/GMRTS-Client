@@ -16,11 +16,36 @@ using System.Text;
 
 namespace GMRTSClient.Systems
 {
-    class SelectionSystem : EntityDrawSystem, IUpdateSystem
+    internal class Unsubscriber<Selectable> : IDisposable
     {
-        public static List<int> SelectedEntities = new List<int>();
+        private List<IObserver<Selectable>> _observers;
+        private IObserver<Selectable> _observer;
 
-        private readonly SpriteBatch spriteBatch;
+        internal Unsubscriber(List<IObserver<Selectable>> observers, IObserver<Selectable> observer)
+        {
+            this._observers = observers;
+            this._observer = observer;
+        }
+
+        public void Dispose()
+        {
+            if (_observers.Contains(_observer))
+                _observers.Remove(_observer);
+        }
+    }
+    class SelectionSystem : EntityDrawSystem, IUpdateSystem, IObservable<Selectable>
+    {
+        private static SelectionSystem instance;
+        public static SelectionSystem Instance
+        {
+            get
+            {
+                return instance;
+            }
+        }
+    
+
+    private readonly SpriteBatch spriteBatch;
         private readonly OrthographicCamera camera;
         private ComponentMapper<Selectable> selectableMapper;
         private ComponentMapper<FancyRect> rectMapper;
@@ -38,10 +63,19 @@ namespace GMRTSClient.Systems
 
         private UIStatus uiStatus;
 
+        private List<IObserver<Selectable>> observers;
+
+        public List<int> SelectedEntities;
 
         public SelectionSystem(ContentManager content, GraphicsDevice graphics, SpriteBatch spriteBatch, OrthographicCamera camera, UIStatus uiStatus)
             : base(Aspect.All(typeof(Selectable), typeof(FancyRect), typeof(Transform2), typeof(Sprite)))
         {
+            if(instance == null)
+            {
+                instance = this;
+            }
+
+            observers = new List<IObserver<Selectable>>();
             this.spriteBatch = spriteBatch;
             this.camera = camera;
             this.uiStatus = uiStatus;
@@ -49,6 +83,8 @@ namespace GMRTSClient.Systems
             pixel = new Texture2D(graphics, 1, 1);
             pixel.SetData(new[] { Color.White });
             selectionTexture = content.Load<Texture2D>("SelectionMarker");
+
+            SelectedEntities = new List<int>();
 
             mouseListener = new MouseListener();
 
@@ -136,6 +172,7 @@ namespace GMRTSClient.Systems
                         selectable.Selected = false;
                     }
                 }
+
                 if(selectable.Selected)
                 {
                     SelectedEntities.Add(entityId);
@@ -145,6 +182,18 @@ namespace GMRTSClient.Systems
                     SelectedEntities.Remove(entityId);
                 }
             }
+        }
+        public IDisposable Subscribe(IObserver<Selectable> observer)
+        {
+            // Check whether observer is already registered. If not, add it
+            if (!observers.Contains(observer))
+            {
+                observers.Add(observer);
+                // Provide observer with existing data.
+                foreach (var item in ActiveEntities)
+                    observer.OnNext(selectableMapper.Get(item));
+            }
+            return new Unsubscriber<Selectable>(observers, observer);
         }
 
         public override void Draw(GameTime gameTime)
@@ -172,5 +221,6 @@ namespace GMRTSClient.Systems
         {
             mouseListener.Update(gameTime);
         }
+
     }
 }
