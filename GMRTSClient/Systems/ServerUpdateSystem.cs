@@ -77,6 +77,7 @@ namespace GMRTSClient.Systems
                     {
                         var entity = CreateEntity();
                         var transform = new Transform2(rng.Next(-500, 500), rng.Next(-500, 500));
+                        transform.Scale = Vector2.One * 0.1f;
                         Unit unit = new Unit(Guid.NewGuid());
                         Builder unitComponent = new Builder(unit, content);
 
@@ -96,6 +97,7 @@ namespace GMRTSClient.Systems
                     { //this is c o o l (i hope)
                         var entity = CreateEntity();
                         var transform = new Transform2(0, 0);
+                        transform.Scale = Vector2.One * 0.1f;
                         Unit unit = new Unit(Guid.NewGuid());
                         Factory unitComponent = new Factory(unit, content);
 
@@ -199,6 +201,7 @@ namespace GMRTSClient.Systems
 
             var entity = CreateEntity();
             var transform = new Transform2();
+            transform.Scale = Vector2.One * 0.1f;
 
             UnitComponent unitComponent;
 
@@ -213,6 +216,7 @@ namespace GMRTSClient.Systems
                     entity.Attach((Builder)unitComponent);
                     break;
                 case "Factory":
+                    transform.Scale = Vector2.One * 0.001f;
                     unitComponent = new Factory(unit, content);
                     entity.Attach((Factory)unitComponent);
                     break;
