@@ -20,9 +20,18 @@ namespace GMRTSClient.Systems
 {
     class ServerUpdateSystem : EntityUpdateSystem
     {
+        private static ServerUpdateSystem instance;
+        public static ServerUpdateSystem Instance
+        {
+            get
+            {
+                return instance;
+            }
+        }
+
         private SignalRClient client;
 
-        private Stopwatch stopwatch;
+        public Stopwatch Stopwatch { get; set; }
 
         private List<Component.Unit.Unit> units;
 
@@ -42,7 +51,16 @@ namespace GMRTSClient.Systems
         public ServerUpdateSystem(GameUI gameui, ContentManager content, Stopwatch stopwatch)
             : base(Aspect.One(typeof(Unit), typeof(DTOActionData)))
         {
-            this.stopwatch = stopwatch;
+            if (instance == null)
+            {
+                instance = this;
+            }
+            else
+            {
+                throw new Exception("Systems are singletons");
+            }
+
+            this.Stopwatch = stopwatch;
             this.gameui = gameui;
             this.content = content;
             units = new List<Unit>();
@@ -54,6 +72,7 @@ namespace GMRTSClient.Systems
             client.OnGameStart += Client_OnGameStart;
             client.SpawnUnit += Client_SpawnUnit;
             client.OnActionFinish += Client_OnActionFinish;
+            client.OnResourceUpdated += Client_OnResourceUpdated;
 
             gameui.BuildTankButton.Click += (s, a) =>  { EnqueueFactoryOrder(GMRTSClasses.Units.MobileUnitType.Tank); };
             gameui.BuildBuilderButton.Click += (s, a) =>  { EnqueueFactoryOrder(GMRTSClasses.Units.MobileUnitType.Builder); };
@@ -69,6 +88,7 @@ namespace GMRTSClient.Systems
             Task.Run(async () =>
             {
                 await Task.Delay(500);
+
 
                 if (!startConnectionTask.Result)
                 {
@@ -86,7 +106,7 @@ namespace GMRTSClient.Systems
                         entity.Attach(unit);
                         entity.Attach(unitComponent);
                         entity.Attach(transform);
-                        entity.Attach(new ClientOnlyUnit(unit, transform, unitComponent));
+                        entity.Attach(new ClientOnlyUnit(unit, transform, unitComponent, rng.Next(0, 100)));
                         entity.Attach(unit.Sprite);
                         entity.Attach(new FancyRect(transform, unit.Sprite.TextureRegion.Size));
                         entity.Attach(new Selectable());
@@ -105,7 +125,7 @@ namespace GMRTSClient.Systems
                         entity.Attach(unit);
                         entity.Attach(unitComponent);
                         entity.Attach(transform);
-                        entity.Attach(new ClientOnlyUnit(unit, transform, unitComponent));
+                        entity.Attach(new ClientOnlyUnit(unit, transform, unitComponent, rng.Next(0, 100)));
                         entity.Attach(unit.Sprite);
                         entity.Attach(new FancyRect(transform, unit.Sprite.TextureRegion.Size));
                         entity.Attach(new Selectable());
@@ -113,8 +133,21 @@ namespace GMRTSClient.Systems
                         units.Add(unit);
                         unitDic.Add(unit.ID, unit);
                     }
+                    stopwatch.Restart();
                 }
             });
+        }
+
+        private void Client_OnResourceUpdated(GMRTSClasses.STCTransferData.ResourceUpdate obj)
+        {
+            if(obj.ResourceType == GMRTSClasses.STCTransferData.ResourceType.Mineral)
+            {
+                gameui.Minerals = obj.Value;
+            }
+            else
+            {
+                gameui.Gold = obj.Value;
+            }
         }
 
         private void EnqueueFactoryOrder(GMRTSClasses.Units.MobileUnitType unitType)
@@ -148,7 +181,7 @@ namespace GMRTSClient.Systems
                 {
                     var unit = unitMapper.Get(entityId);
 
-                    unit.Update((ulong)stopwatch.ElapsedMilliseconds);
+                    unit.Update((ulong)Stopwatch.ElapsedMilliseconds);
                 }
                 else
                 {
@@ -189,7 +222,7 @@ namespace GMRTSClient.Systems
         /// <param name="obj">The time the game starts i think</param>
         private void Client_OnGameStart(DateTime obj)
         {
-            stopwatch.Restart();
+            Stopwatch.Restart();
         }
         /// <summary>
         /// Called when the server spawns a unit

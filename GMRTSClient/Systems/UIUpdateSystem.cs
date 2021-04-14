@@ -38,7 +38,7 @@ namespace GMRTSClient.Systems
 
         public override void Update(GameTime gameTime)
         {
-
+            gameUI.Update((ulong)ServerUpdateSystem.Instance.Stopwatch.ElapsedMilliseconds);
         }
 
         public void OnCompleted()

@@ -12,6 +12,15 @@ namespace GMRTSClient.Systems
 {
     class UnitUpdateSystem : EntityUpdateSystem
     {
+        private static UnitUpdateSystem instance;
+        public static UnitUpdateSystem Instance
+        {
+            get
+            {
+                return instance;
+            }
+        }
+
         private ComponentMapper<Transform2> transformMapper;
         private ComponentMapper<Unit> unitMapper;
         private Stopwatch stopwatch;
@@ -19,6 +28,15 @@ namespace GMRTSClient.Systems
         public UnitUpdateSystem(Stopwatch stopwatch)
            : base(Aspect.All(typeof(Transform2), typeof(Unit)))
         {
+            if (instance == null)
+            {
+                instance = this;
+            }
+            else
+            {
+                throw new Exception("Systems are singletons");
+            }
+
             this.stopwatch = stopwatch;
         }
 

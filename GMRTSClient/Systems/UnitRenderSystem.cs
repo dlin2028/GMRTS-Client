@@ -45,9 +45,10 @@ namespace GMRTSClient.Systems
                 spriteBatch.Draw(unit.Sprite, transform);
 
                 Vector2 size = unit.Sprite.TextureRegion.Size * transform.Scale;
-                var healthBarSize = new Vector2(Math.Max(size.X, size.Y) , 10);
+                var healthBarSize = new Vector2(Math.Max(size.X, size.Y), 10);
 
-                spriteBatch.Draw(pixel, new Rectangle((int)(transform.WorldPosition.X - healthBarSize.X/2f), (int)(transform.WorldPosition.Y + Math.Max(size.X, size.Y) * 1.414 / 2f), (int)healthBarSize.X, (int)healthBarSize.Y), unit.Color);
+                spriteBatch.Draw(pixel, new Rectangle((int)(transform.WorldPosition.X - healthBarSize.X / 2f), (int)(transform.WorldPosition.Y + Math.Max(size.X, size.Y) * 1.414 / 2f), (int)healthBarSize.X, (int)healthBarSize.Y), Color.DarkGray);
+                spriteBatch.Draw(pixel, new Rectangle((int)(transform.WorldPosition.X - healthBarSize.X/2f), (int)(transform.WorldPosition.Y + Math.Max(size.X, size.Y) * 1.414 / 2f), (int)(healthBarSize.X * (unit.Health.Value / 100f)), (int)healthBarSize.Y), unit.Color);
             }
         }
     }

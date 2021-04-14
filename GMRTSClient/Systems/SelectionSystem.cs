@@ -88,6 +88,10 @@ namespace GMRTSClient.Systems
             {
                 instance = this;
             }
+            else
+            {
+                throw new Exception("Systems are singletons");
+            }
 
             observers = new List<IObserver<SelectableData>>();
             this.spriteBatch = spriteBatch;
