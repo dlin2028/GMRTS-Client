@@ -19,16 +19,21 @@ namespace GMRTSClient.Systems
         private ComponentMapper<Transform2> transformMapper;
         private ComponentMapper<Unit> spriteMapper;
 
+        private Texture2D pixel;
+
         public override void Initialize(IComponentMapperService mapperService)
         {
             transformMapper = mapperService.GetMapper<Transform2>();
             spriteMapper = mapperService.GetMapper<Unit>();
         }
 
-        public UnitRenderSystem(SpriteBatch spriteBatch)
+        public UnitRenderSystem(SpriteBatch spriteBatch, GraphicsDevice graphics)
             : base(Aspect.All(typeof(Unit), typeof(Transform2)))
         {
             this.spriteBatch = spriteBatch;
+
+            pixel = new Texture2D(graphics, 1, 1);
+            pixel.SetData(new[] { Color.White });
         }
 
         public override void Draw(GameTime gameTime)
@@ -38,6 +43,11 @@ namespace GMRTSClient.Systems
                 var unit = spriteMapper.Get(entity);
                 var transform = transformMapper.Get(entity);
                 spriteBatch.Draw(unit.Sprite, transform);
+
+                Vector2 size = unit.Sprite.TextureRegion.Size * transform.Scale;
+                var healthBarSize = new Vector2(Math.Max(size.X, size.Y) , 10);
+
+                spriteBatch.Draw(pixel, new Rectangle((int)(transform.WorldPosition.X - healthBarSize.X/2f), (int)(transform.WorldPosition.Y + Math.Max(size.X, size.Y) * 1.414 / 2f), (int)healthBarSize.X, (int)healthBarSize.Y), unit.Color);
             }
         }
     }

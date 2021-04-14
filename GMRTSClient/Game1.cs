@@ -63,7 +63,7 @@ namespace GMRTSClient
                    .AddSystem(new CameraSystem(camera))
                    .AddSystem(new ServerUpdateSystem(gameUI,Content, stopwatch))
                    .AddSystem(new UnitUpdateSystem(stopwatch))
-                   .AddSystem(new UnitRenderSystem(spriteBatch))
+                   .AddSystem(new UnitRenderSystem(spriteBatch, GraphicsDevice))
                    .AddSystem(new RenderSystem(spriteBatch))
                    .AddSystem(new UnitActionSystem(uiStatus, gameUI, camera, Content))
                    .AddSystem(new ActionRenderSystem(Content, GraphicsDevice, spriteBatch))

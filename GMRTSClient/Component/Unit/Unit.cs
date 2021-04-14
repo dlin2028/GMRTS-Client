@@ -1,4 +1,5 @@
 ﻿using GMRTSClient.UI.ClientAction;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended.Sprites;
@@ -17,6 +18,21 @@ namespace GMRTSClient.Component.Unit
         /// </summary>
         public LinkedList<UnitAction> Orders { get; set; }
 
+        public Color Color
+        {
+            get
+            {
+                if(Health.Value > 80)
+                {
+                    return Color.Green;
+                }
+                else if(Health.Value > 30)
+                {
+                    return Color.Orange;
+                }
+                return Color.Red;
+            }
+        }
 
         public Unit(Guid id)
             :base(id)
