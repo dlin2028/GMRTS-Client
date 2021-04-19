@@ -132,6 +132,22 @@ namespace GMRTSClient.Systems
             transMapper = mapperService.GetMapper<Transform2>();
             spriteMapper = mapperService.GetMapper<Sprite>();
         }
+
+        public void DeselectAllUnits()
+        {
+            foreach (var entityID in ActiveEntities)
+            {
+                selectableMapper.Get(entityID).Selected = false;
+            }
+            updateObservers();
+        }
+        private void updateObservers()
+        {
+            foreach (var observer in observers)
+            {
+                observer.OnNext(new SelectableData(ActiveEntities.Select(x => x).ToList(), SelectedEntities));
+            }
+        }
         private Rectangle createRectangle(Point a, Point b)
         {
             return new Rectangle(Math.Min(a.X, b.X),
@@ -200,10 +216,7 @@ namespace GMRTSClient.Systems
                     SelectedEntities.Remove(entityId);
                 }
             }
-            foreach (var observer in observers)
-            {
-                observer.OnNext(new SelectableData(ActiveEntities.Select(x => x).ToList(), SelectedEntities));
-            }
+            updateObservers();
         }
         public IDisposable Subscribe(IObserver<SelectableData> observer)
         {

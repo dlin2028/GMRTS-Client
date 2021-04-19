@@ -76,6 +76,10 @@ namespace GMRTSClient.Systems
                     selectedUnits.Add(unitMapper.Get(entityId));
                 }
             }
+            if(selectedEntities.Count <= 0)
+            {
+                return;
+            }
 
             var keyState = KeyboardExtended.GetState();
             if (!keyState.IsShiftDown())
@@ -209,10 +213,7 @@ namespace GMRTSClient.Systems
 
             if (!keyState.IsShiftDown())
             {
-                foreach (var entityId in selectedEntities)
-                {
-                    selectMapper.Get(entityId).Selected = false;
-                }
+                SelectionSystem.Instance.DeselectAllUnits();
                 gameui.CurrentAction = ActionType.None;
             }
         }

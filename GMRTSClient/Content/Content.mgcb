@@ -10,6 +10,7 @@
 
 #-------------------------------- References --------------------------------#
 
+/reference:..\..\..\..\..\.nuget\packages\monogame.extended.content.pipeline\3.8.0\tools\MonoGame.Extended.Content.Pipeline.dll
 
 #---------------------------------- Content ---------------------------------#
 
@@ -73,6 +74,18 @@
 /processorParam:TextureFormat=Color
 /build:Factory.png
 
+#begin isometric_grass_and_water.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:isometric_grass_and_water.png
+
 #begin Market.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -120,6 +133,11 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:patrol.png
+
+#begin puddles.tmx
+/importer:TiledMapImporter
+/processor:TiledMapProcessor
+/build:puddles.tmx
 
 #begin SelectionMarker.png
 /importer:TextureImporter

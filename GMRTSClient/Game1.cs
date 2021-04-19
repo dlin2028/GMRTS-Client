@@ -69,6 +69,7 @@ namespace GMRTSClient
                    .AddSystem(new ActionRenderSystem(Content, GraphicsDevice, spriteBatch))
                    .AddSystem(new SelectionSystem(Content, GraphicsDevice, spriteBatch, camera, uiStatus))
                    .AddSystem(new UIUpdateSystem(gameUI, uiStatus)) //for some reason the mouseListener OnDragEnd happens here first
+                   .AddSystem(new MapRenderSystem(Content, GraphicsDevice, camera))
                    .Build();
 
             Components.Add(world);

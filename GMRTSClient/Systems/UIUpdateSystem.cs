@@ -56,6 +56,7 @@ namespace GMRTSClient.Systems
             if(value.SelectedEntityIds.Count == 0 && uiStatus.MouseHovering == false)
             {
                 gameUI.CurrentAction = ActionType.None;
+                gameUI.BuildMenuFlags = BuildFlags.None;
                 return;
             }
 
