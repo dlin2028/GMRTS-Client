@@ -142,11 +142,11 @@ namespace GMRTSClient.Systems
         {
             if(obj.ResourceType == GMRTSClasses.STCTransferData.ResourceType.Mineral)
             {
-                gameui.Minerals = obj.Value;
+                gameui.Minerals = new Changing<float>(obj.Value.Start, obj.Value.Change, FloatChanger.FChanger, obj.Value.StartTime);
             }
             else
             {
-                gameui.Gold = obj.Value;
+                gameui.Gold = new Changing<float>(obj.Value.Start, obj.Value.Change, FloatChanger.FChanger, obj.Value.StartTime); ;
             }
         }
 
