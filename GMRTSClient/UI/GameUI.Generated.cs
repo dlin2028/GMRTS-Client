@@ -180,6 +180,13 @@ namespace GMRTSClient.UI
 			GoldLabel.GridRow = 1;
 			GoldLabel.Id = "GoldLabel";
 
+			FPSLabel = new Label();
+			FPSLabel.Text = "FPS: ";
+			FPSLabel.GridRow = 2;
+			FPSLabel.Id = "FPSLabel";
+
+
+
 			var grid2 = new Grid();
 			grid2.RowsProportions.Add(new Proportion
 			{
@@ -193,6 +200,7 @@ namespace GMRTSClient.UI
 			});
 			grid2.Widgets.Add(MineralLabel);
 			grid2.Widgets.Add(GoldLabel);
+			grid2.Widgets.Add(FPSLabel);
 
 			
 			Widgets.Add(grid1);
@@ -201,7 +209,7 @@ namespace GMRTSClient.UI
 			Widgets.Add(grid2);
 		}
 
-		
+		public Label FPSLabel;
 		public ImageButton MoveButton;
 		public ImageButton AttackButton;
 		public ImageButton AssistButton;
