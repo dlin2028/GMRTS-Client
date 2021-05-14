@@ -17,8 +17,10 @@ using System.Text;
 
 namespace GMRTSClient.Systems
 {
-    class UnitActionSystem : EntityUpdateSystem
+    class UnitActionCreationSystem : EntityUpdateSystem
     {
+
+
         private readonly OrthographicCamera camera;
         private readonly ContentManager content;
 
@@ -32,7 +34,7 @@ namespace GMRTSClient.Systems
         private ActionType currentAction => uiStatus.CurrentAction;
         private BuildingType currentBuilding => uiStatus.CurrentBuilding;
 
-        public UnitActionSystem(UIStatus uiStatus, GameUI gameui, OrthographicCamera camera, ContentManager content)
+        public UnitActionCreationSystem(UIStatus uiStatus, GameUI gameui, OrthographicCamera camera, ContentManager content)
             : base(Aspect.All(typeof(Unit)))
         {
             this.uiStatus = uiStatus;
