@@ -1,8 +1,0 @@
-{
-  "profiles": {
-    "DummyProject": {
-      "commandName": "Executable",
-      "executablePath": "C:\\Users\\dlin2\\OneDrive\\Documents\\GitHub\\GMRTS\\GMRTSClient\\bin\\Debug\\netcoreapp3.1\\GMRTSClient.exe"
-    }
-  }
-}

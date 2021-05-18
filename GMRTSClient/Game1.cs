@@ -23,18 +23,18 @@ namespace GMRTSClient
         private UIStatus uiStatus;
 
         //TEMPORARY
-        public FrameCounter frameCounter;
+        //public FrameCounter frameCounter;
 
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
-            frameCounter = new FrameCounter();
+            //frameCounter = new FrameCounter();
             //uncomment for 3000 FPS ultimate gamer mode
             //also works as PC toaster mode
-            IsFixedTimeStep = false;
-            graphics.SynchronizeWithVerticalRetrace = false;
+            //IsFixedTimeStep = false;
+            //graphics.SynchronizeWithVerticalRetrace = false;
         }
 
         protected override void Initialize()
@@ -93,8 +93,8 @@ namespace GMRTSClient
 
         protected override void Draw(GameTime gameTime)
         {
-            frameCounter.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
-            gameUI.FPSLabel.Text = "FPS: " + frameCounter.CurrentFramesPerSecond;
+            //frameCounter.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
+            //gameUI.FPSLabel.Text = "FPS: " + frameCounter.CurrentFramesPerSecond;
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
             var transformMatrix = camera.GetViewMatrix();
