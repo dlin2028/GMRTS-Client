@@ -19,8 +19,6 @@ namespace GMRTSClient.Systems
 {
     class UnitActionCreationSystem : EntityUpdateSystem
     {
-
-
         private readonly OrthographicCamera camera;
         private readonly ContentManager content;
 
@@ -66,7 +64,8 @@ namespace GMRTSClient.Systems
                 gameui.CurrentAction = ActionType.None;
             }
 
-            if (e.Button != MouseButton.Right || uiStatus.MouseHovering) return;
+            var keyState = KeyboardExtended.GetState();
+            if (e.Button != MouseButton.Right || uiStatus.MouseHovering || keyState.IsControlDown() ) return;
 
             List<int> selectedEntities = new List<int>();
             List<Unit> selectedUnits = new List<Unit>();
@@ -83,7 +82,6 @@ namespace GMRTSClient.Systems
                 return;
             }
 
-            var keyState = KeyboardExtended.GetState();
             if (!keyState.IsShiftDown())
             {
                 List<UnitAction> oldOrders = new List<UnitAction>();

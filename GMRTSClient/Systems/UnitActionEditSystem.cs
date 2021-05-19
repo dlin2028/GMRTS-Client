@@ -8,6 +8,7 @@ using MonoGame.Extended.Input;
 using MonoGame.Extended.Input.InputListeners;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace GMRTSClient.Systems
@@ -58,10 +59,32 @@ namespace GMRTSClient.Systems
         private void MouseListener_MouseClicked(object sender, MouseEventArgs e)
         {
             var keyState = KeyboardExtended.GetState();
-            if (!keyState.IsControlDown() && !keyState.IsShiftDown())
+            if (!keyState.IsControlDown() || !keyState.IsShiftDown() || !(e.Button == MouseButton.Right))
                 return;
             
-            return;
+            (var unitAction, var entityId) = getIntersectingAction(e);
+            if(unitAction == null)
+                return;            
+
+            HashSet<UnitAction> affectedActions = new HashSet<UnitAction>();
+            foreach(var unit in unitAction.Units)
+            {
+                var nextAction = unit.Orders.Find(unitAction).Next;
+                if(nextAction != null)
+                {
+                    affectedActions.Add(nextAction.Value);
+                }
+                unit.Orders.Remove(unitAction);
+            }
+            foreach (var a in affectedActions)
+            {
+                a.UpdateCollections();
+            }
+            var deleteEntity = CreateEntity();
+            var deleteAction = new DeleteAction(unitAction.Units.ToArray(), unitAction);
+            deleteEntity.Attach(deleteAction);
+            deleteEntity.Attach(new DTOActionData(deleteAction));
+            DestroyEntity(entityId);
         }
 
 

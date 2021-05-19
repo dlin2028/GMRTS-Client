@@ -51,6 +51,10 @@ namespace GMRTSClient.UI.ClientAction
             updateCollections(null, null);
         }
 
+        public void UpdateCollections()
+        {
+            updateCollections(null, null);
+        }
         private void updateCollections(object sender, EventArgs e)
         {
             PrevOrders.Clear();
