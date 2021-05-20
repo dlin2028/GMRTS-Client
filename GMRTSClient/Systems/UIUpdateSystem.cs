@@ -1,4 +1,5 @@
-﻿using GMRTSClient.Component;
+﻿using GMRTSClient.ClientAction;
+using GMRTSClient.Component;
 using GMRTSClient.Component.Unit;
 using GMRTSClient.UI;
 using GMRTSClient.UI.ClientAction;
@@ -8,6 +9,7 @@ using MonoGame.Extended.Entities.Systems;
 using MonoGame.Extended.Input.InputListeners;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace GMRTSClient.Systems
@@ -61,6 +63,14 @@ namespace GMRTSClient.Systems
             }
 
             var currBuildFlags = BuildFlags.None;
+            List<FactoryOrder> orders;
+            if(builderMapper.Has(value.SelectedEntityIds.First()))
+            {
+                orders = new List<FactoryOrder>();
+                var factory = factoryMapper.Get(entityId);
+                orders.Add(factory.Unit.Orders)
+            }
+
             foreach (var entityID in value.SelectedEntityIds)
             {
                 if (selectionMapper.Get(entityID).Selected)
@@ -76,6 +86,8 @@ namespace GMRTSClient.Systems
                 }
             }
             gameUI.BuildMenuFlags = currBuildFlags;
+
+            
         }
     }
 }
