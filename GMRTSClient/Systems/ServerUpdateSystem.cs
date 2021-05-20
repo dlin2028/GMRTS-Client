@@ -157,8 +157,9 @@ namespace GMRTSClient.Systems
                 if(factoryMapper.Has(entityID))
                 {
                     var factory = factoryMapper.Get(entityID);
-                    var entity = CreateEntity();
                     var order = new FactoryEnqueueOrder(factory.Unit.ID, unitType);
+                    factory.Orders.Add(order);
+                    var entity = CreateEntity();
                     entity.Attach(order);
                     entity.Attach(new DTOActionData(order));
                 }

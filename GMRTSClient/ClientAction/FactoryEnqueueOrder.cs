@@ -15,6 +15,7 @@ namespace GMRTSClient.ClientAction
             this.unitType = unitType;
         }
 
+
         public override FactoryAction ToDTOFactoryAction()
         {
             return new GMRTSClasses.CTSTransferData.FactoryActions.EnqueueBuildOrder() { TargetFactory = targetFactory, OrderID = ID, UnitType = unitType };

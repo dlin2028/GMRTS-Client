@@ -62,17 +62,46 @@ namespace GMRTSClient.Systems
                 return;
             }
 
+            var firstId = value.SelectedEntityIds.First();
             var currBuildFlags = BuildFlags.None;
-            List<FactoryOrder> orders;
-            if(builderMapper.Has(value.SelectedEntityIds.First()))
+            IEnumerable<FactoryOrder> orders = null;
+            IEnumerable<BuildAction> actions = null;
+            if(factoryMapper.Has(value.SelectedEntityIds.First()))
             {
-                orders = new List<FactoryOrder>();
-                var factory = factoryMapper.Get(entityId);
-                orders.Add(factory.Unit.Orders)
+                var factory = factoryMapper.Get(firstId);
+                orders = factory.Orders;
+            }
+            else
+            {
+                actions = new List<BuildAction>();
+                var builder = builderMapper.Get(firstId);
+                actions = builder.Unit.Orders.Where(x => x.ActionType == ActionType.Build).Cast<BuildAction>();
             }
 
+            bool displayQueue = true;
             foreach (var entityID in value.SelectedEntityIds)
             {
+                if(displayQueue)
+                {
+                    if(orders == null)
+                    {
+                        var builder = builderMapper.Get(entityID);
+                        var builderActions = builder.Unit.Orders.Where(x => x.ActionType == ActionType.Build).Cast<BuildAction>();
+                        if(actions.SequenceEqual(builderActions))
+                        {
+                            displayQueue = false;
+                        }
+                    }
+                    else
+                    {
+                        var factory = factoryMapper.Get(entityID);
+                        if(orders.SequenceEqual(factory.Orders))
+                        {
+                            displayQueue = false;
+                        }
+                    }
+                }
+
                 if (selectionMapper.Get(entityID).Selected)
                 {
                     if (builderMapper.Has(entityID))
@@ -85,9 +114,22 @@ namespace GMRTSClient.Systems
                     }
                 }
             }
-            gameUI.BuildMenuFlags = currBuildFlags;
+            if(displayQueue)
+            {
+                if(orders == null)
+                {
+                    foreach (var action in actions)
+                    {
+                        
+                    }
+                }
+                else
+                {
 
-            
+                }
+            }
+
+            gameUI.BuildMenuFlags = currBuildFlags;
         }
     }
 }
