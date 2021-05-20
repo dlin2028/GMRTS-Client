@@ -1,0 +1,44 @@
+<Project>
+  <Project.ExportOptions Namespace="GMRTSClient.UI" Class="GameUI" OutputPath="C:\Users\David\Desktop\test" />
+  <Panel>
+    <Grid ShowGridLines="True" ColumnSpacing="8" RowSpacing="8" HorizontalAlignment="Left" VerticalAlignment="Bottom">
+      <Grid.ColumnsProportions>
+        <Proportion Type="Auto" />
+        <Proportion Type="Auto" />
+      </Grid.ColumnsProportions>
+      <ImageButton Image="buttonassets/move.png" PressedImage="buttonassets/movePressed.png" Toggleable="True" Id="MoveButton" />
+      <ImageButton Image="buttonassets/attack.png" PressedImage="buttonassets/attackPressed.png" Toggleable="True" GridColumn="1" Id="AttackButton" />
+      <ImageButton Image="buttonassets/assist.png" PressedImage="buttonassets/assistPressed.png" Toggleable="True" GridRow="1" Id="AssistButton" />
+      <ImageButton Image="buttonassets/patrol.png" PressedImage="buttonassets/patrolPressed.png" Toggleable="True" GridColumn="1" GridRow="1" Id="PatrolButton" />
+    </Grid>
+    <Grid ShowGridLines="True" CanSelectNothing="True" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0, 0, 0, 20" Id="BuildGrid">
+      <Grid.ColumnsProportions>
+        <Proportion Type="Pixels" Value="100" />
+        <Proportion Type="Pixels" Value="100" />
+        <Proportion Type="Pixels" Value="100" />
+        <Proportion Type="Pixels" Value="100" />
+        <Proportion Type="Pixels" Value="100" />
+        <Proportion Type="Pixels" Value="100" />
+        <Proportion Type="Pixels" Value="100" />
+      </Grid.ColumnsProportions>
+      <Grid.RowsProportions>
+        <Proportion Type="Pixels" Value="100" />
+        <Proportion Type="Pixels" Value="100" />
+      </Grid.RowsProportions>
+      <ImageButton Image="unitassets/Tank.png" PressedImage="buttonassets/patrolPressed.png" MaxWidth="100" MaxHeight="100" Id="BuildTankButton" />
+      <ImageButton Image="unitassets/Builder.png" PressedImage="buttonassets/patrolPressed.png" MaxWidth="100" MaxHeight="100" GridColumn="1" Id="BuildBuilderButton" />
+      <ImageButton Image="unitassets/Factory.png" PressedImage="buttonassets/patrolPressed.png" MaxWidth="100" MaxHeight="100" GridColumn="2" Id="BuildFactoryButton" />
+      <ImageButton Image="unitassets/Market.png" PressedImage="buttonassets/patrolPressed.png" MaxWidth="100" MaxHeight="100" GridColumn="3" Id="BuildMarketButton" />
+      <ImageButton Image="unitassets/Mine.png" PressedImage="buttonassets/patrolPressed.png" MaxWidth="100" MaxHeight="100" GridColumn="4" Id="BuildMineButton" />
+    </Grid>
+    <HorizontalSlider HorizontalAlignment="Center" Width="700" VerticalAlignment="Bottom" />
+    <Grid>
+      <Grid.RowsProportions>
+        <Proportion Type="Auto" Value="100" />
+        <Proportion Type="Auto" Value="100" />
+      </Grid.RowsProportions>
+      <Label Text="Minerals:" Id="MineralLabel" GridRow="0"/>
+      <Label Text="Gold:" Id="GoldLabel" GridRow="1"/>
+    </Grid>
+  </Panel>
+</Project>
