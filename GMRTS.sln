@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GMRTSClasses", "GMRTSClasse
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GMRTSClient", "GMRTSClient\GMRTSClient.csproj", "{1FC7B3F6-3588-498A-A5D3-7315DFD1726B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GMRTSClasses", "GMRTSClasses\GMRTSClasses.csproj", "{B2DBD442-7528-472C-8E01-413BD70A9010}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
