@@ -34,7 +34,7 @@
     <PackageReference Include="Myra" Version="1.2.3" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\GMRTSClasses\GMRTSClasses.csproj" />
+    <ProjectReference Include="..\GMRTS-Shared\GMRTSClasses\GMRTSClasses.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Update="buttonassets\assist.png">

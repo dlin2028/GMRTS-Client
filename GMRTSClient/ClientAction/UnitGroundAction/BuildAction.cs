@@ -1,5 +1,6 @@
 ﻿using GMRTSClasses.CTSTransferData;
 using GMRTSClasses.CTSTransferData.MetaActions;
+using GMRTSClasses.Units;
 using GMRTSClient.Component.Unit;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
@@ -58,7 +59,7 @@ namespace GMRTSClient.UI.ClientAction
 
         private ContentManager content;
 
-        public BuildAction(List<Unit> units, Vector2 target, BuildingType buildingType, ContentManager content) : base(units, target)
+        public BuildAction(List<Component.Unit.Unit> units, Vector2 target, BuildingType buildingType, ContentManager content) : base(units, target)
         {
             this.content = content;
 

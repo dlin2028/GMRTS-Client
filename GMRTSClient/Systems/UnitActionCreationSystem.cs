@@ -1,4 +1,5 @@
 ﻿using GMRTSClasses.CTSTransferData;
+using GMRTSClasses.Units;
 using GMRTSClient.Component;
 using GMRTSClient.Component.Unit;
 using GMRTSClient.UI;
@@ -22,7 +23,7 @@ namespace GMRTSClient.Systems
         private readonly OrthographicCamera camera;
         private readonly ContentManager content;
 
-        private ComponentMapper<Unit> unitMapper;
+        private ComponentMapper<Component.Unit.Unit> unitMapper;
         private ComponentMapper<Selectable> selectMapper;
         private ComponentMapper<FancyRect> rectMapper;
         private MouseListener mouseListener;
@@ -33,7 +34,7 @@ namespace GMRTSClient.Systems
         private BuildingType currentBuilding => uiStatus.CurrentBuilding;
 
         public UnitActionCreationSystem(UIStatus uiStatus, GameUI gameui, OrthographicCamera camera, ContentManager content)
-            : base(Aspect.All(typeof(Unit)))
+            : base(Aspect.All(typeof(Component.Unit.Unit)))
         {
             this.uiStatus = uiStatus;
             this.camera = camera;
@@ -47,7 +48,7 @@ namespace GMRTSClient.Systems
 
         public override void Initialize(IComponentMapperService mapperService)
         {
-            unitMapper = mapperService.GetMapper<Unit>();
+            unitMapper = mapperService.GetMapper<Component.Unit.Unit>();
             selectMapper = mapperService.GetMapper<Selectable>();
             rectMapper = mapperService.GetMapper<FancyRect>();
         }
@@ -68,7 +69,7 @@ namespace GMRTSClient.Systems
             if (e.Button != MouseButton.Right || uiStatus.MouseHovering || keyState.IsControlDown() ) return;
 
             List<int> selectedEntities = new List<int>();
-            List<Unit> selectedUnits = new List<Unit>();
+            List<Component.Unit.Unit> selectedUnits = new List<Component.Unit.Unit>();
             foreach (var entityId in ActiveEntities)
             {
                 if (selectMapper.Get(entityId).Selected)
@@ -121,7 +122,7 @@ namespace GMRTSClient.Systems
             switch (currentAction)
             {
                 case ActionType.None:
-                    Unit target = null;
+                    Component.Unit.Unit target = null;
                     var clickedUnits = GetIntersectingUnits(e.Position);
                     if (clickedUnits.Count() > 0)
                         target = unitMapper.Get(clickedUnits.First());
@@ -147,7 +148,7 @@ namespace GMRTSClient.Systems
                     newEntity.Attach(new DTOActionData(newAction));
                     break;
                 case ActionType.Attack:
-                    Unit attackTarget = null;
+                    Component.Unit.Unit attackTarget = null;
                     var unitsToAttack = GetIntersectingUnits(e.Position);
                     if (unitsToAttack.Count() > 0)
                         attackTarget = unitMapper.Get(unitsToAttack.First());
@@ -160,7 +161,7 @@ namespace GMRTSClient.Systems
                     }
                     break;
                 case ActionType.Assist:
-                    Unit assistTarget = null;
+                    Component.Unit.Unit assistTarget = null;
                     var unitsToAssist = GetIntersectingUnits(e.Position);
                     if (unitsToAssist.Count() > 0)
                         assistTarget = unitMapper.Get(unitsToAssist.First());
@@ -174,7 +175,7 @@ namespace GMRTSClient.Systems
                     break;
                 case ActionType.Patrol:
                     DestroyEntity(newEntity.Id); //so that the extraEntities are sent before the newEntity
-                    List<(UnitAction?, IEnumerable<Unit>)> prevActions = new List<(UnitAction?, IEnumerable<Unit>)>();
+                    List<(UnitAction?, IEnumerable<Component.Unit.Unit>)> prevActions = new List<(UnitAction?, IEnumerable<Component.Unit.Unit>)>();
                     foreach (var uniqueAction in selectedUnits.Select(x => x.Orders).Select(x => x.LastOrDefault()).Distinct())
                     {
                         prevActions.Add((uniqueAction, selectedUnits.Where(x => x.Orders.LastOrDefault() == uniqueAction)));
