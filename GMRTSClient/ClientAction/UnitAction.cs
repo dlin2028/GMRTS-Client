@@ -50,7 +50,6 @@ namespace GMRTSClient.UI.ClientAction
             }
             updateCollections(null, null);
         }
-
         public void UpdateCollections()
         {
             updateCollections(null, null);

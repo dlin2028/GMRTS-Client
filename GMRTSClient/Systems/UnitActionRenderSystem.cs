@@ -14,7 +14,7 @@ using System.Text;
 
 namespace GMRTSClient.Systems
 {
-    class ActionRenderSystem : EntityDrawSystem
+    class UnitActionRenderSystem : EntityDrawSystem
     {
         private ComponentMapper<PlayerAction> actionMapper;
         private SpriteBatch spriteBatch;
@@ -22,7 +22,7 @@ namespace GMRTSClient.Systems
         private Texture2D circle;
         private Texture2D pixel;
 
-        public ActionRenderSystem(ContentManager content, GraphicsDevice graphics, SpriteBatch spriteBatch)
+        public UnitActionRenderSystem(ContentManager content, GraphicsDevice graphics, SpriteBatch spriteBatch)
             : base(Aspect.All(typeof(PlayerAction)))
         {
             this.spriteBatch = spriteBatch;

@@ -71,7 +71,8 @@ namespace GMRTSClient
                    .AddSystem(new RenderSystem(spriteBatch))
                    .AddSystem(new UnitActionCreationSystem(uiStatus, gameUI, camera, Content))
                    .AddSystem(new UnitActionEditSystem(camera))
-                   .AddSystem(new ActionRenderSystem(Content, GraphicsDevice, spriteBatch))
+                   .AddSystem(new UnitActionUpdateSystem())
+                   .AddSystem(new UnitActionRenderSystem(Content, GraphicsDevice, spriteBatch))
                    .AddSystem(new SelectionSystem(Content, GraphicsDevice, spriteBatch, camera, uiStatus))
                    .AddSystem(new UIUpdateSystem(gameUI, uiStatus)) //for some reason the mouseListener OnDragEnd happens here first
                    .AddSystem(new MapRenderSystem(Content, GraphicsDevice, camera))

@@ -17,7 +17,7 @@ namespace GMRTSClient.Component.Unit
         public ClientOnlyUnit(Unit unit, Transform2 transform, UnitComponent unitComponent, int health)
             :base(unit, unitComponent.Sprite)
         {
-            unit.Position = new GMRTSClasses.Changing<System.Numerics.Vector2>(new System.Numerics.Vector2(transform.Position.X, transform.Position.Y), System.Numerics.Vector2.Zero, Vector2Changer.VectorChanger, 0);
+            unit.Position = new GMRTSClasses.Changing<System.Numerics.Vector2>(new System.Numerics.Vector2(transform.Position.X, transform.Position.Y), System.Numerics.Vector2.One, Vector2Changer.VectorChanger, 0);
             unit.Rotation = new GMRTSClasses.Changing<float>(transform.Rotation, 0.5f, FloatChanger.FChanger, 0);
             unit.Health = new Changing<float>(health, 0, FloatChanger.FChanger, 0);
         }
