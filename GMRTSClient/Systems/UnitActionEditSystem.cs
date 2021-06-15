@@ -1,4 +1,5 @@
 ﻿using GMRTSClient.Component;
+using GMRTSClient.Component.Unit;
 using GMRTSClient.UI.ClientAction;
 using Microsoft.Xna.Framework;
 using MonoGame.Extended;
@@ -17,12 +18,14 @@ namespace GMRTSClient.Systems
     {
         private MouseListener mouseListener;
         private ComponentMapper<PlayerAction> actionMapper;
+        private ComponentMapper<FancyRect> rectMapper;
+        private ComponentMapper<Unit> unitMapper;
         private readonly OrthographicCamera camera;
         int currentEntityId;
         UnitAction currentAction;
         Vector2 oldActionPosition;
         public UnitActionEditSystem(OrthographicCamera camera)
-            :base(Aspect.All(typeof(PlayerAction)))
+            : base(Aspect.One(typeof(PlayerAction), typeof(Unit)))
         {
             this.camera = camera;
             mouseListener = new MouseListener();
@@ -30,16 +33,45 @@ namespace GMRTSClient.Systems
             mouseListener.MouseDragEnd += MouseListener_MouseDragEnd;
             mouseListener.MouseClicked += MouseListener_MouseClicked;
         }
+        public override void Initialize(IComponentMapperService mapperService)
+        {
+            actionMapper = mapperService.GetMapper<PlayerAction>();
+            rectMapper = mapperService.GetMapper<FancyRect>();
+            unitMapper = mapperService.GetMapper<Unit>();
+        }
 
         private void MouseListener_MouseDragEnd(object sender, MouseEventArgs e)
         {
-            if(currentAction != null)
+            if (currentAction == null)
+                return;
+
+            if (currentAction is UnitUnitAction)
             {
-                var oldId = currentAction.ID;
-                currentAction.ID = Guid.NewGuid();
-                GetEntity(currentEntityId).Attach(new DTOActionData(new ReplaceAction(currentAction, oldId)));
-                currentAction = null;
+                ((UnitUnitAction)currentAction).PauseUpdate = false;
+                var newTargets = getIntersectingUnits(camera.ScreenToWorld(e.Position.ToVector2()));
+                if (newTargets.Count() != 0)
+                {
+                    var newTarget = newTargets.First();
+                    if (currentAction.ActionType == ActionType.Assist) //&& is friendly )
+                    {
+                        ((UnitUnitAction)currentAction).Target = unitMapper.Get(newTarget);
+                    }
+                    else if (currentAction.ActionType == ActionType.Attack) //&& is enemy )
+                    {
+                        ((UnitUnitAction)currentAction).Target = unitMapper.Get(newTarget);
+                    }
+                }
+                else
+                {
+                    return;
+                }
             }
+
+            var oldId = currentAction.ID;
+            currentAction.ID = Guid.NewGuid();
+            GetEntity(currentEntityId).Attach(new DTOActionData(new ReplaceAction(currentAction, oldId)));
+            currentAction = null;
+
         }
 
         private void MouseListener_MouseDragStart(object sender, MouseEventArgs e)
@@ -51,6 +83,10 @@ namespace GMRTSClient.Systems
             (currentAction, currentEntityId) = getIntersectingAction(e);
             if (currentAction != null)
             {
+                if (currentAction is UnitUnitAction)
+                {
+                    ((UnitUnitAction)currentAction).PauseUpdate = true;
+                }
                 oldActionPosition = currentAction.Position;
             }
         }
@@ -61,16 +97,16 @@ namespace GMRTSClient.Systems
             var keyState = KeyboardExtended.GetState();
             if (!keyState.IsControlDown() || !keyState.IsShiftDown() || !(e.Button == MouseButton.Right))
                 return;
-            
+
             (var unitAction, var entityId) = getIntersectingAction(e);
-            if(unitAction == null)
-                return;            
+            if (unitAction == null)
+                return;
 
             HashSet<UnitAction> affectedActions = new HashSet<UnitAction>();
-            foreach(var unit in unitAction.Units)
+            foreach (var unit in unitAction.Units)
             {
                 var nextAction = unit.Orders.Find(unitAction).Next;
-                if(nextAction != null)
+                if (nextAction != null)
                 {
                     affectedActions.Add(nextAction.Value);
                 }
@@ -90,7 +126,7 @@ namespace GMRTSClient.Systems
 
         private (UnitAction, int) getIntersectingAction(MouseEventArgs e)
         {
-            foreach (var entityID in ActiveEntities)
+            foreach (var entityID in ActiveEntities.Where(x => actionMapper.Has(x)))
             {
                 var action = actionMapper.Get(entityID);
                 if (!action.IsUnitAction)
@@ -104,17 +140,17 @@ namespace GMRTSClient.Systems
             }
             return (null, 0);
         }
-
-        public override void Initialize(IComponentMapperService mapperService)
+        private IEnumerable<int> getIntersectingUnits(Vector2 position)
         {
-            actionMapper = mapperService.GetMapper<PlayerAction>();
+            return ActiveEntities.Where(x => rectMapper.Has(x) && rectMapper.Get(x).Contains(position));
         }
+
 
         public override void Update(GameTime gameTime)
         {
             var mouseState = MouseExtended.GetState();
             mouseListener.Update(gameTime);
-            if(currentAction != null)
+            if (currentAction != null)
             {
                 currentAction.Position -= mouseState.DeltaPosition.ToVector2() / camera.Zoom;
             }

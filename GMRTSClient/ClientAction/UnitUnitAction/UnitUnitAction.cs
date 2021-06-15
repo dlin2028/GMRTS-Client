@@ -9,18 +9,22 @@ namespace GMRTSClient.UI.ClientAction
 {
     abstract class UnitUnitAction : UnitAction
     {
-        public Unit Target;
-
+        public Unit Target { get; set; }
+        public bool PauseUpdate { get; set; }
         public UnitUnitAction(List<Unit> units, Unit target)
             : base(units)
         {
             Target = target;
             Position = new Vector2(target.Position.Value.X, target.Position.Value.Y);
+            PauseUpdate = false;
         }
 
         public void Update()
         {
-            Position = new Vector2(Target.Position.Value.X, Target.Position.Value.Y);
+            if(!PauseUpdate)
+            {
+                Position = new Vector2(Target.Position.Value.X, Target.Position.Value.Y);
+            }
         }
     }
 }
