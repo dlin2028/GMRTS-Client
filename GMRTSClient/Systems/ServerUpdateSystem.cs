@@ -47,7 +47,8 @@ namespace GMRTSClient.Systems
         private ComponentMapper<PlayerAction> actionMapper;
 
         private readonly GameUI gameui;
-
+        private bool spawnedClientOnlyUnits = false;
+        private Task<bool> startConnectionTask;
         public ServerUpdateSystem(GameUI gameui, ContentManager content, Stopwatch stopwatch)
             : base(Aspect.One(typeof(Unit), typeof(DTOActionData)))
         {
@@ -74,73 +75,21 @@ namespace GMRTSClient.Systems
             client.OnActionFinish += Client_OnActionFinish;
             client.OnResourceUpdated += Client_OnResourceUpdated;
 
-            gameui.BuildTankButton.Click += (s, a) =>  { EnqueueFactoryOrder(GMRTSClasses.Units.MobileUnitType.Tank); };
-            gameui.BuildBuilderButton.Click += (s, a) =>  { EnqueueFactoryOrder(GMRTSClasses.Units.MobileUnitType.Builder); };
+            gameui.BuildTankButton.Click += (s, a) => { EnqueueFactoryOrder(GMRTSClasses.Units.MobileUnitType.Tank); };
+            gameui.BuildBuilderButton.Click += (s, a) => { EnqueueFactoryOrder(GMRTSClasses.Units.MobileUnitType.Builder); };
 
-            Task<bool> startConnectionTask = client.TryStart();
+            startConnectionTask = client.TryStart();
             startConnectionTask.Wait();
             Task.Run(async () =>
             {
                 await client.JoinGameByNameAndCreateIfNeeded("aaaaa", Guid.NewGuid().ToString());
                 await client.RequestGameStart();
             });
-
-            Task.Run(async () =>
-            {
-                await Task.Delay(500);
-
-
-                if (!startConnectionTask.Result)
-                {
-                    //add some units for debugging
-                    Random rng = new Random();
-                    for (int i = 0; i < 10; i++)
-                    {
-                        var entity = CreateEntity();
-                        var transform = new Transform2(rng.Next(-500, 500), rng.Next(-500, 500));
-                        transform.Scale = Vector2.One * 0.1f;
-                        Unit unit = new Unit(Guid.NewGuid());
-                        Builder unitComponent = new Builder(unit, content);
-
-
-                        entity.Attach(unit);
-                        entity.Attach(unitComponent);
-                        entity.Attach(transform);
-                        entity.Attach(new ClientOnlyUnit(unit, transform, unitComponent, rng.Next(0, 100)));
-                        entity.Attach(unit.Sprite);
-                        entity.Attach(new FancyRect(transform, unit.Sprite.TextureRegion.Size));
-                        entity.Attach(new Selectable());
-
-                        units.Add(unit);
-                        unitDic.Add(unit.ID, unit);
-                    }
-
-                    { //this is c o o l (i hope)
-                        var entity = CreateEntity();
-                        var transform = new Transform2(0, 0);
-                        transform.Scale = Vector2.One * 0.1f;
-                        Unit unit = new Unit(Guid.NewGuid());
-                        Factory unitComponent = new Factory(unit, content);
-
-                        entity.Attach(unit);
-                        entity.Attach(unitComponent);
-                        entity.Attach(transform);
-                        entity.Attach(new ClientOnlyUnit(unit, transform, unitComponent, rng.Next(0, 100)));
-                        entity.Attach(unit.Sprite);
-                        entity.Attach(new FancyRect(transform, unit.Sprite.TextureRegion.Size));
-                        entity.Attach(new Selectable());
-
-                        units.Add(unit);
-                        unitDic.Add(unit.ID, unit);
-                    }
-                    stopwatch.Restart();
-                }
-            });
         }
 
         private void Client_OnResourceUpdated(GMRTSClasses.STCTransferData.ResourceUpdate obj)
         {
-            if(obj.ResourceType == GMRTSClasses.STCTransferData.ResourceType.Mineral)
+            if (obj.ResourceType == GMRTSClasses.STCTransferData.ResourceType.Mineral)
             {
                 gameui.Minerals = new Changing<float>(obj.Value.Start, obj.Value.Change, FloatChanger.FChanger, obj.Value.StartTime);
             }
@@ -154,7 +103,7 @@ namespace GMRTSClient.Systems
         {
             foreach (var entityID in SelectionSystem.Instance.SelectedEntities)
             {
-                if(factoryMapper.Has(entityID))
+                if (factoryMapper.Has(entityID))
                 {
                     var factory = factoryMapper.Get(entityID);
                     var order = new FactoryEnqueueOrder(factory.Unit.ID, unitType);
@@ -176,6 +125,52 @@ namespace GMRTSClient.Systems
 
         public override void Update(GameTime gameTime)
         {
+            if (!startConnectionTask.Result && !spawnedClientOnlyUnits)
+            {
+                spawnedClientOnlyUnits = true;
+                //add some units for debugging
+                Random rng = new Random();
+                for (int i = 0; i < 10; i++)
+                {
+                    var entity = CreateEntity();
+                    var transform = new Transform2(rng.Next(-500, 500), rng.Next(-500, 500));
+                    transform.Scale = Vector2.One * 0.1f;
+                    Unit unit = new Unit(Guid.NewGuid());
+                    Builder unitComponent = new Builder(unit, content);
+
+
+                    entity.Attach(unit);
+                    entity.Attach(unitComponent);
+                    entity.Attach(transform);
+                    entity.Attach(new ClientOnlyUnit(unit, transform, unitComponent, rng.Next(0, 100)));
+                    entity.Attach(unit.Sprite);
+                    entity.Attach(new FancyRect(transform, unit.Sprite.TextureRegion.Size));
+                    entity.Attach(new Selectable());
+
+                    units.Add(unit);
+                    unitDic.Add(unit.ID, unit);
+                }
+
+                { //this is c o o l (i hope)
+                    var entity = CreateEntity();
+                    var transform = new Transform2(0, 0);
+                    transform.Scale = Vector2.One * 0.1f;
+                    Unit unit = new Unit(Guid.NewGuid());
+                    Factory unitComponent = new Factory(unit, content);
+
+                    entity.Attach(unit);
+                    entity.Attach(unitComponent);
+                    entity.Attach(transform);
+                    entity.Attach(new ClientOnlyUnit(unit, transform, unitComponent, rng.Next(0, 100)));
+                    entity.Attach(unit.Sprite);
+                    entity.Attach(new FancyRect(transform, unit.Sprite.TextureRegion.Size));
+                    entity.Attach(new Selectable());
+
+                    units.Add(unit);
+                    unitDic.Add(unit.ID, unit);
+                }
+                Stopwatch.Restart();
+            }
             foreach (var entityId in ActiveEntities)
             {
                 if (unitMapper.Has(entityId))
@@ -197,18 +192,18 @@ namespace GMRTSClient.Systems
                         actionDic.Add(actionData.Action.ID, actionData.Action);
                         client.ArbitraryNonmeta(nonmeta);
                     }
-                    if(factory != null)
+                    if (factory != null)
                     {
                         client.FactoryAct(factory);
                     }
-                    if(meta != null)
+                    if (meta != null)
                     {
                         client.ArbitraryMeta(meta);
                     }
                     actionDataMapper.Delete(entityId);
 
                     //maybe destroy empty entities here
-                    if(!actionMapper.Has(entityId))
+                    if (!actionMapper.Has(entityId))
                     {
                         DestroyEntity(entityId);
                     }
@@ -271,7 +266,7 @@ namespace GMRTSClient.Systems
             entity.Attach(transform);
             entity.Attach(new FancyRect(transform, unitComponent.Sprite.TextureRegion.Size));
             entity.Attach(new Selectable());
-             
+
             units.Add(unit);
             unitDic.Add(unit.ID, unit);
         }
