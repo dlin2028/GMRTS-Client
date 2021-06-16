@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PipelineBuildEvent xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-  <SourceFile>C:/Users/David/Documents/GitHub/GMRTS-Client/GMRTSClient/Content/patrol.png</SourceFile>
-  <SourceTime>2021-06-13T20:58:19.4819312-07:00</SourceTime>
-  <DestFile>C:/Users/David/Documents/GitHub/GMRTS-Client/GMRTSClient/Content/bin/DesktopGL/Content/patrol.xnb</DestFile>
-  <DestTime>2021-06-13T21:06:23.8480014-07:00</DestTime>
+  <SourceFile>c:/Users/David/Documents/GitHub/GMRTS-Client/GMRTSClient/Content/patrol.png</SourceFile>
+  <SourceTime>2021-06-15T20:40:45.7771621-07:00</SourceTime>
+  <DestFile>c:/Users/David/Documents/GitHub/GMRTS-Client/GMRTSClient/Content/bin/DesktopGL/Content/patrol.xnb</DestFile>
+  <DestTime>2021-06-15T20:45:45.1003413-07:00</DestTime>
   <Importer>TextureImporter</Importer>
   <ImporterTime>2020-08-10T16:17:54-07:00</ImporterTime>
   <Processor>TextureProcessor</Processor>
