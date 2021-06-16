@@ -4,19 +4,19 @@
   <Platform>DesktopGL</Platform>
   <Config />
   <SourceFiles>
-    <File>c:/Users/David/Documents/GitHub/GMRTS-Client/GMRTSClient/Content/assist.png</File>
-    <File>c:/Users/David/Documents/GitHub/GMRTS-Client/GMRTSClient/Content/attack.png</File>
-    <File>c:/Users/David/Documents/GitHub/GMRTS-Client/GMRTSClient/Content/Builder.png</File>
-    <File>c:/Users/David/Documents/GitHub/GMRTS-Client/GMRTSClient/Content/Circle.png</File>
-    <File>c:/Users/David/Documents/GitHub/GMRTS-Client/GMRTSClient/Content/Factory.png</File>
-    <File>c:/Users/David/Documents/GitHub/GMRTS-Client/GMRTSClient/Content/isometric_grass_and_water.png</File>
-    <File>c:/Users/David/Documents/GitHub/GMRTS-Client/GMRTSClient/Content/Market.png</File>
-    <File>c:/Users/David/Documents/GitHub/GMRTS-Client/GMRTSClient/Content/Mine.png</File>
-    <File>c:/Users/David/Documents/GitHub/GMRTS-Client/GMRTSClient/Content/move.png</File>
-    <File>c:/Users/David/Documents/GitHub/GMRTS-Client/GMRTSClient/Content/patrol.png</File>
-    <File>c:/Users/David/Documents/GitHub/GMRTS-Client/GMRTSClient/Content/puddles.tmx</File>
-    <File>c:/Users/David/Documents/GitHub/GMRTS-Client/GMRTSClient/Content/SelectionMarker.png</File>
-    <File>c:/Users/David/Documents/GitHub/GMRTS-Client/GMRTSClient/Content/Tank.png</File>
+    <File>C:/Users/David/Documents/GitHub/GMRTS-Client/GMRTSClient/Content/assist.png</File>
+    <File>C:/Users/David/Documents/GitHub/GMRTS-Client/GMRTSClient/Content/attack.png</File>
+    <File>C:/Users/David/Documents/GitHub/GMRTS-Client/GMRTSClient/Content/Builder.png</File>
+    <File>C:/Users/David/Documents/GitHub/GMRTS-Client/GMRTSClient/Content/Circle.png</File>
+    <File>C:/Users/David/Documents/GitHub/GMRTS-Client/GMRTSClient/Content/Factory.png</File>
+    <File>C:/Users/David/Documents/GitHub/GMRTS-Client/GMRTSClient/Content/isometric_grass_and_water.png</File>
+    <File>C:/Users/David/Documents/GitHub/GMRTS-Client/GMRTSClient/Content/Market.png</File>
+    <File>C:/Users/David/Documents/GitHub/GMRTS-Client/GMRTSClient/Content/Mine.png</File>
+    <File>C:/Users/David/Documents/GitHub/GMRTS-Client/GMRTSClient/Content/move.png</File>
+    <File>C:/Users/David/Documents/GitHub/GMRTS-Client/GMRTSClient/Content/patrol.png</File>
+    <File>C:/Users/David/Documents/GitHub/GMRTS-Client/GMRTSClient/Content/puddles.tmx</File>
+    <File>C:/Users/David/Documents/GitHub/GMRTS-Client/GMRTSClient/Content/SelectionMarker.png</File>
+    <File>C:/Users/David/Documents/GitHub/GMRTS-Client/GMRTSClient/Content/Tank.png</File>
   </SourceFiles>
   <DestFiles>
     <File xsi:nil="true" />
