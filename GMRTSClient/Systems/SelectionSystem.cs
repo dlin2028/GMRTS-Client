@@ -139,9 +139,9 @@ namespace GMRTSClient.Systems
             {
                 selectableMapper.Get(entityID).Selected = false;
             }
-            updateObservers();
+            UpdateObservers();
         }
-        private void updateObservers()
+        public void UpdateObservers()
         {
             foreach (var observer in observers)
             {
@@ -216,7 +216,7 @@ namespace GMRTSClient.Systems
                     SelectedEntities.Remove(entityId);
                 }
             }
-            updateObservers();
+            UpdateObservers();
         }
         public IDisposable Subscribe(IObserver<SelectableData> observer)
         {

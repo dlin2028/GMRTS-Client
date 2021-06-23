@@ -1,4 +1,5 @@
-﻿using GMRTSClient.ClientAction;
+﻿using GMRTSClasses.Units;
+using GMRTSClient.ClientAction;
 using GMRTSClient.Component;
 using GMRTSClient.Component.Unit;
 using GMRTSClient.UI;
@@ -7,6 +8,9 @@ using Microsoft.Xna.Framework;
 using MonoGame.Extended.Entities;
 using MonoGame.Extended.Entities.Systems;
 using MonoGame.Extended.Input.InputListeners;
+using Myra;
+using Myra.Graphics2D.TextureAtlases;
+using Myra.Graphics2D.UI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,16 +20,38 @@ namespace GMRTSClient.Systems
 {
     class UIUpdateSystem : EntityUpdateSystem, IObserver<SelectableData>
     {
+        private static UIUpdateSystem instance;
+        public static UIUpdateSystem Instance
+        {
+            get
+            {
+                return instance;
+            }
+        }
+
         private ComponentMapper<Selectable> selectionMapper;
-        private ComponentMapper<Builder> builderMapper;
-        private ComponentMapper<Factory> factoryMapper;
+        private ComponentMapper<Component.Unit.Builder> builderMapper;
+        private ComponentMapper<Component.Unit.Factory> factoryMapper;
         private readonly GameUI gameUI;
         private readonly UIStatus uiStatus;
+        private MouseListener mouseListener;
         private IDisposable unsubscriber;
-
+        private List<(ImageButton, PlayerAction)> queueButtons;
         public UIUpdateSystem(GameUI gameUI, UIStatus uiStatus)
             :base(Aspect.All(typeof(Selectable)))
         {
+            if(instance == null)
+            {
+                instance = this;
+            }
+            else
+            {
+                throw new Exception("systems are singletons");
+            }
+            mouseListener = new MouseListener();
+            mouseListener.MouseClicked += RefreshQueue;
+
+            queueButtons = new List<(ImageButton, PlayerAction)>();
             this.gameUI = gameUI;
             this.uiStatus = uiStatus;
             unsubscriber = SelectionSystem.Instance.Subscribe(this);
@@ -34,8 +60,8 @@ namespace GMRTSClient.Systems
         public override void Initialize(IComponentMapperService mapperService)
         {
             selectionMapper = mapperService.GetMapper<Selectable>();
-            builderMapper = mapperService.GetMapper<Builder>();
-            factoryMapper = mapperService.GetMapper<Factory>();
+            builderMapper = mapperService.GetMapper<Component.Unit.Builder>();
+            factoryMapper = mapperService.GetMapper<Component.Unit.Factory>();
         }
 
         public override void Update(GameTime gameTime)
@@ -52,9 +78,14 @@ namespace GMRTSClient.Systems
         {
             throw new NotImplementedException();
         }
-
+        private SelectableData lastValue;
+        public void RefreshQueue(object sender, MouseEventArgs e)
+        {
+            OnNext(lastValue);
+        }
         public void OnNext(SelectableData value)
         {
+            lastValue = value;
             if(value.SelectedEntityIds.Count == 0 && uiStatus.MouseHovering == false)
             {
                 gameUI.CurrentAction = ActionType.None;
@@ -87,7 +118,7 @@ namespace GMRTSClient.Systems
                     {
                         var builder = builderMapper.Get(entityID);
                         var builderActions = builder.Unit.Orders.Where(x => x.ActionType == ActionType.Build).Cast<BuildAction>();
-                        if(actions.SequenceEqual(builderActions))
+                        if(!actions.SequenceEqual(builderActions))
                         {
                             displayQueue = false;
                         }
@@ -95,7 +126,7 @@ namespace GMRTSClient.Systems
                     else
                     {
                         var factory = factoryMapper.Get(entityID);
-                        if(orders.SequenceEqual(factory.Orders))
+                        if(!orders.SequenceEqual(factory.Orders))
                         {
                             displayQueue = false;
                         }
@@ -114,13 +145,44 @@ namespace GMRTSClient.Systems
                     }
                 }
             }
+
+            while(queueButtons.Count > 0)
+            {
+                gameUI.BuildGrid.Widgets.Remove(queueButtons.First().Item1);
+                queueButtons.RemoveAt(0);
+            }
+
             if(displayQueue)
             {
                 if(orders == null)
                 {
-                    foreach (var action in actions)
+                    for (int i = 0; i < actions.Count(); i++)
                     {
-                        
+                        var action = actions.ElementAt(i);
+                        if(action.ActionType == ActionType.Build)
+                        {
+                            var newButton = new ImageButton();
+                            
+                            newButton.Image = ((BuildAction)action).BuildingType switch {
+                                BuildingType.Factory => MyraEnvironment.DefaultAssetManager.Load<TextureRegion>("unitassets/Factory.png"),
+                                BuildingType.Mine =>  MyraEnvironment.DefaultAssetManager.Load<TextureRegion>("unitassets/Mine.png"),
+                                BuildingType.Supermarket => MyraEnvironment.DefaultAssetManager.Load<TextureRegion>("unitassets/Market.png")
+                            };
+                            newButton.PressedImage = MyraEnvironment.DefaultAssetManager.Load<TextureRegion>("buttonassets/patrolPressed.png");
+                            newButton.MaxWidth = 100;
+                            newButton.MaxHeight = 100;
+                            newButton.GridRow = 1;
+                            newButton.GridColumn = i;
+                            newButton.Id = "BuildFactoryButton";
+                            newButton.Click += (s, e) => {
+                                gameUI.BuildGrid.Widgets.Remove((ImageButton)s);
+                                UnitActionEditSystem.Instance.DeleteAction(action);
+                                OnNext(value);
+                            };
+
+                            gameUI.BuildGrid.Widgets.Add(newButton);
+                            queueButtons.Add((newButton, action));
+                        }
                     }
                 }
                 else
