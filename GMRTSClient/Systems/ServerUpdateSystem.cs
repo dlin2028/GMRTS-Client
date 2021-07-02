@@ -75,8 +75,8 @@ namespace GMRTSClient.Systems
             client.OnActionFinish += Client_OnActionFinish;
             client.OnResourceUpdated += Client_OnResourceUpdated;
 
-            gameui.BuildTankButton.Click += (s, a) => { EnqueueFactoryOrder(GMRTSClasses.Units.MobileUnitType.Tank); };
-            gameui.BuildBuilderButton.Click += (s, a) => { EnqueueFactoryOrder(GMRTSClasses.Units.MobileUnitType.Builder); };
+            gameui.BuildTankButton.Click += (s, a) => { EnqueueFactoryOrder(GMRTSClasses.Units.MobileUnitType.Tank); UIUpdateSystem.Instance.RefreshQueue(); };
+            gameui.BuildBuilderButton.Click += (s, a) => { EnqueueFactoryOrder(GMRTSClasses.Units.MobileUnitType.Builder); UIUpdateSystem.Instance.RefreshQueue(); };
 
             startConnectionTask = client.TryStart();
             startConnectionTask.Wait();

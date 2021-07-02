@@ -38,9 +38,9 @@ namespace GMRTSClient.Systems
         private IDisposable unsubscriber;
         private List<(ImageButton, PlayerAction)> queueButtons;
         public UIUpdateSystem(GameUI gameUI, UIStatus uiStatus)
-            :base(Aspect.All(typeof(Selectable)))
+            : base(Aspect.All(typeof(Selectable)))
         {
-            if(instance == null)
+            if (instance == null)
             {
                 instance = this;
             }
@@ -83,10 +83,14 @@ namespace GMRTSClient.Systems
         {
             OnNext(lastValue);
         }
+        public void RefreshQueue()
+        {
+            OnNext(lastValue);
+        }
         public void OnNext(SelectableData value)
         {
             lastValue = value;
-            if(value.SelectedEntityIds.Count == 0 && uiStatus.MouseHovering == false)
+            if (value.SelectedEntityIds.Count == 0 && uiStatus.MouseHovering == false)
             {
                 gameUI.CurrentAction = ActionType.None;
                 gameUI.BuildMenuFlags = BuildFlags.None;
@@ -97,7 +101,7 @@ namespace GMRTSClient.Systems
             var currBuildFlags = BuildFlags.None;
             IEnumerable<FactoryOrder> orders = null;
             IEnumerable<BuildAction> actions = null;
-            if(factoryMapper.Has(value.SelectedEntityIds.First()))
+            if (factoryMapper.Has(value.SelectedEntityIds.First()))
             {
                 var factory = factoryMapper.Get(firstId);
                 orders = factory.Orders;
@@ -112,13 +116,13 @@ namespace GMRTSClient.Systems
             bool displayQueue = true;
             foreach (var entityID in value.SelectedEntityIds)
             {
-                if(displayQueue)
+                if (displayQueue)
                 {
-                    if(orders == null)
+                    if (orders == null)
                     {
                         var builder = builderMapper.Get(entityID);
                         var builderActions = builder.Unit.Orders.Where(x => x.ActionType == ActionType.Build).Cast<BuildAction>();
-                        if(!actions.SequenceEqual(builderActions))
+                        if (!actions.SequenceEqual(builderActions))
                         {
                             displayQueue = false;
                         }
@@ -126,7 +130,7 @@ namespace GMRTSClient.Systems
                     else
                     {
                         var factory = factoryMapper.Get(entityID);
-                        if(!orders.SequenceEqual(factory.Orders))
+                        if (!orders.SequenceEqual(factory.Orders))
                         {
                             displayQueue = false;
                         }
@@ -146,26 +150,27 @@ namespace GMRTSClient.Systems
                 }
             }
 
-            while(queueButtons.Count > 0)
+            while (queueButtons.Count > 0)
             {
                 gameUI.BuildGrid.Widgets.Remove(queueButtons.First().Item1);
                 queueButtons.RemoveAt(0);
             }
 
-            if(displayQueue)
+            if (displayQueue)
             {
-                if(orders == null)
+                if (orders == null)
                 {
                     for (int i = 0; i < actions.Count(); i++)
                     {
                         var action = actions.ElementAt(i);
-                        if(action.ActionType == ActionType.Build)
+                        if (action.ActionType == ActionType.Build)
                         {
                             var newButton = new ImageButton();
-                            
-                            newButton.Image = ((BuildAction)action).BuildingType switch {
+
+                            newButton.Image = ((BuildAction)action).BuildingType switch
+                            {
                                 BuildingType.Factory => MyraEnvironment.DefaultAssetManager.Load<TextureRegion>("unitassets/Factory.png"),
-                                BuildingType.Mine =>  MyraEnvironment.DefaultAssetManager.Load<TextureRegion>("unitassets/Mine.png"),
+                                BuildingType.Mine => MyraEnvironment.DefaultAssetManager.Load<TextureRegion>("unitassets/Mine.png"),
                                 BuildingType.Supermarket => MyraEnvironment.DefaultAssetManager.Load<TextureRegion>("unitassets/Market.png")
                             };
                             newButton.PressedImage = MyraEnvironment.DefaultAssetManager.Load<TextureRegion>("buttonassets/patrolPressed.png");
@@ -174,7 +179,8 @@ namespace GMRTSClient.Systems
                             newButton.GridRow = 1;
                             newButton.GridColumn = i;
                             newButton.Id = "BuildFactoryButton";
-                            newButton.Click += (s, e) => {
+                            newButton.Click += (s, e) =>
+                            {
                                 gameUI.BuildGrid.Widgets.Remove((ImageButton)s);
                                 UnitActionEditSystem.Instance.DeleteAction(action);
                                 OnNext(value);
@@ -187,7 +193,41 @@ namespace GMRTSClient.Systems
                 }
                 else
                 {
+                    for (int i = 0; i < orders.Count(); i++)
+                    {
+                        var order = orders.ElementAt(i);
+                        var newButton = new ImageButton();
 
+                        if (order is FactoryEnqueueOrder)
+                        {
+                            newButton.Image = ((FactoryEnqueueOrder)order).UnitType switch
+                            {
+                                MobileUnitType.Builder => MyraEnvironment.DefaultAssetManager.Load<TextureRegion>("unitassets/Builder.png"),
+                                MobileUnitType.Tank => MyraEnvironment.DefaultAssetManager.Load<TextureRegion>("unitassets/Tank.png")
+                            };
+                            newButton.PressedImage = MyraEnvironment.DefaultAssetManager.Load<TextureRegion>("buttonassets/patrolPressed.png");
+                            newButton.MaxWidth = 100;
+                            newButton.MaxHeight = 100;
+                            newButton.GridRow = 1;
+                            newButton.GridColumn = i;
+                            newButton.Id = "BuildFactoryButton";
+                            int orderIndex = i;
+                            newButton.Click += (s, e) =>
+                            {
+                                foreach (var facId in value.SelectedEntityIds)
+                                {
+                                    var factory = factoryMapper.Get(facId);
+                                    var entity = CreateEntity();
+                                    entity.Attach(new DTOActionData(new FactoryCancelOrder(factory.Unit.ID, factory.Orders.ElementAt(orderIndex).ID)));
+                                    factory.Orders.RemoveAt(orderIndex);
+                                }
+                                OnNext(value);
+                            };
+                            gameUI.BuildGrid.Widgets.Add(newButton);
+                            queueButtons.Add((newButton, order));
+                        }
+
+                    }
                 }
             }
 
