@@ -121,7 +121,10 @@ namespace GMRTSClient.Systems
                     if (orders == null)
                     {
                         if(!builderMapper.Has(entityID))
+                        {
+                            displayQueue = false;
                             break;
+                        }
 
                         var builder = builderMapper.Get(entityID);
                         var builderActions = builder.Unit.Orders.Where(x => x.ActionType == ActionType.Build).Cast<BuildAction>();
@@ -133,7 +136,10 @@ namespace GMRTSClient.Systems
                     else
                     {
                         if(!factoryMapper.Has(entityID))
+                        {
+                            displayQueue = false;
                             break;
+                        }
 
                         var factory = factoryMapper.Get(entityID);
                         if (!orders.SequenceEqual(factory.Orders))
