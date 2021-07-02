@@ -94,11 +94,16 @@ namespace GMRTSClient.Systems
             {
                 gameUI.CurrentAction = ActionType.None;
                 gameUI.BuildMenuFlags = BuildFlags.None;
+                while (queueButtons.Count > 0)
+                {
+                    gameUI.BuildGrid.Widgets.Remove(queueButtons.First().Item1);
+                    queueButtons.RemoveAt(0);
+                }
                 return;
             }
 
             var firstId = value.SelectedEntityIds.First();
-            var currBuildFlags = BuildFlags.None;
+            var currBuildFlags = BuildFlags.All;
             IEnumerable<FactoryOrder> orders = null;
             IEnumerable<BuildAction> actions = null;
             if (factoryMapper.Has(value.SelectedEntityIds.First()))
@@ -114,15 +119,17 @@ namespace GMRTSClient.Systems
             }
 
             bool displayQueue = true;
+            bool displayBuild = false;
             foreach (var entityID in value.SelectedEntityIds)
             {
                 if (displayQueue)
                 {
                     if (orders == null)
                     {
-                        if(!builderMapper.Has(entityID))
+                        if (!builderMapper.Has(entityID))
                         {
                             displayQueue = false;
+                            currBuildFlags = BuildFlags.None;
                             break;
                         }
 
@@ -135,9 +142,10 @@ namespace GMRTSClient.Systems
                     }
                     else
                     {
-                        if(!factoryMapper.Has(entityID))
+                        if (!factoryMapper.Has(entityID))
                         {
                             displayQueue = false;
+                            currBuildFlags = BuildFlags.None;
                             break;
                         }
 
@@ -151,15 +159,24 @@ namespace GMRTSClient.Systems
 
                 if (selectionMapper.Get(entityID).Selected)
                 {
+                    displayBuild = true;
                     if (builderMapper.Has(entityID))
                     {
-                        currBuildFlags |= builderMapper.Get(entityID).BuildFlags;
+                        currBuildFlags &= builderMapper.Get(entityID).BuildFlags;
                     }
-                    if (factoryMapper.Has(entityID))
+                    else if (factoryMapper.Has(entityID))
                     {
-                        currBuildFlags |= factoryMapper.Get(entityID).BuildFlags;
+                        currBuildFlags &= factoryMapper.Get(entityID).BuildFlags;
+                    }
+                    else
+                    {
+                        currBuildFlags = BuildFlags.None;
                     }
                 }
+            }
+            if (!displayBuild)
+            {
+                currBuildFlags = BuildFlags.None;
             }
 
             while (queueButtons.Count > 0)

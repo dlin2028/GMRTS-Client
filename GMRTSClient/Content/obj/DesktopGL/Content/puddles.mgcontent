@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PipelineBuildEvent xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-  <SourceFile>c:/Users/David/Documents/GitHub/GMRTS-Client/GMRTSClient/Content/puddles.tmx</SourceFile>
+  <SourceFile>C:/Users/David/Documents/GitHub/GMRTS-Client/GMRTSClient/Content/puddles.tmx</SourceFile>
   <SourceTime>2021-06-15T20:40:45.7802022-07:00</SourceTime>
-  <DestFile>c:/Users/David/Documents/GitHub/GMRTS-Client/GMRTSClient/Content/bin/DesktopGL/Content/puddles.xnb</DestFile>
-  <DestTime>2021-07-02T12:23:40.588466-07:00</DestTime>
+  <DestFile>C:/Users/David/Documents/GitHub/GMRTS-Client/GMRTSClient/Content/bin/DesktopGL/Content/puddles.xnb</DestFile>
+  <DestTime>2021-07-02T12:27:21.1532694-07:00</DestTime>
   <Importer>TiledMapImporter</Importer>
   <ImporterTime>2020-08-29T17:17:30-07:00</ImporterTime>
   <Processor>TiledMapProcessor</Processor>
   <ProcessorTime>2020-08-29T17:17:30-07:00</ProcessorTime>
   <Dependencies />
   <BuildAsset>
-    <string>c:/Users/David/Documents/GitHub/GMRTS-Client/GMRTSClient/Content/bin/DesktopGL/Content/isometric_grass_and_water_0.xnb</string>
+    <string>C:/Users/David/Documents/GitHub/GMRTS-Client/GMRTSClient/Content/bin/DesktopGL/Content/isometric_grass_and_water_0.xnb</string>
   </BuildAsset>
   <BuildOutput />
 </PipelineBuildEvent>

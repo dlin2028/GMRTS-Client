@@ -33,9 +33,10 @@ namespace GMRTSClient.UI
 	}
 	[Flags] public enum BuildFlags
 	{
-		None,
-		Building,
-		Unit
+		None = 0,
+		Building = 1,
+		Unit = 2,
+		All = 3
 	} 
 
 	public partial class GameUI
