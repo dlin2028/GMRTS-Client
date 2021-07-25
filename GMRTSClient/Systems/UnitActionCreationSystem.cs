@@ -211,6 +211,7 @@ namespace GMRTSClient.Systems
                 default:
                     break;
             }
+            SelectionSystem.Instance.UpdateObservers();
 
             if (!keyState.IsShiftDown())
             {

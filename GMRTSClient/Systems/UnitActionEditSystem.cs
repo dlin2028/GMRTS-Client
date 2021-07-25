@@ -21,12 +21,28 @@ namespace GMRTSClient.Systems
         private ComponentMapper<FancyRect> rectMapper;
         private ComponentMapper<Unit> unitMapper;
         private readonly OrthographicCamera camera;
+        private static UnitActionEditSystem instance;
+        public static UnitActionEditSystem Instance{
+            get
+            {
+                return instance;
+            }
+        }
+
         int currentEntityId;
         UnitAction currentAction;
         Vector2 oldActionPosition;
         public UnitActionEditSystem(OrthographicCamera camera)
             : base(Aspect.One(typeof(PlayerAction), typeof(Unit)))
         {
+            if(instance == null)
+            {
+                instance = this;
+            }
+            else
+            {
+                throw new Exception("systems are singletons");
+            }
             this.camera = camera;
             mouseListener = new MouseListener();
             mouseListener.MouseDragStart += MouseListener_MouseDragStart;
@@ -121,6 +137,29 @@ namespace GMRTSClient.Systems
             deleteEntity.Attach(deleteAction);
             deleteEntity.Attach(new DTOActionData(deleteAction));
             DestroyEntity(entityId);
+        }
+
+        public void DeleteAction(UnitAction unitAction)
+        {
+             HashSet<UnitAction> affectedActions = new HashSet<UnitAction>();
+            foreach (var unit in unitAction.Units)
+            {
+                var nextAction = unit.Orders.Find(unitAction).Next;
+                if (nextAction != null)
+                {
+                    affectedActions.Add(nextAction.Value);
+                }
+                unit.Orders.Remove(unitAction);
+            }
+            foreach (var a in affectedActions)
+            {
+                a.UpdateCollections();
+            }
+            var deleteEntity = CreateEntity();
+            var deleteAction = new DeleteAction(unitAction.Units.ToArray(), unitAction);
+            deleteEntity.Attach(deleteAction);
+            deleteEntity.Attach(new DTOActionData(deleteAction));
+            DestroyEntity(ActiveEntities.First(x => actionMapper.Get(x) == unitAction));
         }
 
 
