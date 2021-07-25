@@ -1,4 +1,3 @@
-C:\Users\David\Documents\GitHub\GMRTS-Client\GMRTSClient\obj\Debug\netcoreapp3.1\GMRTSClient.csprojAssemblyReference.cache
 C:\Users\David\Documents\GitHub\GMRTS-Client\GMRTSClient\obj\Debug\netcoreapp3.1\GMRTSClient.AssemblyInfoInputs.cache
 C:\Users\David\Documents\GitHub\GMRTS-Client\GMRTSClient\obj\Debug\netcoreapp3.1\GMRTSClient.AssemblyInfo.cs
 C:\Users\David\Documents\GitHub\GMRTS-Client\GMRTSClient\obj\Debug\netcoreapp3.1\GMRTSClient.csproj.CoreCompileInputs.cache
@@ -83,3 +82,4 @@ C:\Users\David\Documents\GitHub\GMRTS-Client\GMRTSClient\obj\Debug\netcoreapp3.1
 C:\Users\David\Documents\GitHub\GMRTS-Client\GMRTSClient\obj\Debug\netcoreapp3.1\GMRTSClient.dll
 C:\Users\David\Documents\GitHub\GMRTS-Client\GMRTSClient\obj\Debug\netcoreapp3.1\GMRTSClient.pdb
 C:\Users\David\Documents\GitHub\GMRTS-Client\GMRTSClient\obj\Debug\netcoreapp3.1\GMRTSClient.genruntimeconfig.cache
+C:\Users\David\Documents\GitHub\GMRTS-Client\GMRTSClient\obj\Debug\netcoreapp3.1\GMRTSClient.csproj.AssemblyReference.cache

@@ -5,6 +5,7 @@ using MonoGame.Extended;
 using MonoGame.Extended.Entities;
 using MonoGame.Extended.Entities.Systems;
 using MonoGame.Extended.Sprites;
+using System;
 
 namespace GMRTSClient.Systems
 {
@@ -33,6 +34,8 @@ namespace GMRTSClient.Systems
             {
                 var sprite = spriteMapper.Get(entity);
                 var transform = transformMapper.Get(entity);
+                float Z = 0;
+                transform.Position = new Vector2((transform.Position.X - Z) / (float)Math.Sqrt(2), (transform.Position.X + 2 * transform.Position.Y + Z) / (float)Math.Sqrt(6));
                 spriteBatch.Draw(sprite, transform);
             }
         }
